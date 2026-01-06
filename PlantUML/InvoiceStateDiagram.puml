@@ -1,0 +1,33 @@
+@startuml
+' https://plantuml.com/state-diagram
+
+skinparam state {
+  BackgroundColor White
+  BorderColor Black
+}
+
+title Діаграма станів рахунку Invoice
+
+[*] --> DRAFT : createDraft
+
+DRAFT --> ISSUED : issue\n(totalAmount > 0)
+DRAFT --> PAID : issue\n(totalAmount = 0)\n[гарантійний ремонт]
+DRAFT --> CANCELED : cancel
+
+ISSUED --> PARTIALLY_PAID : applyPayment\n(partial)
+ISSUED --> PAID : applyPayment\n(full)
+ISSUED --> OVERDUE : dueDate expired
+ISSUED --> CANCELED : cancel
+
+PARTIALLY_PAID --> PAID : applyPayment\n(full)
+PARTIALLY_PAID --> OVERDUE : dueDate expired
+PARTIALLY_PAID --> CANCELED : cancel
+
+OVERDUE --> PARTIALLY_PAID : applyPayment\n(partial)
+OVERDUE --> PAID : applyPayment\n(full)
+OVERDUE --> CANCELED : cancel
+
+PAID --> [*]
+CANCELED --> [*]
+
+@enduml

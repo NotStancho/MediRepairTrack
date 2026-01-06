@@ -1,0 +1,38 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+left to right direction
+
+actor "Інженер" as Engineer
+
+rectangle "MediRepairTrack\n(діалог інженера)" {
+
+    usecase "Переглянути призначені\nзаявки на ремонт" as UC_ViewAssignedClaims
+    usecase "Переглянути заявку\nна ремонт" as UC_ViewClaim
+
+    usecase "Додати запис\nвиконаних робіт" as UC_AddWorkLog
+    usecase "Додати інформацію\nпро використані запчастини" as UC_AddParts
+    usecase "Додати інформацію\nпро доставку" as UC_AddDelivery
+
+    usecase "Переглянути рахунок" as UC_ViewInvoice
+
+    note bottom of UC_ViewInvoice
+      Інженер може:
+      – додавати додаткові позиції рахунку (OTHER)
+      – редагувати додаткові позиції
+      – видаляти додаткові позиції
+
+      Операції доступні лише у статусі рахунку DRAFT
+    end note
+
+}
+
+Engineer --> UC_ViewAssignedClaims
+Engineer --> UC_ViewInvoice
+
+UC_ViewAssignedClaims .> UC_ViewClaim : <<include>>
+
+UC_AddWorkLog ..> UC_ViewClaim : <<extend>>
+UC_AddParts ..> UC_ViewClaim : <<extend>>
+UC_AddDelivery ..> UC_ViewClaim : <<extend>>
+@enduml

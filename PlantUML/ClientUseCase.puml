@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+left to right direction
+
+actor "Клієнт" as Client
+
+rectangle "MediRepairTrack\n(діалог клієнта)" {
+
+    usecase "Створити заявку\nна ремонт" as UC_CreateClaim
+    usecase "Перегляд своїх заявок\nта їх статус" as ViewOwnClaimsAndStatus
+    usecase "Переглянути рахунки та статус" as UC_ViewInvoices
+
+    usecase "Ініціювати оплату" as UC_InitPayment
+    usecase "Завершити оплату" as UC_CompletePayment
+}
+
+Client --> UC_CreateClaim
+Client --> ViewOwnClaimsAndStatus
+Client --> UC_ViewInvoices
+Client --> UC_InitPayment
+
+UC_InitPayment <.. UC_CompletePayment : <<extend>>
+
+@enduml

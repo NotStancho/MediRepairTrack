@@ -1,0 +1,234 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber 1.1
+title Діаграма послідовності формування рахунку Invoice
+
+actor Manager as "Менеджер"
+actor System as "Система (події)"
+
+boundary UI as "Web UI"
+control InvoiceController
+participant InvoiceService
+participant BillingService
+participant InvoiceStatusMachine
+participant InvoiceRepository
+participant InvoiceDetailRepository
+
+== Створення рахунку (DRAFT) ==
+
+Manager -> UI : Натискає «Створити рахунок»
+activate Manager
+activate UI
+UI -> InvoiceController : POST /api/invoice/claim/{claimId}
+activate InvoiceController
+
+InvoiceController -> InvoiceService : createDraft(claimId)
+activate InvoiceService
+
+InvoiceService -> InvoiceRepository : save(Invoice[DRAFT])
+activate InvoiceRepository
+InvoiceRepository --> InvoiceService : Invoice
+deactivate InvoiceRepository
+
+InvoiceService --> InvoiceController : InvoiceResponseDTO
+deactivate InvoiceService
+
+InvoiceController --> UI : Display created invoice
+deactivate InvoiceController
+Manager --> UI : View created invoice
+deactivate UI
+deactivate Manager
+
+== Автоматичний секційний перерахунок (події) ==
+
+System -> InvoiceService : recalculateLabor/Parts/Delivery(claimId)
+activate InvoiceService
+activate System
+deactivate System
+
+' getEditableInvoiceByClaim(claimId) робить findByClaimId + перевірку статусу
+InvoiceService -> InvoiceRepository : findByClaimId(claimId)
+activate InvoiceRepository
+InvoiceRepository --> InvoiceService : Invoice | null
+deactivate InvoiceRepository
+
+alt invoice == null
+  InvoiceService --> InvoiceService : return (інвойс відсутній)
+else invoice != null
+  InvoiceService -> InvoiceStatusMachine : allowsRecalculate(invoice.status)
+  activate InvoiceStatusMachine
+  InvoiceStatusMachine --> InvoiceService : true/false
+  deactivate InvoiceStatusMachine
+
+  alt status not allowed
+    InvoiceService --> InvoiceService : return (інвойс не редагується)
+  else status allowed
+
+    alt секція = LABOR
+      InvoiceService -> InvoiceDetailRepository : deleteByInvoiceIdAndItemType(invoiceId, LABOR)
+      activate InvoiceDetailRepository
+      InvoiceDetailRepository --> InvoiceService : items removed
+      deactivate InvoiceDetailRepository
+
+      InvoiceService -> BillingService : calculateLabor(claimId)
+      activate BillingService
+      BillingService --> InvoiceService : BillingSectionResultDTO
+      deactivate BillingService
+
+      InvoiceService -> InvoiceDetailRepository : save(InvoiceDetail[LABOR]...)
+      activate InvoiceDetailRepository
+      InvoiceDetailRepository --> InvoiceService : saved
+      deactivate InvoiceDetailRepository
+
+    else секція = PARTS
+      InvoiceService -> InvoiceDetailRepository : deleteByInvoiceIdAndItemType(invoiceId, PARTS)
+      activate InvoiceDetailRepository
+      InvoiceDetailRepository --> InvoiceService : items removed
+      deactivate InvoiceDetailRepository
+
+      InvoiceService -> BillingService : calculateParts(claimId)
+      activate BillingService
+      BillingService --> InvoiceService : BillingSectionResultDTO
+      deactivate BillingService
+
+      InvoiceService -> InvoiceDetailRepository : save(InvoiceDetail[PARTS]...)
+      activate InvoiceDetailRepository
+      InvoiceDetailRepository --> InvoiceService : saved
+      deactivate InvoiceDetailRepository
+
+    else секція = DELIVERY
+      InvoiceService -> InvoiceDetailRepository : deleteByInvoiceIdAndItemType(invoiceId, DELIVERY)
+      activate InvoiceDetailRepository
+      InvoiceDetailRepository --> InvoiceService : items removed
+      deactivate InvoiceDetailRepository
+
+      InvoiceService -> BillingService : calculateDelivery(claimId)
+      activate BillingService
+      BillingService --> InvoiceService : BillingSectionResultDTO
+      deactivate BillingService
+
+      InvoiceService -> InvoiceDetailRepository : save(InvoiceDetail[DELIVERY]...)
+      activate InvoiceDetailRepository
+      InvoiceDetailRepository --> InvoiceService : saved
+      deactivate InvoiceDetailRepository
+    end
+
+    ' refreshInvoiceTotals(invoice): sumTotalBeforeDiscount + sumTotalPrice + invoiceRepository.save
+    InvoiceService -> InvoiceDetailRepository : sumTotalBeforeDiscount(invoiceId)
+    activate InvoiceDetailRepository
+    InvoiceDetailRepository --> InvoiceService : Decimal
+    deactivate InvoiceDetailRepository
+
+    InvoiceService -> InvoiceDetailRepository : sumTotalPrice(invoiceId)
+    activate InvoiceDetailRepository
+    InvoiceDetailRepository --> InvoiceService : Decimal
+    deactivate InvoiceDetailRepository
+
+    InvoiceService -> InvoiceRepository : save(updated totals)
+    activate InvoiceRepository
+    InvoiceRepository --> InvoiceService : updated Invoice
+    deactivate InvoiceRepository
+
+  end
+end
+
+deactivate InvoiceService
+deactivate System
+
+
+== Ручний перерахунок рахунку ==
+
+Manager -> UI : Натискає «Перерахувати»
+activate Manager
+activate UI
+UI -> InvoiceController : POST /api/invoice/{id}/recalculate
+activate InvoiceController
+
+InvoiceController -> InvoiceService : recalculate(invoiceId)
+activate InvoiceService
+
+InvoiceService -> InvoiceRepository : findById(invoiceId)
+activate InvoiceRepository
+InvoiceRepository --> InvoiceService : Invoice
+deactivate InvoiceRepository
+
+InvoiceService -> InvoiceStatusMachine : allowsRecalculate(invoice.status)
+activate InvoiceStatusMachine
+InvoiceStatusMachine --> InvoiceService : true/false
+deactivate InvoiceStatusMachine
+
+alt status not allowed
+  InvoiceService --> InvoiceController : error (409)
+else status allowed
+
+  InvoiceService -> BillingService : calculateFull(claimId)
+  activate BillingService
+  BillingService --> InvoiceService : BillingResultDTO
+  deactivate BillingService
+
+  InvoiceService -> InvoiceDetailRepository : deleteAutoGeneratedItems(invoiceId)  ' (видаляє все, крім OTHER)
+  activate InvoiceDetailRepository
+  InvoiceDetailRepository --> InvoiceService : items removed
+  deactivate InvoiceDetailRepository
+
+  InvoiceService -> InvoiceDetailRepository : save(InvoiceDetail[LABOR/PARTS/DELIVERY])
+  activate InvoiceDetailRepository
+  InvoiceDetailRepository --> InvoiceService : saved
+  deactivate InvoiceDetailRepository
+
+  InvoiceService -> InvoiceRepository : save(updated invoice totals)
+  activate InvoiceRepository
+  InvoiceRepository --> InvoiceService : updated Invoice
+  deactivate InvoiceRepository
+
+  InvoiceService --> InvoiceController : InvoiceResponseDTO
+end
+
+deactivate InvoiceService
+InvoiceController --> UI : Display recalculated invoice
+Manager --> UI : View recalculated invoice
+deactivate UI
+deactivate InvoiceController
+deactivate Manager
+
+== Видача рахунку (ISSUE) ==
+
+Manager -> UI : Натискає «Видати рахунок»
+activate Manager
+activate UI
+UI -> InvoiceController : POST /api/invoice/{id}/issue
+activate InvoiceController
+
+InvoiceController -> InvoiceService : issue(invoiceId)
+activate InvoiceService
+
+note right of InvoiceService
+Перевірка:
+invoice.status == DRAFT
+end note
+
+InvoiceService -> InvoiceService : recalculate(invoiceId)
+
+alt totalAmount == 0\n(гарантійний ремонт)
+    InvoiceService -> InvoiceRepository : save(status = PAID, closedAt)
+    activate InvoiceRepository
+    InvoiceRepository --> InvoiceService : updated Invoice
+    deactivate InvoiceRepository
+else totalAmount > 0
+    InvoiceService -> InvoiceRepository : save(status = ISSUED, dueAt)
+    activate InvoiceRepository
+    InvoiceRepository --> InvoiceService : updated Invoice
+    deactivate InvoiceRepository
+end
+
+InvoiceService --> InvoiceController : InvoiceResponseDTO
+deactivate InvoiceService
+
+InvoiceController --> UI : Display issued invoice
+Manager --> UI : View issued invoice
+deactivate UI
+deactivate Manager
+deactivate InvoiceController
+
+@enduml
