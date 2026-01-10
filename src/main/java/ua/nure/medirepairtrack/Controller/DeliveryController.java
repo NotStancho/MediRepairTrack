@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.nure.medirepairtrack.DTO.DeliveryDTO.*;
-import ua.nure.medirepairtrack.DTO.DeliveryDTO.*;
 import ua.nure.medirepairtrack.Entity.Delivery.DeliveryStatus;
 import ua.nure.medirepairtrack.Service.DeliveryService;
 

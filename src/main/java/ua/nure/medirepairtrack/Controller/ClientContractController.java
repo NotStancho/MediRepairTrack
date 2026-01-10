@@ -3,10 +3,6 @@ package ua.nure.medirepairtrack.Controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.ClientContractDTO.ClientContractResponseDTO;
-import ua.nure.medirepairtrack.DTO.ClientContractDTO.ContractDiscountDTO;
-import ua.nure.medirepairtrack.DTO.ClientContractDTO.CreateClientContractDTO;
-import ua.nure.medirepairtrack.DTO.ClientContractDTO.UpdateClientContractFullDTO;
 import ua.nure.medirepairtrack.DTO.ClientContractDTO.*;
 import ua.nure.medirepairtrack.Service.ClientContractService;
 

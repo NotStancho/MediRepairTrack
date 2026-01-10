@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.ClientDTO.*;
-import ua.nure.medirepairtrack.DTO.ClientDTO.*;
 import ua.nure.medirepairtrack.Entity.Client.Client;
 import ua.nure.medirepairtrack.Entity.User.Role;
 import ua.nure.medirepairtrack.Entity.User.User;
-import ua.nure.medirepairtrack.Exception.BadRequestException;
-import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.*;
 import ua.nure.medirepairtrack.Repository.ClientRepository;
 import ua.nure.medirepairtrack.Repository.UserRepository;
 

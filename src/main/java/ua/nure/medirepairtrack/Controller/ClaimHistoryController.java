@@ -2,10 +2,6 @@ package ua.nure.medirepairtrack.Controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.ClaimHistoryDTO.ClaimHistoryResponseDTO;
-import ua.nure.medirepairtrack.DTO.ClaimHistoryDTO.CreateCommentDTO;
-import ua.nure.medirepairtrack.DTO.ClaimHistoryDTO.CreateWorkLogDTO;
-import ua.nure.medirepairtrack.DTO.ClaimHistoryDTO.UpdateWorkLogDTO;
 import ua.nure.medirepairtrack.DTO.ClaimHistoryDTO.*;
 import ua.nure.medirepairtrack.Service.ClaimHistoryService;
 

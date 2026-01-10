@@ -3,8 +3,6 @@ package ua.nure.medirepairtrack.Controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.PricingDTO.PricingConfigResponseDTO;
-import ua.nure.medirepairtrack.DTO.PricingDTO.UpdatePricingConfigDTO;
 import ua.nure.medirepairtrack.DTO.PricingDTO.*;
 import ua.nure.medirepairtrack.Entity.Claim.RepairType;
 import ua.nure.medirepairtrack.Service.PricingConfigService;

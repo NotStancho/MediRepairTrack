@@ -3,10 +3,6 @@ package ua.nure.medirepairtrack.Controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.EquipmentDTO.CreateEquipmentDTO;
-import ua.nure.medirepairtrack.DTO.EquipmentDTO.EquipmentFullResponseDTO;
-import ua.nure.medirepairtrack.DTO.EquipmentDTO.EquipmentResponseDTO;
-import ua.nure.medirepairtrack.DTO.EquipmentDTO.UpdateEquipmentDTO;
 import ua.nure.medirepairtrack.DTO.EquipmentDTO.*;
 import ua.nure.medirepairtrack.Service.EquipmentService;
 

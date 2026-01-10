@@ -3,14 +3,11 @@ package ua.nure.medirepairtrack.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.nure.medirepairtrack.DTO.EquipmentModelDTO.CreateEquipmentModelDTO;
-import ua.nure.medirepairtrack.DTO.EquipmentModelDTO.EquipmentModelResponseDTO;
-import ua.nure.medirepairtrack.DTO.EquipmentModelDTO.UpdateEquipmentModelDTO;
 import ua.nure.medirepairtrack.Entity.EquipmentModel.EquipmentModel;
 import ua.nure.medirepairtrack.Entity.EquipmentModel.EquipmentType;
 import ua.nure.medirepairtrack.DTO.EquipmentModelDTO.*;
 import ua.nure.medirepairtrack.Entity.EquipmentModel.*;
-import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.*;
 import ua.nure.medirepairtrack.Repository.EquipmentModelRepository;
 
 import java.time.LocalDateTime;

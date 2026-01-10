@@ -2,14 +2,9 @@ package ua.nure.medirepairtrack.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ua.nure.medirepairtrack.DTO.UserDTO.CreateUserDTO;
-import ua.nure.medirepairtrack.DTO.UserDTO.RegisterUserDTO;
-import ua.nure.medirepairtrack.DTO.UserDTO.UpdateUserDTO;
-import ua.nure.medirepairtrack.DTO.UserDTO.UserResponseDTO;
-import ua.nure.medirepairtrack.Entity.User.Role;
-import ua.nure.medirepairtrack.Entity.User.User;
-import ua.nure.medirepairtrack.Exception.BadRequestException;
-import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.DTO.UserDTO.*;
+import ua.nure.medirepairtrack.Entity.User.*;
+import ua.nure.medirepairtrack.Exception.*;
 import ua.nure.medirepairtrack.Repository.UserRepository;
 
 import java.time.LocalDateTime;

@@ -1,13 +1,7 @@
 package ua.nure.medirepairtrack.Controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ua.nure.medirepairtrack.DTO.ClaimEmployeeDTO.AssignedActiveClaimDTO;
-import ua.nure.medirepairtrack.DTO.ClaimEmployeeDTO.AssignedClaimDTO;
-import ua.nure.medirepairtrack.DTO.ClaimEmployeeDTO.ClaimEmployeeResponseDTO;
+import org.springframework.web.bind.annotation.*;
 import ua.nure.medirepairtrack.DTO.ClaimEmployeeDTO.*;
 import ua.nure.medirepairtrack.Service.ClaimEmployeeService;
 

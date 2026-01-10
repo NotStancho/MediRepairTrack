@@ -2,15 +2,11 @@ package ua.nure.medirepairtrack.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ua.nure.medirepairtrack.DTO.ClientContractDTO.ClientContractResponseDTO;
-import ua.nure.medirepairtrack.DTO.ClientContractDTO.ContractDiscountDTO;
-import ua.nure.medirepairtrack.DTO.ClientContractDTO.CreateClientContractDTO;
-import ua.nure.medirepairtrack.DTO.ClientContractDTO.UpdateClientContractFullDTO;
 import ua.nure.medirepairtrack.DTO.ClientContractDTO.*;
 import ua.nure.medirepairtrack.Entity.Client.Client;
 import ua.nure.medirepairtrack.Entity.ClientContract.ClientContract;
 import ua.nure.medirepairtrack.Entity.ClientContract.ContractStatus;
-import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.*;
 import ua.nure.medirepairtrack.Repository.ClientContractRepository;
 import ua.nure.medirepairtrack.Repository.ClientRepository;
 

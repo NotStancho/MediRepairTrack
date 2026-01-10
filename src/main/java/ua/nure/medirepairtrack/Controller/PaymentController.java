@@ -3,8 +3,6 @@ package ua.nure.medirepairtrack.Controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.PaymentDTO.CreatePaymentDTO;
-import ua.nure.medirepairtrack.DTO.PaymentDTO.PaymentResponseDTO;
 import ua.nure.medirepairtrack.DTO.PaymentDTO.*;
 import ua.nure.medirepairtrack.Service.PaymentService;
 

@@ -4,15 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.nure.medirepairtrack.DTO.EquipmentDTO.CreateEquipmentDTO;
-import ua.nure.medirepairtrack.DTO.EquipmentDTO.EquipmentFullResponseDTO;
-import ua.nure.medirepairtrack.DTO.EquipmentDTO.EquipmentResponseDTO;
-import ua.nure.medirepairtrack.DTO.EquipmentDTO.UpdateEquipmentDTO;
 import ua.nure.medirepairtrack.DTO.EquipmentDTO.*;
 import ua.nure.medirepairtrack.Entity.Equipment.Equipment;
 import ua.nure.medirepairtrack.Entity.EquipmentModel.EquipmentModel;
-import ua.nure.medirepairtrack.Exception.BadRequestException;
-import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.*;
 import ua.nure.medirepairtrack.Repository.EquipmentModelRepository;
 import ua.nure.medirepairtrack.Repository.EquipmentRepository;
 

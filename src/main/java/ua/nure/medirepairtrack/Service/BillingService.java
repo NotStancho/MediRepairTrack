@@ -2,9 +2,6 @@ package ua.nure.medirepairtrack.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ua.nure.medirepairtrack.DTO.BillingDTO.BillingItemDTO;
-import ua.nure.medirepairtrack.DTO.BillingDTO.BillingResultDTO;
-import ua.nure.medirepairtrack.DTO.BillingDTO.BillingSectionResultDTO;
 import ua.nure.medirepairtrack.DTO.BillingDTO.*;
 import ua.nure.medirepairtrack.DTO.ClaimDTO.ClaimResponseDTO;
 import ua.nure.medirepairtrack.DTO.ClaimHistoryDTO.ClaimHistoryResponseDTO;
