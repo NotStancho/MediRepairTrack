@@ -42,7 +42,7 @@ export default function ClaimDetailsPage() {
     }
 
     return (
-        <div className="space-y-2">
+        <div>
             <ClaimHeader
                 claim={claim}
                 equipment={equipment}

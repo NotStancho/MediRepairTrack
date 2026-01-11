@@ -32,8 +32,10 @@ export default function AppLayout() {
             </header>
 
             {/* Main */}
-            <main className="col-start-2 row-start-2 overflow-y-auto overflow-x-hidden p-4 min-w-0">
-                <Outlet />
+            <main className="col-start-2 row-start-2 overflow-y-auto overflow-x-hidden min-w-0">
+                <div className="p-4">
+                    <Outlet />
+                </div>
             </main>
         </div>
     );

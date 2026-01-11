@@ -70,7 +70,7 @@ export default function ClaimTabs({ claim }: Props) {
 
 
     return (
-        <div className="space-y-4">
+        <div>
             {/* Tabs header */}
             <div className="sticky top-0 z-10 bg-gray-50">
                 <div className="relative border-b">
