@@ -186,65 +186,67 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
             )}
 
             {/* Items */}
-            <table className="w-full text-sm border rounded">
-                <thead className="bg-gray-100">
-                <tr>
-                    <th className="p-2 border">Тип</th>
-                    <th className="p-2 border">Опис</th>
-                    <th className="p-2 border text-right">Кількість</th>
-                    <th className="p-2 border text-right">Ціна</th>
-                    <th className="p-2 border text-right">Сума</th>
-                    {hasEditableOtherItems && (
-                        <th className="p-2 border w-10">Дії </th>
-                    )}
-                </tr>
-                </thead>
-
-                <tbody>
-                {invoice.items.map((i) => (
-                    <tr key={i.id}>
-                        <td className="p-2 border">
-                            {INVOICE_ITEM_LABELS[i.itemType]}
-                        </td>
-                        <td className="p-2 border">
-                            {i.description}
-                        </td>
-                        <td className="p-2 border text-right">
-                            {i.quantity} {i.unitName}
-                        </td>
-                        <td className="p-2 border text-right font-mono">
-                            {formatMoney(i.pricePerUnit)}
-                        </td>
-                        <td className="p-2 border text-right font-mono font-semibold">
-                            {formatMoney(i.totalPrice)}
-                        </td>
-
-                        {/*{hasEditableOtherItems &&*/}
-                        {/*    i.itemType === 'OTHER' && (*/}
-                        {/*        <td className="p-2 border text-right">*/}
-                        {/*            <RowActionsMenu*/}
-                        {/*                onEdit={() => openEditOther(i) }*/}
-                        {/*                onDelete={() => setDeleteId(i.id) }*/}
-                        {/*            />*/}
-                        {/*        </td>*/}
-                        {/*    )}*/}
-
+            <div className="overflow-x-auto">
+                <table className="w-full text-sm border rounded">
+                    <thead className="bg-gray-100">
+                    <tr>
+                        <th className="p-2 border">Тип</th>
+                        <th className="p-2 border">Опис</th>
+                        <th className="p-2 border text-right">Кількість</th>
+                        <th className="p-2 border text-right">Ціна</th>
+                        <th className="p-2 border text-right">Сума</th>
                         {hasEditableOtherItems && (
-                            i.itemType === 'OTHER' ? (
-                                <td className="p-2 border text-right">
-                                    <RowActionsMenu
-                                        onEdit={() => openEditOther(i)}
-                                        onDelete={() => setDeleteId(i.id)}
-                                    />
-                                </td>
-                            ) : (
-                                <td className="p-2 border" />
-                            )
+                            <th className="p-2 border w-10">Дії </th>
                         )}
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                    {invoice.items.map((i) => (
+                        <tr key={i.id}>
+                            <td className="p-2 border">
+                                {INVOICE_ITEM_LABELS[i.itemType]}
+                            </td>
+                            <td className="p-2 border">
+                                {i.description}
+                            </td>
+                            <td className="p-2 border text-right">
+                                {i.quantity} {i.unitName}
+                            </td>
+                            <td className="p-2 border text-right font-mono">
+                                {formatMoney(i.pricePerUnit)}
+                            </td>
+                            <td className="p-2 border text-right font-mono font-semibold">
+                                {formatMoney(i.totalPrice)}
+                            </td>
+
+                            {/*{hasEditableOtherItems &&*/}
+                            {/*    i.itemType === 'OTHER' && (*/}
+                            {/*        <td className="p-2 border text-right">*/}
+                            {/*            <RowActionsMenu*/}
+                            {/*                onEdit={() => openEditOther(i) }*/}
+                            {/*                onDelete={() => setDeleteId(i.id) }*/}
+                            {/*            />*/}
+                            {/*        </td>*/}
+                            {/*    )}*/}
+
+                            {hasEditableOtherItems && (
+                                i.itemType === 'OTHER' ? (
+                                    <td className="p-2 border text-right">
+                                        <RowActionsMenu
+                                            onEdit={() => openEditOther(i)}
+                                            onDelete={() => setDeleteId(i.id)}
+                                        />
+                                    </td>
+                                ) : (
+                                    <td className="p-2 border" />
+                                )
+                            )}
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* Totals */}
             <div className="flex justify-end text-sm">
