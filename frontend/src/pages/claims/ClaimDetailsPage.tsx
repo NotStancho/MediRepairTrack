@@ -42,13 +42,13 @@ export default function ClaimDetailsPage() {
     }
 
     return (
-        <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <div className="space-y-2">
             <ClaimHeader
                 claim={claim}
                 equipment={equipment}
             />
 
-            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            <div>
                 <ClaimTabs claim={claim} />
             </div>
         </div>

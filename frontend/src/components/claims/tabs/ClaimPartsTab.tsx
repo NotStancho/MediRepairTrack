@@ -1,16 +1,11 @@
 import {useEffect, useMemo, useState} from 'react';
 import { getUsedPartsByClaim } from '../../../api/usedPart';
-import type { UsedPart } from '../../../types/usedPart.ts';
+import type { UsedPart } from '../../../types/usedPart';
+import { formatMoney } from '../../../utils/moneyFormat';
 
 interface Props {
     claimId: number;
 }
-
-const format = (v: number) =>
-    v.toLocaleString('uk-UA', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
 
 const formatQty = (v: number) =>
     Number.isInteger(v) ? v.toString() : v.toString();
@@ -48,7 +43,7 @@ export default function ClaimPartsTab({ claimId }: Props) {
 
     return (
         <div className="relative space-y-4">
-            <div className="overflow-x-auto max-h-[60vh]">
+            <div className="overflow-x-auto">
                 <table className="w-full text-sm border rounded">
                     <thead className="bg-gray-100 text-left sticky top-0 z-10">
                     <tr>
@@ -79,11 +74,11 @@ export default function ClaimPartsTab({ claimId }: Props) {
                                 </td>
 
                                 <td className="p-2 border text-right font-mono">
-                                    {format(p.unitPrice)}
+                                    {formatMoney(p.unitPrice)}
                                 </td>
 
                                 <td className="p-2 border text-right font-mono font-semibold">
-                                    {format(total)}
+                                    {formatMoney(total)}
                                 </td>
                             </tr>
                         );
@@ -100,7 +95,7 @@ export default function ClaimPartsTab({ claimId }: Props) {
                         Всього запчастин:
                     </span>
                         <span className="font-semibold font-mono">
-                        {format(totalSum)}
+                        {formatMoney(totalSum)}
                     </span>
                     </div>
                 </div>

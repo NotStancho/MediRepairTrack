@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import type {AuthUser} from "../types/auth.ts";
+import type {AuthUser} from "../types/auth";
+import { FiChevronDown } from 'react-icons/fi';
+
 
 export default function Header() {
     const { user, signOut } = useAuth();
@@ -53,16 +55,7 @@ export default function Header() {
     if (!user) return null;
 
     return (
-        <header
-            className="
-                sticky top-0 z-30
-                h-12
-                bg-white
-                border-b border-gray-200
-                flex items-center
-                px-4
-            "
-        >
+        <header className="h-12 bg-white border-b border-gray-200 flex items-center px-4 z-30">
             <div className="font-medium text-gray-700">
                 {getCabinetTitle(user)}
             </div>
@@ -88,15 +81,14 @@ export default function Header() {
                         {user.lastName} {user.firstName}
                     </span>
 
-                    <span
+                    <FiChevronDown
+                        size={16}
                         className={`
                             text-gray-500
-                            transition-transform
+                            transition-transform duration-200
                             ${open ? 'rotate-180' : ''}
                         `}
-                    >
-                        ▾
-                    </span>
+                    />
                 </button>
 
                 {open && (
