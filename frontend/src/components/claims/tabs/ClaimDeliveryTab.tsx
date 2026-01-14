@@ -2,16 +2,11 @@ import { useEffect, useState } from 'react';
 import { getDeliveriesByClaim } from '../../../api/delivery';
 import type { Delivery } from '../../../types/delivery';
 import { DELIVERY_PROVIDER_LABELS, DELIVERY_STATUS_LABELS, DELIVERY_TYPE_LABELS } from '../../../utils/deliveryLabels';
+import { formatMoney } from '../../../utils/moneyFormat';
 
 interface Props {
     claimId: number;
 }
-
-const format = (v: number) =>
-    v.toLocaleString('uk-UA', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
 
 export default function ClaimDeliveryTab({ claimId }: Props) {
     const [items, setItems] = useState<Delivery[]>([]);
@@ -74,12 +69,12 @@ export default function ClaimDeliveryTab({ claimId }: Props) {
 
                             <td className="p-2 border text-right font-mono">
                                 {d.type === 'ENGINEER_ON_SITE' && d.pricePerUnit != null
-                                    ? `${format(d.pricePerUnit)} / км`
+                                    ? `${formatMoney(d.pricePerUnit)} / км`
                                     : 'Фіксована'}
                             </td>
 
                             <td className="p-2 border text-right font-mono font-semibold">
-                                {total != null ? format(total) : '-'}
+                                {total != null ? formatMoney(total) : '-'}
                             </td>
                         </tr>
                     );

@@ -3,8 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getHomeRoute } from '../../utils/roleRedirect';
 
+import Input from '../../ui/Input';
+import InputField from '../../ui/InputField';
+import PasswordInput from '../../ui/PasswordInput';
+import Button from '../../ui/Button';
+
 export default function LoginPage() {
     const { signIn } = useAuth();
+    const [submitted, setSubmitted] = useState(false);
+
     const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
@@ -12,11 +19,39 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
+    const isFormValid = email.trim() !== '' && password.trim() !== '';
+    const isButtonDisabled = loading || !isFormValid;
+
+    const emailError = submitted && !email ? 'Поле email є обовʼязковим' : undefined;
+    const passwordError = submitted && !password ? 'Поле пароль є обовʼязковим' : undefined;
+
+    const missingFields: string[] = [];
+
+    if (!email.trim()) missingFields.push('email');
+    if (!password.trim()) missingFields.push('пароль');
+
+    const showHint = missingFields.length > 0 && !submitted;
+
+    const hintText =
+        missingFields.length === 1
+            ? `Заповніть ${missingFields[0]}`
+            : `Заповніть: ${missingFields.join(', ')}`;
+
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+        if (error) setError(null);
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(e.target.value);
+        if (error) setError(null);
+    };
+
     const handleLogin = async () => {
-        if (!email || !password) {
-            setError('Введіть email та пароль');
-            return;
-        }
+        setSubmitted(true);
+
+        if (!isFormValid) return;
 
         try {
             setLoading(true);
@@ -44,28 +79,53 @@ export default function LoginPage() {
                     </div>
                 )}
 
-                <input
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
-                    placeholder="Email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                />
+                <InputField label="Email" required showRequired={submitted && !email} error={emailError}>
+                    <Input
+                        type="email"
+                        placeholder="Наприклад maksym.ivanov@gmail.com"
+                        value={email}
+                        onChange={handleEmailChange}
+                        invalid={submitted && !email}
+                    />
+                </InputField>
 
-                <input
-                    type="password"
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
-                    placeholder="Пароль"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                />
+                <InputField label="Пароль" required showRequired={submitted && !password} error={passwordError}>
+                    <PasswordInput
+                        value={password}
+                        onChange={handlePasswordChange}
+                        invalid={submitted && !password}
+                        placeholder="Введіть ваш пароль"
+                    />
+                </InputField>
 
-                <button
-                    className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
-                    disabled={loading}
-                    onClick={handleLogin}
-                >
-                    {loading ? 'Вхід...' : 'Увійти'}
-                </button>
+                <div className="relative group">
+                    <Button
+                        variant="default"
+                        disabled={isButtonDisabled}
+                        onClick={handleLogin}
+                        className="w-full"
+                    >
+                        {loading ? 'Вхід...' : 'Увійти'}
+                    </Button>
+
+                    {showHint && (
+                        <div
+                            className="
+                                pointer-events-none
+                                absolute -top-8 left-1/2 -translate-x-1/2
+                                whitespace-nowrap
+                                rounded bg-gray-800 px-2 py-1
+                                text-xs text-white
+                                opacity-0
+                                transition
+                                group-hover:opacity-100
+                            "
+                        >
+                            {hintText}
+                        </div>
+                    )}
+                </div>
+
             </div>
         </div>
     );

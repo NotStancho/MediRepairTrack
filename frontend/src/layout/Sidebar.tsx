@@ -1,94 +1,121 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import type { IconType } from 'react-icons';
+import { FiFileText, FiUsers, FiTool, FiTruck, FiDollarSign, FiCreditCard, FiPackage, FiClipboard, FiUser, FiMenu, FiBriefcase  } from 'react-icons/fi';
 
-type MenuItem = { to: string; label: string };
+type MenuItem = {
+    to: string;
+    label: string;
+    icon: IconType;
+};
 
-export default function Sidebar() {
+interface Props {
+    collapsed: boolean;
+    onToggle: () => void;
+}
+
+export default function Sidebar({ collapsed, onToggle }: Props) {
     const { user } = useAuth();
     const { pathname } = useLocation();
 
     if (!user) return null;
 
-    const isClient = user.role === 'CLIENT';
-    const isEmployee = user.role === 'EMPLOYEE';
-    const isEngineer = isEmployee && user.position === 'SERVICE_ENGINEER';
-    const isManager = isEmployee && user.position === 'MANAGER';
-    const isAdmin = user.role === 'ADMIN';
-
     const menu: MenuItem[] = [];
 
     // CLIENT
-    if (isClient) {
+    if (user.role === 'CLIENT') {
         menu.push(
-            { to: '/client/claims', label: 'Мої заявки' },
-            { to: '/client/contracts', label: 'Мої контракти' },
-            { to: '/client/equipment', label: 'Моє обладнання' },
-            { to: '/client/deliveries', label: 'Мої доставки' },
-            { to: '/client/invoices', label: 'Мої рахунки' },
-            { to: '/client/payments', label: 'Мої платежі' },
-            { to: '/profile', label: 'Мій профіль' },
+            { to: '/client/claims', label: 'Мої заявки', icon: FiClipboard },
+            { to: '/client/contracts', label: 'Мої контракти', icon: FiFileText },
+            { to: '/client/equipment', label: 'Моє обладнання', icon: FiTool },
+            { to: '/client/deliveries', label: 'Мої доставки', icon: FiTruck },
+            { to: '/client/invoices', label: 'Мої рахунки', icon: FiDollarSign },
+            { to: '/client/payments', label: 'Мої платежі', icon: FiCreditCard },
+            { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
     }
 
     // SERVICE ENGINEER
-    if (isEngineer) {
+    if (user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER') {
         menu.push(
-            { to: '/employee/claims', label: 'Призначені заявки' },
-            { to: '/employee/employees', label: 'Всі працівники' },
-            { to: '/employee/equipment', label: 'Всі обладнання' },
-            { to: '/employee/parts', label: 'Всі деталі' },
-            { to: '/employee/deliveries', label: 'Мої доставки' },
-            { to: '/profile', label: 'Мій профіль' },
+            { to: '/employee/claims', label: 'Призначені заявки', icon: FiClipboard },
+            { to: '/employee/employees', label: 'Всі працівники', icon: FiUsers },
+            { to: '/employee/equipment', label: 'Всі обладнання', icon: FiTool },
+            { to: '/employee/parts', label: 'Всі деталі', icon: FiPackage },
+            { to: '/employee/deliveries', label: 'Мої доставки', icon: FiTruck },
+            { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
     }
 
     // MANAGER / ADMIN
-    if (isManager || isAdmin) {
+    if (user.role === 'ADMIN' || (user.role === 'EMPLOYEE' && user.position === 'MANAGER')) {
         menu.push(
-            { to: '/claims', label: 'Всі заявки' },
-            { to: '/clients', label: 'Всі клієнти' },
-            { to: '/contracts', label: 'Всі контракти' },
-            { to: '/employees', label: 'Всі працівники' },
-            { to: '/equipment', label: 'Всі обладнання' },
-            { to: '/parts', label: 'Всі деталі' },
-            { to: '/deliveries', label: 'Всі доставки' },
-            { to: '/invoices', label: 'Всі рахунки' },
-            { to: '/payments', label: 'Всі оплати' },
-            { to: '/profile', label: 'Мій профіль' },
+            { to: '/claims', label: 'Всі заявки', icon: FiClipboard },
+            { to: '/clients', label: 'Всі клієнти', icon: FiUsers },
+            { to: '/contracts', label: 'Всі контракти', icon: FiFileText },
+            { to: '/employees', label: 'Всі працівники', icon: FiBriefcase },
+            { to: '/equipment', label: 'Всі обладнання', icon: FiTool },
+            { to: '/parts', label: 'Всі деталі', icon: FiPackage },
+            { to: '/deliveries', label: 'Всі доставки', icon: FiTruck },
+            { to: '/invoices', label: 'Всі рахунки', icon: FiDollarSign },
+            { to: '/payments', label: 'Всі оплати', icon: FiCreditCard },
+            { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
     }
 
     return (
-        <aside className="w-64 h-screen bg-slate-900 text-slate-200 flex flex-col border-r border-slate-800">
-            {/* Header / Logo */}
-            <div className="px-4 py-4 border-b border-slate-800">
-                <div className="text-lg font-semibold tracking-wide">
-                    MediRepairTrack
-                </div>
+        <div className="h-screen bg-slate-900 text-slate-200 flex flex-col border-r border-slate-800">
+            {/* Logo + toggle */}
+            <div
+                className={[
+                    'flex items-center h-12 border-b border-slate-800 px-3',
+                    collapsed ? 'justify-center' : 'justify-between',
+                ].join(' ')}
+            >
+                {!collapsed && (
+                    <div className="font-semibold tracking-wide">
+                        MediRepairTrack
+                    </div>
+                )}
+
+                <button onClick={onToggle} className="p-2 rounded-md hover:bg-slate-800 transition">
+                    <FiMenu size={18} />
+                </button>
+
             </div>
 
+
             {/* Navigation */}
-            <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-                {menu.map((item) => {
+            <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
+                {menu.map(item => {
                     const active = pathname === item.to;
+                    const Icon = item.icon;
 
                     return (
                         <Link
                             key={item.to}
                             to={item.to}
+                            title={collapsed ? item.label : undefined}
                             className={[
-                                'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                                 'hover:bg-slate-800 hover:text-white',
                                 active
                                     ? 'bg-slate-800 text-blue-300'
                                     : 'text-slate-300',
                             ].join(' ')}
                         >
-                            {item.label}
+                            <Icon
+                                size={18}
+                                className={active
+                                    ? 'text-blue-400'
+                                    : 'text-slate-400 group-hover:text-white'}
+                            />
+
+                            {!collapsed && <span>{item.label}</span>}
                         </Link>
                     );
                 })}
             </nav>
-        </aside>
+        </div>
     );
 }

@@ -1,19 +1,42 @@
 import { Outlet } from 'react-router-dom';
+import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 export default function AppLayout() {
+    const [collapsed, setCollapsed] = useState(false);
+
     return (
-        <div className="flex h-screen">
-            <Sidebar />
+        <div
+            className={`
+                grid h-screen bg-gray-50
+                grid-rows-[3rem_1fr]
+                transition-all duration-300
+                ${collapsed
+                ? 'grid-cols-[4rem_1fr]'
+                : 'grid-cols-[14rem_1fr]'
+            }
+            `}
+        >
+            {/* Sidebar */}
+            <aside className="row-span-2">
+                <Sidebar
+                    collapsed={collapsed}
+                    onToggle={() => setCollapsed(v => !v)}
+                />
+            </aside>
 
-            <div className="flex flex-col flex-1">
+            {/* Header */}
+            <header className="col-start-2 row-start-1">
                 <Header />
+            </header>
 
-                <main className="flex-1 overflow-y-auto bg-gray-50 p-4">
+            {/* Main */}
+            <main className="col-start-2 row-start-2 overflow-y-auto overflow-x-hidden min-w-0">
+                <div className="p-4">
                     <Outlet />
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     );
 }
