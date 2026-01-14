@@ -1,11 +1,5 @@
-export type EquipmentType =
-    | 'HEMOGLOBINOMETER'
-    | 'MICROSCOPE'
-    | 'ANALYZER'
-    | 'CENTRIFUGE'
-    | 'ELECTROCARDIOGRAPH'
-    | 'ULTRASOUND'
-    | 'XRAY';
+// types/equipment/equipmentFull
+import type { EquipmentType } from './equipmentType';
 
 export interface EquipmentFull {
     id: number;
