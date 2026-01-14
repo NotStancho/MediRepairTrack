@@ -1,4 +1,4 @@
-import type { RoleInClaim } from './assignedClaim';
+import type { RoleInClaim } from './claim/assignedClaim.ts';
 
 export interface ClaimEmployee {
     employeeId: number;
