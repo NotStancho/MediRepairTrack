@@ -1,4 +1,4 @@
-import type { ClaimStatus, RepairType } from '../types/claim';
+import type { ClaimStatus, RepairType } from '../types/claim/claim';
 
 export const CLAIM_STATUS_LABELS: Record<ClaimStatus, string> = {
     NEW: 'Нова',
