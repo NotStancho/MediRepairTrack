@@ -112,7 +112,7 @@ public class EquipmentService {
     public EquipmentResponseDTO getByModelAndSerial(Integer modelId, String serialNumber) {
         return equipmentRepository.findByModelIdAndSerialNumber(modelId, serialNumber)
                 .map(this::map)
-                .orElseThrow(() -> new NotFoundException("Обладнання не знайдено для цієї моделі та serial_number"));
+                .orElseThrow(() -> new NotFoundException("Обладнання з таким серійним номером для обраної моделі не знайдено"));
     }
 
     public void delete(Integer id) {
