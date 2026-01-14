@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
-import type {Claim} from '../../../types/claim';
+import type {Claim} from '../../../types/claim/claim';
 import type {ClientFull} from '../../../types/client';
-import type {EquipmentFull} from '../../../types/equipment';
+import type {EquipmentFull} from '../../../types/equipment/equipmentFull';
 import {getClientFullById} from '../../../api/client';
 import {getEquipmentFullById} from '../../../api/equipment';
 import {formatDateTime} from '../../../utils/dateFormat';

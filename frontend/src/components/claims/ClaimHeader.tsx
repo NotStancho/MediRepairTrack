@@ -1,5 +1,5 @@
-import type { Claim } from '../../types/claim';
-import type {EquipmentFull} from "../../types/equipment";
+import type { Claim } from '../../types/claim/claim';
+import type {EquipmentFull} from "../../types/equipment/equipmentFull";
 import {CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS, STATUS_COLORS, REPAIR_TYPE_COLORS } from '../../utils/claimLabels';
 
 interface Props {
@@ -34,7 +34,7 @@ export default function ClaimHeader({ claim, equipment }: Props) {
             {/* 🧰 Обладнання */}
             {equipment && (
                 <div className="text-sm text-gray-600">
-                    {equipment.manufacturer} {equipment.modelName}
+                    {equipment.modelName}
                     <span className="mx-2 text-gray-400">•</span>
                     SN: <span className="font-mono">{equipment.serialNumber}</span>
                 </div>

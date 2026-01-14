@@ -1,12 +1,12 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import type { Claim } from '../../types/claim';
+import type { Claim } from '../../types/claim/claim';
 import ClaimHeader from '../../components/claims/ClaimHeader';
 import ClaimTabs from '../../components/claims/ClaimTabs';
 import { getClaimById } from '../../api/claim';
 
 import {getEquipmentFullById} from "../../api/equipment";
-import type {EquipmentFull} from "../../types/equipment";
+import type { EquipmentFull } from "../../types/equipment/equipmentFull";
 
 export default function ClaimDetailsPage() {
     const { id } = useParams<{ id: string }>();
