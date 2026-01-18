@@ -6,6 +6,7 @@ import AppLayout from '../layout/AppLayout';
 import ClaimListPage from "../pages/claims/ClaimListPage";
 import ClaimDetailsPage from "../pages/claims/ClaimDetailsPage";
 import ClaimCreatePage from "../pages/claims/ClaimCreatePage";
+import ClaimCreateEmployeePage from "../pages/claims/ClaimCreateEmployeePage";
 import ComingSoonPage from "../pages/common/ComingSoonPage";
 
 export default function AppRouter() {
@@ -33,6 +34,9 @@ export default function AppRouter() {
                 <Route path="/client/deliveries" element={<ComingSoonPage title="Мої доставки" />} />
                 <Route path="/client/invoices" element={<ComingSoonPage title="Мої рахунки" />} />
                 <Route path="/client/payments" element={<ComingSoonPage title="Мої платежі" />} />
+
+                {/* EMPLOYEE / ADMIN */}
+                <Route path="/employee/claims/new" element={<ClaimCreateEmployeePage />} />
 
                 {/* EMPLOYEE (ENGINEER) */}
                 <Route path="/employee/claims" element={<ClaimListPage />} />

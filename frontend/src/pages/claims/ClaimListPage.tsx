@@ -73,6 +73,18 @@ export default function ClaimListPage() {
                         + Подати заявку
                     </Button>
                 )}
+
+                {(user.role === 'ADMIN' ||
+                    (user.role === 'EMPLOYEE' &&
+                        ['MANAGER', 'SERVICE_ENGINEER'].includes(user.position!))
+                ) && (
+                    <Button
+                        variant="primary"
+                        onClick={() => navigate('/employee/claims/new')}
+                    >
+                        + Створити заявку
+                    </Button>
+                )}
             </div>
 
             {user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER' ? (
