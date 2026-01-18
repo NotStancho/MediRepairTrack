@@ -4,6 +4,7 @@ import { RequireAuth } from './RequireAuth';
 import AppLayout from '../layout/AppLayout';
 
 import ClaimListPage from "../pages/claims/ClaimListPage";
+import ClaimCreatePage from "../pages/claims/ClaimCreatePage";
 import ClaimDetailsPage from "../pages/claims/ClaimDetailsPage";
 import ComingSoonPage from "../pages/common/ComingSoonPage";
 
@@ -24,6 +25,7 @@ export default function AppRouter() {
                 {/* CLIENT */}
                 <Route path="/client" element={<Navigate to="/client/claims" replace />}/>
                 <Route path="/client/claims" element={<ClaimListPage />} />
+                <Route path="/client/claims/new" element={<ClaimCreatePage />} />
                 <Route path="/client/claims/:id" element={<ClaimDetailsPage />} />
 
                 <Route path="/client/contracts" element={<ComingSoonPage title="Мої контракти" />} />

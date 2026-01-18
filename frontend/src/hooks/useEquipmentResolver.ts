@@ -8,12 +8,12 @@ export type EquipmentResolveState =
     | 'EXISTS'
     | 'NEW';
 
-export function useEquipmentResolver(modelId: number | '', serialNumber: string) {
+export function useEquipmentResolver(modelId: number | null, serialNumber: string) {
     const [state, setState] = useState<EquipmentResolveState>('IDLE');
     const [equipmentId, setEquipmentId] = useState<number | null>(null);
 
     useEffect(() => {
-        if (!modelId || !serialNumber.trim()) {
+        if (modelId == null || !serialNumber.trim()) {
             setState('IDLE');
             setEquipmentId(null);
             return;
@@ -39,7 +39,7 @@ export function useEquipmentResolver(modelId: number | '', serialNumber: string)
                     console.error(e);
                 }
             }
-        }, 300);
+        }, 1000);
 
         return () => clearTimeout(timeout);
     }, [modelId, serialNumber]);

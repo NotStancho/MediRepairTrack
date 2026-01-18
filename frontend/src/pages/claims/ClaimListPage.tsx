@@ -5,11 +5,13 @@ import {useAuth} from '../../context/AuthContext';
 import {getAllClaims, getClaimsByClient} from '../../api/claim';
 import {getAssignedActiveClaims} from '../../api/claimEmployee';
 
-import type {Claim} from '../../types/claim';
-import type {AssignedActiveClaim} from "../../types/assignedClaim";
+import type {Claim} from '../../types/claim/claim';
+import type {AssignedActiveClaim} from "../../types/claim/assignedClaim";
 
 import {CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS, STATUS_COLORS} from '../../utils/claimLabels';
-import {ROLE_IN_CLAIM_LABELS, ROLE_IN_CLAIM_COLORS} from '../../utils/roleInClaimLabels.ts';
+import {ROLE_IN_CLAIM_LABELS, ROLE_IN_CLAIM_COLORS} from '../../utils/roleInClaimLabels';
+
+import Button from '../../ui/Button';
 
 import {formatDateTime} from '../../utils/dateFormat';
 
@@ -54,13 +56,24 @@ export default function ClaimListPage() {
 
     return (
         <div className="space-y-4">
-            <h1 className="text-2xl font-bold">
-                {user?.role === 'CLIENT'
-                    ? 'Мої заявки'
-                    : user?.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER'
-                        ? 'Призначені заявки'
-                        : 'Всі заявки'}
-            </h1>
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold">
+                    {user?.role === 'CLIENT'
+                        ? 'Мої заявки'
+                        : user?.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER'
+                            ? 'Призначені заявки'
+                            : 'Всі заявки'}
+                </h1>
+
+                {user.role === 'CLIENT' && (
+                    <Button
+                        variant="primary"
+                        onClick={() => navigate('/client/claims/new')}
+                    >
+                        + Подати заявку
+                    </Button>
+                )}
+            </div>
 
             {user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER' ? (
                 assignedClaims.length === 0 ? (
@@ -147,72 +160,72 @@ export default function ClaimListPage() {
                     </table>
                 )
             ) : (
-            /* таблиця для CLIENT / MANAGER */
-            <div className="overflow-x-auto rounded border">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-100 text-left">
-                    <tr>
-                        <th className="p-2 border">№</th>
-                        <th className="p-2 border">Тип ремонту</th>
-                        <th className="p-2 border">Статус</th>
-                        <th className="p-2 border">Опис дефекту</th>
-                        <th className="p-2 border">Створено</th>
-                        <th className="p-2 border">Закрито</th>
-                        <th className="p-2 border w-20 text-center">Дії</th>
-                    </tr>
-                    </thead>
+                /* таблиця для CLIENT / MANAGER */
+                <div className="overflow-x-auto rounded border">
+                    <table className="w-full text-sm">
+                        <thead className="bg-gray-100 text-left">
+                        <tr>
+                            <th className="p-2 border">№</th>
+                            <th className="p-2 border">Тип ремонту</th>
+                            <th className="p-2 border">Статус</th>
+                            <th className="p-2 border">Опис дефекту</th>
+                            <th className="p-2 border">Створено</th>
+                            <th className="p-2 border">Закрито</th>
+                            <th className="p-2 border w-20 text-center">Дії</th>
+                        </tr>
+                        </thead>
 
-                    <tbody>
-                    {claims.map(c => (
-                        <tr
-                            key={c.id}
-                            onClick={() => openClaim(c.id)}
-                            className="cursor-pointer hover:bg-blue-50 transition"
-                        >
-                            <td className="p-2 border font-medium">
-                                №{c.id}
-                            </td>
+                        <tbody>
+                        {claims.map(c => (
+                            <tr
+                                key={c.id}
+                                onClick={() => openClaim(c.id)}
+                                className="cursor-pointer hover:bg-blue-50 transition"
+                            >
+                                <td className="p-2 border font-medium">
+                                    №{c.id}
+                                </td>
 
-                            <td className="p-2 border">
-                                {REPAIR_TYPE_LABELS[c.repairType]}
-                            </td>
+                                <td className="p-2 border">
+                                    {REPAIR_TYPE_LABELS[c.repairType]}
+                                </td>
 
-                            <td className="p-2 border">
+                                <td className="p-2 border">
                                 <span
                                     className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[c.status]}`}
                                 >
                                     {CLAIM_STATUS_LABELS[c.status]}
                                 </span>
-                            </td>
+                                </td>
 
-                            <td className="p-2 border max-w-xs truncate">
-                                {c.defectDescription}
-                            </td>
+                                <td className="p-2 border max-w-xs truncate">
+                                    {c.defectDescription}
+                                </td>
 
-                            <td className="p-2 border whitespace-nowrap">
-                                {formatDateTime(c.createdAt)}
-                            </td>
+                                <td className="p-2 border whitespace-nowrap">
+                                    {formatDateTime(c.createdAt)}
+                                </td>
 
-                            <td className="p-2 border whitespace-nowrap">
-                                {formatDateTime(c.closedAt)}
-                            </td>
+                                <td className="p-2 border whitespace-nowrap">
+                                    {formatDateTime(c.closedAt)}
+                                </td>
 
-                            <td className="p-2 border">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation(); // важливо
-                                        openClaim(c.id);
-                                    }}
-                                    className="text-blue-600 hover:underline text-sm"
-                                >
-                                    Деталі →
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+                                <td className="p-2 border">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // важливо
+                                            openClaim(c.id);
+                                        }}
+                                        className="text-blue-600 hover:underline text-sm"
+                                    >
+                                        Деталі →
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
         </div>
     );
