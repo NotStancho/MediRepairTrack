@@ -4,8 +4,8 @@ import { RequireAuth } from './RequireAuth';
 import AppLayout from '../layout/AppLayout';
 
 import ClaimListPage from "../pages/claims/ClaimListPage";
-import ClaimCreatePage from "../pages/claims/ClaimCreatePage";
 import ClaimDetailsPage from "../pages/claims/ClaimDetailsPage";
+import ClaimCreatePage from "../pages/claims/ClaimCreatePage";
 import ComingSoonPage from "../pages/common/ComingSoonPage";
 
 export default function AppRouter() {

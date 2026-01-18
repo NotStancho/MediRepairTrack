@@ -1,7 +1,7 @@
 // hooks/useEquipmentModels
 import { useEffect, useState } from 'react';
-import { getEquipmentModels } from '../api/equipmentModel';
 import type { EquipmentModel } from '../types/equipment/equipmentModel';
+import { getEquipmentModels } from '../api/equipmentModel';
 
 export function useEquipmentModels() {
     const [models, setModels] = useState<EquipmentModel[]>([]);

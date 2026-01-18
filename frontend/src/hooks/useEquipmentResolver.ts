@@ -1,6 +1,6 @@
 // hooks/useEquipmentResolver
-import { useEffect, useState } from 'react';
 import { findEquipmentByModelAndSerial } from '../api/equipment';
+import { useEffect, useState } from 'react';
 
 export type EquipmentResolveState =
     | 'IDLE'
