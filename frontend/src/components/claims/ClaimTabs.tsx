@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 
-import type { Claim } from '../../types/claim';
+import type { Claim } from '../../types/claim/claim';
 import ClaimDetailsTab from "./tabs/ClaimDetailsTab.tsx";
 import ClaimHistoryTab from "./tabs/ClaimHistoryTab.tsx";
 import ClaimEmployeesTab from "./tabs/ClaimEmployeesTab";

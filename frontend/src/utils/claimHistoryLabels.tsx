@@ -8,7 +8,7 @@ import {
 } from 'react-icons/hi2';
 
 import type { ReactNode } from 'react';
-import type { ClaimHistoryActionType } from '../types/claimHistory';
+import type { ClaimHistoryActionType } from '../types/claim/claimHistory';
 
 export const HISTORY_ICONS: Record<
     ClaimHistoryActionType,

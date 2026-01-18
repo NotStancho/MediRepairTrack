@@ -1,4 +1,4 @@
-import type { RoleInClaim } from '../types/assignedClaim';
+import type { RoleInClaim } from '../types/claim/assignedClaim';
 
 /* =========================
    ROLE IN CLAIM LABELS

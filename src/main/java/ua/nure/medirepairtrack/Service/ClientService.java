@@ -1,6 +1,7 @@
 package ua.nure.medirepairtrack.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.ClientDTO.*;
@@ -127,6 +128,20 @@ public class ClientService {
         return mapToFullResponse(client);
     }
 
+    public List<ClientSearchDTO> searchClients(String q, int limit) {
+        if (q == null || q.length() < 2) {
+            return List.of();
+        }
+
+        int safeLimit = Math.min(Math.max(limit, 1), 20);
+
+        return clientRepository
+                .searchPrefix(q, PageRequest.of(0, safeLimit))
+                .stream()
+                .map(this::mapToSearchDto)
+                .toList();
+    }
+
     public List<ClientResponseDTO> searchByOrganization(String name) {
         return clientRepository.findByOrganizationNameContainingIgnoreCase(name)
                 .stream()
@@ -158,6 +173,16 @@ public class ClientService {
                 .contactPersonName(c.getContactPersonName())
                 .address(c.getAddress())
                 .notes(c.getNotes())
+                .build();
+    }
+
+    private ClientSearchDTO mapToSearchDto(Client c) {
+        return ClientSearchDTO.builder()
+                .id(c.getId())
+                .organizationName(c.getOrganizationName())
+                .organizationEmail(c.getOrganizationEmail())
+                .organizationPhoneNumber(c.getOrganizationPhoneNumber())
+                .contactPersonName(c.getContactPersonName())
                 .build();
     }
 

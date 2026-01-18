@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { ClaimHistory } from '../../../types/claimHistory';
+import type { ClaimHistory } from '../../../types/claim/claimHistory';
 import type { Employee } from '../../../types/employee';
 import { getClaimHistory } from '../../../api/claimHistory';
 import { getEmployeeById } from '../../../api/employee';

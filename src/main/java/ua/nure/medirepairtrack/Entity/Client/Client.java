@@ -22,10 +22,10 @@ public class Client {
     @JoinColumn(name = "fk_user", referencedColumnName = "id_user")
     private User user;  // може бути null
 
-    @Column(name = "organization_name", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "organization_name", nullable = false, length = 255)
     private String organizationName;
 
-    @Column(name = "organization_email", nullable = false, length = 45)
+    @Column(name = "organization_email", nullable = false, length = 254)
     private String organizationEmail;
 
     @Column(name = "organization_phone_number", nullable = false, length = 20)

@@ -1,6 +1,6 @@
 import { api } from './api';
 import type { ClaimEmployee } from '../types/claimEmployee';
-import type { AssignedActiveClaim } from '../types/assignedClaim';
+import type { AssignedActiveClaim } from '../types/claim/assignedClaim';
 
 export const getAssignedActiveClaims = async (employeeId: number) =>
     (await api.get<AssignedActiveClaim[]>(

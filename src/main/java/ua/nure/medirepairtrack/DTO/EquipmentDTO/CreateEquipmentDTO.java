@@ -16,10 +16,8 @@ public class CreateEquipmentDTO {
     @Size(max = 45)
     private String serialNumber;
 
-    @NotNull
     private LocalDate purchaseDate;
 
-    @NotNull
     @DecimalMin(value = "0.00", inclusive = false)
     private BigDecimal price;
 

@@ -13,6 +13,7 @@ import ua.nure.medirepairtrack.Repository.EquipmentRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +24,16 @@ public class EquipmentService {
 
     @Transactional
     public EquipmentResponseDTO create(CreateEquipmentDTO dto) {
+        if (dto.getPurchaseDate() == null || dto.getPrice() == null) {
+            throw new BadRequestException("Дата купівлі та ціна обовʼязкові");
+        }
+
         EquipmentModel model = equipmentModelRepository.findById(dto.getModelId())
                 .orElseThrow(() -> new NotFoundException("Модель обладнання не знайдена"));
 
         // швидка бізнес-перевірка (і все одно є захист у БД через unique)
         if (equipmentRepository.existsByModelIdAndSerialNumber(dto.getModelId(), dto.getSerialNumber())) {
-            throw new BadRequestException("Такий serial_number вже існує в межах цієї моделі");
+            throw new BadRequestException("Обладнання з таким серійним номером вже існує в межах цієї моделі");
         }
 
         Equipment eq = Equipment.builder()
@@ -47,20 +52,32 @@ public class EquipmentService {
 
     @Transactional
     public Equipment getOrCreate(CreateEquipmentDTO dto) {
-        // Спробувати знайти існуюче обладнання
-        return equipmentRepository
-                .findByModelIdAndSerialNumber(dto.getModelId(), dto.getSerialNumber())
-                .orElseGet(() -> {
+        // 1. Якщо обладнання вже існує — просто повертаємо
+        Optional<Equipment> existing = equipmentRepository
+                .findByModelIdAndSerialNumber(dto.getModelId(), dto.getSerialNumber());
 
-                    // Якщо не існує — створюємо
-                    EquipmentResponseDTO created = create(dto);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
 
-                    // Повертаємо entity (потрібно ClaimService)
-                    return equipmentRepository.findById(created.getId())
-                            .orElseThrow(() ->
-                                    new IllegalStateException("Не вдалося отримати щойно створене обладнання")
-                            );
-                });
+        // 2. Якщо НОВЕ — перевіряємо бізнес-умови
+        if (dto.getPurchaseDate() == null || dto.getPrice() == null) {
+            throw new BadRequestException("Для нового обладнання обовʼязкові дата купівлі та ціна");
+        }
+
+        EquipmentModel model = equipmentModelRepository.findById(dto.getModelId())
+                .orElseThrow(() -> new NotFoundException("Модель обладнання не знайдена"));
+
+        Equipment equipment = Equipment.builder()
+                .model(model)
+                .serialNumber(dto.getSerialNumber())
+                .purchaseDate(dto.getPurchaseDate())
+                .price(dto.getPrice())
+                .description(dto.getDescription())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        return equipmentRepository.save(equipment);
     }
 
     @Transactional
@@ -112,7 +129,7 @@ public class EquipmentService {
     public EquipmentResponseDTO getByModelAndSerial(Integer modelId, String serialNumber) {
         return equipmentRepository.findByModelIdAndSerialNumber(modelId, serialNumber)
                 .map(this::map)
-                .orElseThrow(() -> new NotFoundException("Обладнання не знайдено для цієї моделі та serial_number"));
+                .orElseThrow(() -> new NotFoundException("Обладнання з таким серійним номером для обраної моделі не знайдено"));
     }
 
     public void delete(Integer id) {
