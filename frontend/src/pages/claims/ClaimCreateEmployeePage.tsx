@@ -69,6 +69,30 @@ export default function ClaimCreateEmployeePage() {
 
     const isQueryTooShort = clientQuery.trim().length > 0 && clientQuery.trim().length < 2;
 
+    const missingFields: string[] = [];
+
+    if (!selectedClient) missingFields.push('клієнта');
+    if (!repairType) missingFields.push('тип ремонту');
+    if (!status) missingFields.push('статус');
+    if (!modelId) missingFields.push('модель обладнання');
+    if (!serialNumber.trim()) missingFields.push('серійний номер');
+    if (!defectDescription.trim()) missingFields.push('опис несправності');
+
+    if (isNew) {
+        if (!purchaseDate) missingFields.push('дату купівлі');
+        if (!price) missingFields.push('ціну');
+    }
+
+    const showHint =
+        missingFields.length > 0 &&
+        !submitted &&
+        !loading;
+
+    const hintText =
+        missingFields.length === 1
+            ? `Заповніть ${missingFields[0]}`
+            : `Заповніть: ${missingFields.join(', ')}`;
+
     // ===== SUBMIT =====
     const handleSubmit = async () => {
         setSubmitted(true);
@@ -378,13 +402,32 @@ export default function ClaimCreateEmployeePage() {
                         Скасувати
                     </Button>
 
-                    <Button
-                        variant="primary"
-                        disabled={isButtonDisabled}
-                        onClick={handleSubmit}
-                    >
-                        {loading ? 'Збереження…' : 'Створити заявку'}
-                    </Button>
+                    <div className="relative group">
+                        <Button
+                            variant="primary"
+                            disabled={isButtonDisabled}
+                            onClick={handleSubmit}
+                        >
+                            {loading ? 'Збереження…' : 'Створити заявку'}
+                        </Button>
+
+                        {showHint && (
+                            <div
+                                className="
+                                    pointer-events-none
+                                    absolute -top-8 left-1/2 -translate-x-1/2
+                                    whitespace-nowrap
+                                    rounded bg-gray-800 px-2 py-1
+                                    text-xs text-white
+                                    opacity-0
+                                    transition
+                                    group-hover:opacity-100
+                                "
+                            >
+                                {hintText}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
