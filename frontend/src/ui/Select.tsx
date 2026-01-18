@@ -27,6 +27,7 @@ interface Props<T, V = number | string> {
 
     placeholder?: string;
     searchable?: boolean;
+    onSearchChange?: (query: string) => void;
 
     maxVisibleItems?: number;
     itemHeight?: number;
@@ -44,7 +45,7 @@ const DEFAULT_MAX_VISIBLE_ITEMS = 8;
 export default function Select<T, V extends string | number = number>({
                                                                           value, onChange, options,
                                                                           getLabel, getValue,
-                                                                          placeholder = 'Оберіть значення', searchable,
+                                                                          placeholder = 'Оберіть значення', searchable, onSearchChange,
                                                                           maxVisibleItems, itemHeight,
                                                                           invalid, error, loading, loadingText = 'Завантаження…', disabled
                                                                       }: Props<T, V>) {
@@ -246,8 +247,12 @@ export default function Select<T, V extends string | number = number>({
                                     autoFocus
                                     value={query}
                                     onChange={e => {
-                                        setQuery(e.target.value)
-                                        setHighlightedIndex(0)
+                                        const value = e.target.value;
+
+                                        setQuery(value);
+                                        setHighlightedIndex(0);
+
+                                        onSearchChange?.(value);
                                     }}
                                     placeholder="Пошук…"
                                     className="border-0 rounded"
