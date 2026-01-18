@@ -52,6 +52,11 @@ public class ClientController {
         return clientService.getFullById(id);
     }
 
+    @GetMapping("/search/prefix")
+    public List<ClientSearchDTO> search(@RequestParam String q, @RequestParam(defaultValue = "10") int limit) {
+        return clientService.searchClients(q.trim(), limit);
+    }
+
     @GetMapping("/search/organization")
     public List<ClientResponseDTO> searchByOrganization(@RequestParam String name) {
         return clientService.searchByOrganization(name);
