@@ -1,3 +1,4 @@
+// types/client/clientFull
 export interface ClientFull {
     id: number;
 
