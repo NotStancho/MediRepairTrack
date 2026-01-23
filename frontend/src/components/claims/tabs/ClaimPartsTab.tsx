@@ -35,7 +35,7 @@ export default function ClaimPartsTab({ claimId }: Props) {
 
     if (!items.length) {
         return (
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-ink-muted">
                 Запчастини не використовувались
             </div>
         );
@@ -44,8 +44,8 @@ export default function ClaimPartsTab({ claimId }: Props) {
     return (
         <div className="relative space-y-4">
             <div className="overflow-x-auto">
-                <table className="w-full text-sm border rounded">
-                    <thead className="bg-gray-100 text-left sticky top-0 z-10">
+                <table className="w-full text-sm border border-border rounded-lg">
+                    <thead className="bg-surface-muted text-left sticky top-0 z-10">
                     <tr>
                         <th className="p-2 border">Запчастина</th>
                         <th className="p-2 border">Код</th>
@@ -60,12 +60,12 @@ export default function ClaimPartsTab({ claimId }: Props) {
                         const total = p.quantity * p.unitPrice;
 
                         return (
-                            <tr key={p.partId} className="hover:bg-gray-50">
+                            <tr key={p.partId} className="hover:bg-surface-muted">
                                 <td className="p-2 border font-medium">
                                     {p.partName}
                                 </td>
 
-                                <td className="p-2 border text-gray-600">
+                                <td className="p-2 border text-ink-muted">
                                     {p.partCode}
                                 </td>
 
@@ -88,10 +88,10 @@ export default function ClaimPartsTab({ claimId }: Props) {
             </div>
 
             {/* 🔢 Sticky summary */}
-            <div className="sticky bottom-0 z-20 bg-white border-t">
+            <div className="sticky bottom-0 z-20 bg-surface border-t border-border">
                 <div className="flex justify-end px-4 py-3 text-sm">
-                    <div className="flex gap-4 rounded bg-gray-50 px-4 py-2 border shadow-sm">
-                    <span className="text-gray-600">
+                    <div className="flex gap-4 rounded bg-surface-muted px-4 py-2 border border-border shadow-sm">
+                    <span className="text-ink-muted">
                         Всього запчастин:
                     </span>
                         <span className="font-semibold font-mono">

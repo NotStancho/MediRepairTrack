@@ -28,10 +28,6 @@ export default function ClaimCreateEmployeePage() {
 
     const allowedPositions: EmployeePosition[] = ['MANAGER', 'SERVICE_ENGINEER'];
 
-    if (!user || (user.role !== 'EMPLOYEE' && user.role !== 'ADMIN') || (user.role === 'EMPLOYEE' && !allowedPositions.includes(user.position!))) {
-        return null;
-    }
-
     // ===== CLIENT SEARCH =====
     const [clientQuery, setClientQuery] = useState('');
     const { clients, loading: clientsLoading } = useClientSearch(clientQuery);
@@ -54,6 +50,10 @@ export default function ClaimCreateEmployeePage() {
 
     const { models, loading: modelsLoading } = useEquipmentModels();
     const { checking, exists, isNew } = useEquipmentResolver(modelId, serialNumber);
+
+    if (!user || (user.role !== 'EMPLOYEE' && user.role !== 'ADMIN') || (user.role === 'EMPLOYEE' && !allowedPositions.includes(user.position!))) {
+        return null;
+    }
 
     // ===== VALIDATION =====
     const isFormValid =
@@ -137,16 +137,16 @@ export default function ClaimCreateEmployeePage() {
                 </h1>
 
                 {/* ===== CLIENT ===== */}
-                <div className="space-y-4 rounded-lg border border-gray-200 p-5 bg-white">
+                <div className="space-y-4 rounded-xl border border-border p-5 bg-surface shadow-sm">
                     <h2 className="text-lg font-semibold">Клієнт</h2>
 
                     {isQueryTooShort && (
-                        <div className="text-sm text-red-500">
+                        <div className="text-sm text-danger">
                             Введіть мінімум 2 символи для пошуку
                         </div>
                     )}
                     {clients.length === 0 && clientQuery.length >= 2 && !clientsLoading && (
-                        <div className="text-sm text-red-500">
+                        <div className="text-sm text-danger">
                             Клієнтів не знайдено
                         </div>
                     )}
@@ -179,30 +179,30 @@ export default function ClaimCreateEmployeePage() {
                     </InputField>
 
                     {selectedClient && (
-                        <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-sm">
-                            <div className="font-medium text-gray-900 mb-2">
+                        <div className="rounded-md border border-border bg-surface-muted p-4 text-sm">
+                            <div className="font-medium text-ink mb-2">
                                 Обраний клієнт:
                             </div>
 
                             <div className="grid grid-cols-2 gap-x-6 gap-y-1">
                                 <div>
-                                    <span className="text-gray-500">Організація:</span><br />
+                                    <span className="text-ink-muted">Організація:</span><br />
                                     {selectedClient.organizationName}
                                 </div>
 
                                 <div>
-                                    <span className="text-gray-500">Email:</span><br />
+                                    <span className="text-ink-muted">Email:</span><br />
                                     {selectedClient.organizationEmail}
                                 </div>
 
                                 <div>
-                                    <span className="text-gray-500">Телефон:</span><br />
+                                    <span className="text-ink-muted">Телефон:</span><br />
                                     {selectedClient.organizationPhoneNumber}
                                 </div>
 
                                 {selectedClient.contactPersonName && (
                                     <div>
-                                        <span className="text-gray-500">Контактна особа:</span><br />
+                                        <span className="text-ink-muted">Контактна особа:</span><br />
                                         {selectedClient.contactPersonName}
                                     </div>
                                 )}
@@ -212,7 +212,7 @@ export default function ClaimCreateEmployeePage() {
                 </div>
 
                 {/* ===== CLAIM META ===== */}
-                <div className="space-y-4 rounded-lg border border-gray-200 p-5 bg-white">
+                <div className="space-y-4 rounded-xl border border-border p-5 bg-surface shadow-sm">
                     <h2 className="text-lg font-semibold">
                         Параметри заявки
                     </h2>
@@ -249,11 +249,11 @@ export default function ClaimCreateEmployeePage() {
                 </div>
 
                 {/* ===== EQUIPMENT ===== */}
-                <div className="space-y-4 rounded-lg border border-gray-200 p-5 bg-white">
+                <div className="space-y-4 rounded-xl border border-border p-5 bg-surface shadow-sm">
                     <h2 className="text-lg font-semibold">
                         Дані обладнання
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-ink-muted">
                         Вкажіть модель та серійний номер обладнання, для якого потрібен ремонт
                     </p>
                     <InputField
@@ -301,7 +301,7 @@ export default function ClaimCreateEmployeePage() {
                     </InputField>
 
                     {checking && (
-                        <div className="rounded-md bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-gray-600">
+                        <div className="rounded-md bg-surface-muted border border-border px-3 py-2 text-sm text-ink-muted">
                             Перевіряємо, чи є таке обладнання в системі…
                         </div>
                     )}
@@ -375,7 +375,7 @@ export default function ClaimCreateEmployeePage() {
                 </div>
 
                 {/* ===== DEFECT ===== */}
-                <div className="space-y-4 rounded-lg border border-gray-200 p-5 bg-white">
+                <div className="space-y-4 rounded-xl border border-border p-5 bg-surface shadow-sm">
                     <h2 className="text-lg font-semibold">
                         Опис несправності
                     </h2>
@@ -417,7 +417,7 @@ export default function ClaimCreateEmployeePage() {
                                     pointer-events-none
                                     absolute -top-8 left-1/2 -translate-x-1/2
                                     whitespace-nowrap
-                                    rounded bg-gray-800 px-2 py-1
+                                    rounded bg-ink px-2 py-1
                                     text-xs text-white
                                     opacity-0
                                     transition

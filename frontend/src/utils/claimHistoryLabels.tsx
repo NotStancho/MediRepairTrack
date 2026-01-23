@@ -20,7 +20,7 @@ export const HISTORY_ICONS: Record<
 > = {
     STATUS_CHANGE: {
         icon: <HiOutlineArrowPath />,
-        color: 'bg-blue-600',
+        color: 'bg-brand',
         label: 'Зміна статусу',
     },
     WORK_LOG: {
@@ -35,7 +35,7 @@ export const HISTORY_ICONS: Record<
     },
     SYSTEM_EVENT: {
         icon: <HiOutlineCog6Tooth />,
-        color: 'bg-gray-500',
+        color: 'bg-ink-muted',
         label: 'Системна подія',
     },
     PART_USED: {

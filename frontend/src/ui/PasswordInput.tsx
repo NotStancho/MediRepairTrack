@@ -30,7 +30,7 @@ export default function PasswordInput({value, onChange, invalid, placeholder }: 
                     onClick={() => setVisible(v => !v)}
                     className="
                         absolute right-2 top-1/2 -translate-y-1/2
-                        text-gray-400 hover:text-gray-600
+                        text-ink-soft hover:text-ink
                         transition-colors
                         "
                     tabIndex={-1}

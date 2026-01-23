@@ -60,22 +60,22 @@ export default function ClaimPaymentTab({ claimId }: Props) {
         <div className="space-y-6">
             {/* Summary */}
             <div className="grid grid-cols-3 gap-4 text-sm">
-                <div className="p-3 border rounded">
-                    <div className="text-gray-500">Сума рахунку</div>
+                <div className="p-3 border border-border rounded-lg bg-surface">
+                    <div className="text-ink-muted">Сума рахунку</div>
                     <div className="font-semibold font-mono">
                         {formatMoney(invoice.totalAmount)}
                     </div>
                 </div>
 
-                <div className="p-3 border rounded">
-                    <div className="text-gray-500">Оплачено</div>
+                <div className="p-3 border border-border rounded-lg bg-surface">
+                    <div className="text-ink-muted">Оплачено</div>
                     <div className="font-semibold font-mono">
                         {formatMoney(invoice.totalPaid)}
                     </div>
                 </div>
 
-                <div className="p-3 border rounded">
-                    <div className="text-gray-500">Залишок</div>
+                <div className="p-3 border border-border rounded-lg bg-surface">
+                    <div className="text-ink-muted">Залишок</div>
                     <div className="font-semibold font-mono">
                         {formatMoney(remaining)}
                     </div>
@@ -92,7 +92,7 @@ export default function ClaimPaymentTab({ claimId }: Props) {
             {canPay && remaining > 0 && (
                 <button
                     onClick={() => setModalOpen(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
+                    className={primaryButton}
                 >
                     + Додати оплату
                 </button>
@@ -100,8 +100,8 @@ export default function ClaimPaymentTab({ claimId }: Props) {
 
             {/* Payments table */}
             <div className="overflow-x-auto">
-                <table className="w-full text-sm border rounded">
-                    <thead className="bg-gray-100">
+                <table className="w-full text-sm border border-border rounded-lg">
+                    <thead className="bg-surface-muted">
                     <tr>
                         <th className="p-2 border">Створено</th>
                         <th className="p-2 border">Оплачено</th>
@@ -113,7 +113,7 @@ export default function ClaimPaymentTab({ claimId }: Props) {
                     </thead>
                     <tbody>
                     {payments.map(p => (
-                        <tr key={p.id} className="hover:bg-gray-50">
+                        <tr key={p.id} className="hover:bg-surface-muted">
                             <td className="p-2 border">
                                 {formatDateTime(p.createdAt)}
                             </td>
@@ -126,7 +126,7 @@ export default function ClaimPaymentTab({ claimId }: Props) {
                                 {PAYMENT_METHOD_LABELS[p.method]}
                             </td>
 
-                            <td className="p-2 border text-gray-600 text-sm">
+                            <td className="p-2 border text-ink-muted text-sm">
                                 {p.method !== 'CASH' ? (
                                     <div className="flex flex-col">
                                         {p.provider && (
@@ -141,10 +141,10 @@ export default function ClaimPaymentTab({ claimId }: Props) {
                                         )}
                                         {!p.provider &&
                                             !p.externalRef &&
-                                            '—'}
+                                            '–'}
                                     </div>
                                 ) : (
-                                    '—'
+                                    '–'
                                 )}
                             </td>
 

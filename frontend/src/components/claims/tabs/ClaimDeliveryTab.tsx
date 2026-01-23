@@ -21,12 +21,12 @@ export default function ClaimDeliveryTab({ claimId }: Props) {
     if (loading) return <div>Завантаження доставок…</div>;
 
     if (!items.length)
-        return <div className="text-sm text-gray-500">Доставки відсутні</div>;
+        return <div className="text-sm text-ink-muted">Доставки відсутні</div>;
 
     return (
         <div className="overflow-x-auto">
-            <table className="w-full text-sm border rounded">
-                <thead className="bg-gray-100 text-left">
+            <table className="w-full text-sm border border-border rounded-lg">
+                <thead className="bg-surface-muted text-left">
                 <tr>
                     <th className="p-2 border">Тип</th>
                     <th className="p-2 border">Провайдер</th>
@@ -48,7 +48,7 @@ export default function ClaimDeliveryTab({ claimId }: Props) {
                             : null);
 
                     return (
-                        <tr key={d.id} className="hover:bg-gray-50">
+                        <tr key={d.id} className="hover:bg-surface-muted">
                             <td className="p-2 border">
                                 {DELIVERY_TYPE_LABELS[d.type]}
                             </td>
@@ -61,7 +61,7 @@ export default function ClaimDeliveryTab({ claimId }: Props) {
                                 {DELIVERY_STATUS_LABELS[d.status]}
                             </td>
 
-                            <td className="p-2 border text-sm text-gray-600">
+                            <td className="p-2 border text-sm text-ink-muted">
                                 {isEngineer
                                     ? `${d.distanceKm} км`
                                     : d.trackingCode ?? '-'}

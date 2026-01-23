@@ -33,22 +33,23 @@ export default function TextArea({invalid, className = '', rows = 3, maxHeight =
             className={`
                 min-h-18
                 w-full px-3 py-2 text-sm
-                border rounded
+                border rounded-lg
                 outline-none
                 resize-none
-                
-                placeholder:text-gray-400
-                placeholder:font-normal
-                
-                transition-[border, box-shadow]
+
+                bg-surface
+                text-ink
+                placeholder:text-ink-soft
+
+                transition-[border-color,box-shadow,background-color]
                 duration-150
                 ease-out
-                
-                ${invalid
-                ? 'border-red-500 focus:ring-2 focus:ring-red-200'
-                : 'border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-400'}
 
-                ${props.disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
+                ${invalid
+                ? 'border-danger focus:ring-2 focus:ring-danger-ring focus:border-danger'
+                : 'border-border focus:ring-2 focus:ring-brand-ring focus:border-brand'}
+
+                ${props.disabled ? 'bg-surface-muted text-ink-muted cursor-not-allowed' : ''}
                 ${className}
             `}
         />

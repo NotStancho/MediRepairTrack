@@ -24,17 +24,17 @@ export default function ClaimDetailsTab({claim}: Props) {
         <div className="space-y-6 text-sm">
 
             {/* 🧾 Заявка */}
-            <section className="rounded border bg-gray-50 p-4">
-                <h3 className="font-semibold mb-3 text-gray-800">
+            <section className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                <h3 className="font-semibold mb-3 text-ink">
                     Інформація про заявку
                 </h3>
 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="flex items-center gap-2">
-                        <span className="text-gray-600">Тип ремонту:</span>
+                        <span className="text-ink-muted">Тип ремонту:</span>
                         <span
                             className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                REPAIR_TYPE_COLORS?.[claim.repairType] ?? 'bg-gray-100 text-gray-700'
+                                REPAIR_TYPE_COLORS?.[claim.repairType] ?? 'bg-surface-muted text-ink-muted'
                             }`}
                         >
                             {REPAIR_TYPE_LABELS[claim.repairType]}
@@ -42,7 +42,7 @@ export default function ClaimDetailsTab({claim}: Props) {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <span className="text-gray-600">Статус:</span>
+                        <span className="text-ink-muted">Статус:</span>
                         <span
                             className={`px-2 py-0.5 rounded text-xs font-medium ${
                                 STATUS_COLORS[claim.status]
@@ -55,7 +55,7 @@ export default function ClaimDetailsTab({claim}: Props) {
                     <div>Закрито: {claim.closedAt ? formatDateTime(claim.closedAt) : '-'}</div>
 
                     <div className="md:col-span-2">
-                        <div className="text-gray-500 mb-1">Опис дефекту</div>
+                        <div className="text-ink-muted mb-1">Опис дефекту</div>
                         <div className="whitespace-pre-line">
                             {claim.defectDescription}
                         </div>
@@ -65,8 +65,8 @@ export default function ClaimDetailsTab({claim}: Props) {
 
             {/* 🏢 Клієнт */}
             {client && (
-                <section className="rounded border bg-gray-50 p-4">
-                    <h3 className="font-semibold mb-3 text-gray-800">
+                <section className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                    <h3 className="font-semibold mb-3 text-ink">
                         Клієнт
                     </h3>
 
@@ -84,8 +84,8 @@ export default function ClaimDetailsTab({claim}: Props) {
 
             {/* 🧰 Обладнання */}
             {equipment && (
-                <section className="rounded border bg-gray-50 p-4">
-                    <h3 className="font-semibold mb-3 text-gray-800">
+                <section className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                    <h3 className="font-semibold mb-3 text-ink">
                         Обладнання
                     </h3>
 

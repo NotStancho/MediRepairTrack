@@ -12,22 +12,23 @@ const Input = forwardRef<HTMLInputElement, Props>(
                 ref={ref}
                 {...props}
                 className={`
-                  w-full h-8 px-3 text-sm
-                  border rounded
+                  w-full h-10 px-3 text-sm
+                  border rounded-lg
                   outline-none
-                  transition
-        
-                  placeholder:text-gray-400
-                  placeholder:font-normal
-        
+                  transition-[border-color,box-shadow,background-color]
+
+                  bg-surface
+                  text-ink
+                  placeholder:text-ink-soft
+
                   ${invalid
-                            ? 'border-red-500 focus:ring-2 focus:ring-red-200'
-                            : 'border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-400'}
-        
+                            ? 'border-danger focus:ring-2 focus:ring-danger-ring focus:border-danger'
+                            : 'border-border focus:ring-2 focus:ring-brand-ring focus:border-brand'}
+
                   ${props.disabled
-                            ? 'bg-gray-100 cursor-not-allowed placeholder:text-gray-300'
-                            : 'bg-white'}
-        
+                            ? 'bg-surface-muted text-ink-muted cursor-not-allowed'
+                            : ''}
+
                   ${className}
                 `}
             />

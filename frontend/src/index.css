@@ -1,4 +1,80 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap");
 @import "tailwindcss";
+
+/* Tailwind v4 tokens: app (page bg), surface/surface-muted (cards), border (strokes),
+   ink/ink-muted/ink-soft (text tiers), brand (primary), accent (support), danger (errors), *-ring (focus). */
+@theme {
+    --font-body: "Source Sans 3", "Noto Sans", "Liberation Sans", sans-serif;
+    --font-display: "Space Grotesk", "Source Sans 3", sans-serif;
+
+    --color-app: #f3f6f9;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f8fafc;
+    --color-border: #e2e8f0;
+
+    --color-ink: #0f172a;
+    --color-ink-muted: #475569;
+    --color-ink-soft: #94a3b8;
+
+    --color-brand: #0e5c6d;
+    --color-brand-strong: #0a4652;
+    --color-brand-muted: #87b0b9;
+    --color-brand-soft: #d9eef2;
+    --color-brand-ring: rgba(14, 92, 109, 0.25);
+
+    --color-accent: #f4b04f;
+    --color-accent-soft: #fff2d9;
+
+    --color-danger: #b42318;
+    --color-danger-strong: #8f1b12;
+    --color-danger-muted: #e6b3ad;
+    --color-danger-ring: rgba(180, 35, 24, 0.25);
+}
+
+@layer base {
+    body {
+        min-height: 100vh;
+        font-family: var(--font-body), sans-serif;
+        color: var(--color-ink);
+        background:
+            radial-gradient(1200px 600px at 5% -10%, rgba(14, 92, 109, 0.18), transparent 60%),
+            radial-gradient(1000px 600px at 95% 0%, rgba(244, 176, 79, 0.2), transparent 55%),
+            var(--color-app);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        font-family: var(--font-display), sans-serif;
+        letter-spacing: -0.01em;
+    }
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+::selection {
+    background: var(--color-brand-soft);
+    color: var(--color-brand-strong);
+}
 
 ::-webkit-scrollbar {
     width: 6px;
@@ -6,10 +82,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(120, 165, 194, 0.8);
-    border-radius: 4px;
+    background: var(--color-brand);
+    border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(120, 165, 194, 1);
+    background: var(--color-brand-strong);
 }

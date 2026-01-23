@@ -16,45 +16,58 @@ export default function ClaimHistoryTab({ claimId }: Props) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getClaimHistory(claimId)
-            .then(history => {
-                const sorted = [...history].sort(
-                    (a, b) =>
-                        new Date(b.actionDate).getTime() -
-                        new Date(a.actionDate).getTime()
+        let cancelled = false;
+
+        const load = async () => {
+            setLoading(true);
+
+            const history = await getClaimHistory(claimId);
+
+            const sorted = [...history].sort(
+                (a, b) =>
+                    new Date(b.actionDate).getTime() -
+                    new Date(a.actionDate).getTime()
+            );
+
+            if (cancelled) return;
+
+            setItems(sorted);
+
+            const ids = Array.from(
+                new Set(sorted.map(h => h.employeeId).filter(Boolean))
+            );
+
+            const missing = ids.filter(id => !employees[id]);
+            if (missing.length) {
+                const results = await Promise.all(
+                    missing.map(id => getEmployeeById(id))
                 );
 
-                setItems(sorted);
-                loadEmployees(sorted);
-            })
-            .finally(() => setLoading(false));
-    }, [claimId]);
+                if (!cancelled) {
+                    setEmployees(prev => {
+                        const copy = { ...prev };
+                        results.forEach(emp => (copy[emp.id] = emp));
+                        return copy;
+                    });
+                }
+            }
 
-    const loadEmployees = async (history: ClaimHistory[]) => {
-        const ids = Array.from(
-            new Set(history.map(h => h.employeeId).filter(Boolean))
-        );
+            setLoading(false);
+        };
 
-        const missing = ids.filter(id => !employees[id]);
-        if (!missing.length) return;
+        void load();
 
-        const results = await Promise.all(
-            missing.map(id => getEmployeeById(id))
-        );
-
-        setEmployees(prev => {
-            const copy = { ...prev };
-            results.forEach(emp => (copy[emp.id] = emp));
-            return copy;
-        });
-    };
+        return () => {
+            cancelled = true;
+        };
+    }, [claimId, employees]);
 
     if (loading) return <div>Завантаження історії…</div>;
-    if (!items.length) return <div className="text-sm text-gray-500">Історія порожня</div>;
+    if (!items.length) return <div className="text-sm text-ink-muted">Історія порожня</div>;
 
     return (
         <div className="relative pl-8 space-y-6">
-            <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200" />
+            <div className="absolute left-3 top-0 bottom-0 w-px bg-border" />
 
             {items.map(item => {
                 const employee = employees[item.employeeId];
@@ -69,8 +82,8 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                             {meta.icon}
                         </div>
 
-                        <div className="ml-4 flex-1 rounded bg-white p-3">
-                            <div className="text-xs text-gray-500">
+                        <div className="ml-4 flex-1 rounded-lg bg-surface border border-border p-3 shadow-sm">
+                            <div className="text-xs text-ink-muted">
                                 {formatDateTime(item.actionDate)}
                             </div>
 
@@ -79,19 +92,19 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                             </div>
 
                             {employee && (
-                                <div className="text-xs text-gray-600">
+                                <div className="text-xs text-ink-muted">
                                     {employee.userLastName} {employee.userFirstName}
                                     {' • '}
                                     {employee.position}
                                 </div>
                             )}
 
-                            <div className="text-sm text-gray-700 whitespace-pre-line mt-1">
+                            <div className="text-sm text-ink whitespace-pre-line mt-1">
                                 {item.description}
                             </div>
 
                             {item.timeSpent > 0 && (
-                                <div className="text-xs text-gray-500 mt-1">
+                                <div className="text-xs text-ink-muted mt-1">
                                     ⏱ {item.timeSpent} год
                                 </div>
                             )}

@@ -9,7 +9,7 @@ export default function AppLayout() {
     return (
         <div
             className={`
-                grid h-screen bg-gray-50
+                grid h-screen bg-transparent
                 grid-rows-[3rem_1fr]
                 transition-all duration-300
                 ${collapsed
@@ -33,7 +33,7 @@ export default function AppLayout() {
 
             {/* Main */}
             <main className="col-start-2 row-start-2 overflow-y-auto overflow-x-hidden min-w-0">
-                <div className="p-4">
+                <div className="p-2 lg:p-4">
                     <Outlet />
                 </div>
             </main>

@@ -26,24 +26,36 @@ export default function ClaimListPage() {
     useEffect(() => {
         if (!user) return;
 
-        setLoading(true);
+        let cancelled = false;
 
-        if (user.role === 'CLIENT') {
-            getClaimsByClient(user.clientId!)
-                .then(setClaims)
-                .finally(() => setLoading(false));
+        const load = async () => {
+            try {
+                setLoading(true);
 
-        } else if (user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER') {
-            getAssignedActiveClaims(user.employeeId!)
-                .then(setAssignedClaims)
-                .finally(() => setLoading(false));
+                if (user.role === 'CLIENT') {
+                    const data = await getClaimsByClient(user.clientId!);
+                    if (!cancelled) setClaims(data);
 
-        } else {
-            getAllClaims()
-                .then(setClaims)
-                .finally(() => setLoading(false));
-        }
+                } else if (user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER') {
+                    const data = await getAssignedActiveClaims(user.employeeId!);
+                    if (!cancelled) setAssignedClaims(data);
+
+                } else {
+                    const data = await getAllClaims();
+                    if (!cancelled) setClaims(data);
+                }
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        };
+
+        void load();
+
+        return () => {
+            cancelled = true;
+        };
     }, [user]);
+
 
     const openClaim = (id: number) => {
         if (user?.role === 'CLIENT') navigate(`/client/claims/${id}`);
@@ -90,13 +102,13 @@ export default function ClaimListPage() {
             {user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER' ? (
                 assignedClaims.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
-                        <h2 className="text-lg font-semibold text-gray-800">
+                        <h2 className="text-lg font-semibold text-ink">
                             Наразі немає призначених заявок
                         </h2>
                     </div>
                 ) : (
                     <table className="w-full text-sm">
-                        <thead className="bg-gray-100">
+                        <thead className="bg-surface-muted">
                         <tr>
                             <th className="p-2 border">№</th>
                             <th className="p-2 border">Тип</th>
@@ -116,7 +128,7 @@ export default function ClaimListPage() {
                             <tr
                                 key={c.claimId}
                                 onClick={() => navigate(`/employee/claims/${c.claimId}`)}
-                                className="cursor-pointer hover:bg-blue-50"
+                                className="cursor-pointer hover:bg-brand-soft"
                             >
                                 <td className="p-2 border">№{c.claimId}</td>
                                 <td className="p-2 border">
@@ -161,7 +173,7 @@ export default function ClaimListPage() {
                                             e.stopPropagation();
                                             navigate(`/employee/claims/${c.claimId}`);
                                         }}
-                                        className="text-blue-600 hover:underline"
+                                        className="text-brand hover:underline"
                                     >
                                         Деталі →
                                     </button>
@@ -173,9 +185,9 @@ export default function ClaimListPage() {
                 )
             ) : (
                 /* таблиця для CLIENT / MANAGER */
-                <div className="overflow-x-auto rounded border">
+                <div className="overflow-x-auto rounded border border-border">
                     <table className="w-full text-sm">
-                        <thead className="bg-gray-100 text-left">
+                        <thead className="bg-surface-muted text-left">
                         <tr>
                             <th className="p-2 border">№</th>
                             <th className="p-2 border">Тип ремонту</th>
@@ -192,7 +204,7 @@ export default function ClaimListPage() {
                             <tr
                                 key={c.id}
                                 onClick={() => openClaim(c.id)}
-                                className="cursor-pointer hover:bg-blue-50 transition"
+                                className="cursor-pointer hover:bg-brand-soft transition"
                             >
                                 <td className="p-2 border font-medium">
                                     №{c.id}
@@ -228,7 +240,7 @@ export default function ClaimListPage() {
                                             e.stopPropagation(); // важливо
                                             openClaim(c.id);
                                         }}
-                                        className="text-blue-600 hover:underline text-sm"
+                                        className="text-brand hover:underline text-sm"
                                     >
                                         Деталі →
                                     </button>

@@ -86,6 +86,14 @@ export default function Select<T, V extends string | number = number>({
         ],
     })
 
+    const setReferenceRef = (node: HTMLButtonElement | null) => {
+        refs.setReference(node);
+    };
+    const setFloatingRef = (node: HTMLDivElement | null) => {
+        refs.setFloating(node);
+        dropdownRef.current = node;
+    };
+
     // Determines whether dropdown is rendered above or below the trigger
     const isTop = placement.startsWith('top');
 
@@ -117,7 +125,7 @@ export default function Select<T, V extends string | number = number>({
     }, [open])
 
     const listContent = loading || filteredOptions.length === 0 ? (
-        <div className="px-3 py-2 text-sm text-gray-400">
+        <div className="px-3 py-2 text-sm text-ink-muted">
             {loading ? loadingText : 'Нічого не знайдено'}
         </div>
     ) : (
@@ -156,10 +164,10 @@ export default function Select<T, V extends string | number = number>({
                             px-3 flex items-center text-sm cursor-pointer
                             transition-colors
                             
-                            hover:bg-gray-50
+                            hover:bg-surface-muted
                             
-                            ${isHighlighted ? 'bg-blue-50' : ''}
-                            ${isSelected ? 'bg-blue-100 text-blue-900 font-medium' : ''}
+                            ${isHighlighted ? 'bg-surface-muted' : ''}
+                            ${isSelected ? 'bg-brand-soft text-brand-strong font-medium' : ''}
                         `}
                     >
                         {getLabel(opt)}
@@ -173,30 +181,31 @@ export default function Select<T, V extends string | number = number>({
         <div className="flex flex-col gap-1 relative">
             {/* ===== Trigger ===== */}
             <button
-                ref={refs.setReference}
+                ref={setReferenceRef}
                 type="button"
                 disabled={isDisabled}
                 onClick={() => setOpen(v => !v)}
                 className={`
-                    h-8 px-3 pr-9
+                    h-10 px-3 pr-9
                     flex items-center justify-between
-                    text-sm rounded border
-                    transition outline-none
+                    text-sm rounded-lg border
+                    transition-[border-color,box-shadow,background-color] outline-none
+                    bg-surface text-ink
 
                     ${invalid
-                        ? 'border-red-500 focus:ring-2 focus:ring-red-200'
-                        : 'border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-400'}
+                        ? 'border-danger focus:ring-2 focus:ring-danger-ring focus:border-danger'
+                        : 'border-border focus:ring-2 focus:ring-brand-ring focus:border-brand'}
 
                     ${isDisabled
-                        ? 'bg-gray-100 cursor-not-allowed text-gray-400'
-                        : 'bg-white'}
+                        ? 'bg-surface-muted cursor-not-allowed text-ink-muted'
+                        : ''}
                 `}
             >
-                <span className={selected ? '' : 'text-gray-400'}>
+                <span className={selected ? '' : 'text-ink-soft'}>
                     {selected ? getLabel(selected) : placeholder}
                 </span>
 
-                <span className="absolute right-3 text-gray-400">
+                <span className="absolute right-3 text-ink-soft">
                     {loading ? (
                         <Spinner size={16}/>
                     ) : (
@@ -219,14 +228,11 @@ export default function Select<T, V extends string | number = number>({
             {open && (
                 <Portal>
                     <div
-                        ref={(node) => {
-                            refs.setFloating(node)
-                            dropdownRef.current = node
-                        }}
+                        ref={setFloatingRef}
                         style={floatingStyles}
                         className="
-                            rounded-md border border-gray-200 bg-white
-                            shadow-lg shadow-black/5
+                            rounded-xl border border-border bg-surface
+                            shadow-lg shadow-black/10
                             flex flex-col overflow-hidden
                         "
                     >
@@ -242,7 +248,7 @@ export default function Select<T, V extends string | number = number>({
                         )}
 
                         {searchable && (
-                            <div className={`${isTop ? 'border-t' : 'border-b'} border-gray-200/60`}>
+                            <div className={`${isTop ? 'border-t' : 'border-b'} border-border`}>
                             <Input
                                     autoFocus
                                     value={query}
@@ -255,7 +261,7 @@ export default function Select<T, V extends string | number = number>({
                                         onSearchChange?.(value);
                                     }}
                                     placeholder="Пошук…"
-                                    className="border-0 rounded"
+                                    className="border-0 rounded-none bg-transparent"
                                 />
                             </div>
                         )}
@@ -275,7 +281,7 @@ export default function Select<T, V extends string | number = number>({
             )}
 
             {/* ===== Error ===== */}
-            {error && <div className="text-xs text-red-600">{error}</div>}
+            {error && <div className="text-xs text-danger">{error}</div>}
         </div>
     );
 }

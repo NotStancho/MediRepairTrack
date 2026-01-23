@@ -81,7 +81,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
     if (!invoice) {
         if (!canCreateInvoice) {
             return (
-                <div className="text-sm text-gray-500 italic">
+                <div className="text-sm text-ink-muted italic">
                     Рахунок ще не створено
                 </div>
             );
@@ -115,7 +115,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                 </div>
 
                 <div className="text-right">
-                    <div className="text-sm text-gray-500">До сплати</div>
+                    <div className="text-sm text-ink-muted">До сплати</div>
                     <div className="text-lg font-semibold font-mono">
                         {formatMoney(invoice.totalAmount)}
                     </div>
@@ -123,7 +123,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
             </div>
 
             {/* Meta */}
-            <div className="grid grid-cols-2 gap-x-6 text-sm text-gray-600">
+            <div className="grid grid-cols-2 gap-x-6 text-sm text-ink-muted">
                 {/* LEFT */}
                 <div className="space-y-1">
                     <div>Створено: {formatDateTime(invoice.createdAt)}</div>
@@ -138,7 +138,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                                         setNewDueAt(invoice.dueAt ?? '');
                                         setDueDateModalOpen(true);
                                     }}
-                                    className="text-xs text-blue-600 hover:underline"
+                                    className="text-xs text-brand hover:underline"
                                 >
                                     Продовжити
                                 </button>
@@ -187,8 +187,8 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
 
             {/* Items */}
             <div className="overflow-x-auto">
-                <table className="w-full text-sm border rounded">
-                    <thead className="bg-gray-100">
+                <table className="w-full text-sm border border-border rounded-lg">
+                    <thead className="bg-surface-muted">
                     <tr>
                         <th className="p-2 border">Тип</th>
                         <th className="p-2 border">Опис</th>
@@ -274,6 +274,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                     }
                     onClose={() => setOtherModalOpen(false)}
                     width="md"
+                    backdrop="dim"
                 >
                     <FormField label="Опис">
                         <textarea
@@ -350,9 +351,11 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                                     pricePerUnit: Number(form.pricePerUnit),
                                 };
 
-                                editingItem
-                                    ? await updateOther(editingItem.id, dto)
-                                    : await addOther(dto);
+                                if (editingItem) {
+                                    await updateOther(editingItem.id, dto);
+                                } else {
+                                    await addOther(dto);
+                                }
 
                                 setOtherModalOpen(false);
                             }}
@@ -409,6 +412,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                     title="Видалити позицію?"
                     description="Цю дію неможливо скасувати."
                     confirmText="Так, видалити"
+                    confirmVariant="danger"
                     onConfirm={async () => {
                         await removeOther(deleteId);
                         setDeleteId(null);

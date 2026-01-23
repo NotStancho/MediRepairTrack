@@ -19,12 +19,12 @@ export default function ClaimEmployeesTab({claimId}: Props) {
 
     if (loading) return <div>Завантаження працівників…</div>;
     if (!items.length)
-        return <div className="text-sm text-gray-500">Працівники не призначені</div>;
+        return <div className="text-sm text-ink-muted">Працівники не призначені</div>;
 
     return (
         <div className="overflow-x-auto">
-            <table className="w-full text-sm border rounded">
-                <thead className="bg-gray-100 text-left">
+            <table className="w-full text-sm border border-border rounded-lg">
+                <thead className="bg-surface-muted text-left">
                 <tr>
                     <th className="p-2 border">Працівник</th>
                     <th className="p-2 border">Посада</th>
@@ -57,9 +57,9 @@ export default function ClaimEmployeesTab({claimId}: Props) {
                         <td className="p-2 border ">
                             {e.hoursWorked ?? '—'}
                         </td>
-                        <td className="p-2 border text-gray-600 max-w-xs truncate">
+                        <td className="p-2 border text-ink-muted max-w-xs truncate">
                             {e.notes ? (<span className="whitespace-pre-line">{e.notes}</span>) : (
-                                <span className="text-gray-400">-</span>
+                                <span className="text-ink-soft">-</span>
                             )}
                         </td>
                     </tr>

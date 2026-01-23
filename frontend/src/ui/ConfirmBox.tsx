@@ -1,10 +1,12 @@
 import Modal from './Modal/Modal.tsx';
+import Button from './Button';
 
 interface ConfirmBoxProps {
     title: string;
     description?: string;
     confirmText?: string;
     cancelText?: string;
+    confirmVariant?: 'default' | 'primary' | 'secondary' | 'danger';
     onConfirm: () => void;
     onCancel: () => void;
 }
@@ -14,31 +16,32 @@ export default function ConfirmBox({
                                        description,
                                        confirmText = 'Підтвердити',
                                        cancelText = 'Скасувати',
+                                       confirmVariant = 'primary',
                                        onConfirm,
                                        onCancel,
                                    }: ConfirmBoxProps) {
     return (
         <Modal title={title} onClose={onCancel} width="sm">
             {description && (
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-ink-muted">
                     {description}
                 </div>
             )}
 
             <div className="flex justify-end gap-2 pt-4">
-                <button
+                <Button
                     onClick={onCancel}
-                    className="px-3 py-2 border rounded"
+                    variant="secondary"
                 >
                     {cancelText}
-                </button>
+                </Button>
 
-                <button
+                <Button
                     onClick={onConfirm}
-                    className="px-3 py-2 bg-green-600 text-white rounded"
+                    variant={confirmVariant}
                 >
                     {confirmText}
-                </button>
+                </Button>
             </div>
         </Modal>
     );

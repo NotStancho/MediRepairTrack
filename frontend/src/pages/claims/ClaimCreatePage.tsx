@@ -20,10 +20,6 @@ export default function ClaimCreatePage() {
     const {user} = useAuth();
     const navigate = useNavigate();
 
-    if (!user || user.role !== 'CLIENT' || !user.clientId) {
-        return null;
-    }
-
     // ===== FORM STATE =====
     const [defectDescription, setDefectDescription] = useState('');
     const [modelId, setModelId] = useState<number | null>(null);
@@ -37,6 +33,10 @@ export default function ClaimCreatePage() {
 
     const {models, loading: modelsLoading} = useEquipmentModels();
     const {checking, exists, isNew} = useEquipmentResolver(modelId, serialNumber);
+
+    if (!user || user.role !== 'CLIENT' || !user.clientId) {
+        return null;
+    }
 
     // ===== VALIDATION =====
     const isFormValid =
@@ -115,11 +115,11 @@ export default function ClaimCreatePage() {
                 </h1>
 
                 {/* ===== EQUIPMENT ===== */}
-                <div className="space-y-4 rounded-lg border border-gray-200 p-5 bg-white">
+                <div className="space-y-4 rounded-xl border border-border p-5 bg-surface shadow-sm">
                     <h2 className="text-lg font-semibold">
                         Дані обладнання
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-ink-muted">
                         Вкажіть модель та серійний номер обладнання, для якого потрібен ремонт
                     </p>
                     <InputField
@@ -167,7 +167,7 @@ export default function ClaimCreatePage() {
                     </InputField>
 
                     {checking && (
-                        <div className="rounded-md bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-gray-600">
+                        <div className="rounded-md bg-surface-muted border border-border px-3 py-2 text-sm text-ink-muted">
                             Перевіряємо, чи є таке обладнання в системі…
                         </div>
                     )}
@@ -241,7 +241,7 @@ export default function ClaimCreatePage() {
                 </div>
 
                 {/* ===== DEFECT ===== */}
-                <div className="space-y-4 rounded-lg border border-gray-200 p-5 bg-white">
+                <div className="space-y-4 rounded-xl border border-border p-5 bg-surface shadow-sm">
                     <h2 className="text-lg font-semibold">
                         Опис несправності
                     </h2>
@@ -287,15 +287,15 @@ export default function ClaimCreatePage() {
 
                         {showHint && (
                             <div
-                                className="
-                                    pointer-events-none
-                                    absolute -top-8 left-1/2 -translate-x-1/2
-                                    whitespace-nowrap
-                                    rounded bg-gray-800 px-2 py-1
-                                    text-xs text-white
-                                    opacity-0
-                                    transition
-                                    group-hover:opacity-100
+                            className="
+                                pointer-events-none
+                                absolute -top-8 left-1/2 -translate-x-1/2
+                                whitespace-nowrap
+                                rounded bg-ink px-2 py-1
+                                text-xs text-white
+                                opacity-0
+                                transition
+                                group-hover:opacity-100
                                 "
                             >
                                 {hintText}

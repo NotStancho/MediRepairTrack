@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import {useCallback, useLayoutEffect, useRef, useState} from 'react';
 
 import type { Claim } from '../../types/claim/claim';
 import ClaimDetailsTab from "./tabs/ClaimDetailsTab.tsx";
@@ -29,22 +29,22 @@ const tabs: { key: string; label: string; icon: IconType }[] = [
 export default function ClaimTabs({ claim }: Props) {
     const [active, setActive] = useState('details');
 
+    const activeContentRef = useRef<HTMLSpanElement | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const indicatorRef = useRef<HTMLDivElement>(null);
 
-    const updateIndicator = () => {
+    const updateIndicator = useCallback(() => {
         const container = containerRef.current;
         const indicator = indicatorRef.current;
-        if (!container || !indicator) return;
+        const activeContent = activeContentRef.current;
+        if (!container || !indicator || !activeContent) return;
 
-        const activeBtn = container.querySelector<HTMLButtonElement>(
-            `[data-key="${active}"]`
-        );
-        if (!activeBtn) return;
+        const rect = activeContent.getBoundingClientRect();
+        const parentRect = container.getBoundingClientRect();
 
-        indicator.style.width = `${activeBtn.offsetWidth}px`;
-        indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
-    };
+        indicator.style.width = `${rect.width}px`;
+        indicator.style.transform = `translateX(${rect.left - parentRect.left}px)`;
+    }, []);
 
     useLayoutEffect(() => {
         updateIndicator();
@@ -66,94 +66,80 @@ export default function ClaimTabs({ claim }: Props) {
             ro.disconnect();
             window.removeEventListener('resize', updateIndicator);
         };
-    }, [active]);
-
+    }, [updateIndicator]);
 
     return (
         <div>
-            {/* Tabs header */}
-            <div className="sticky top-0 z-10 bg-gray-50">
-                <div className="relative border-b">
-                    <div
-                        ref={containerRef}
-                        className="flex flex-wrap gap-x-2 gap-y-1 min-w-0"
-                    >
-                        {tabs.map(tab => {
-                            const Icon = tab.icon;
-                            const isActive = active === tab.key;
+            <div className="rounded-xl border border-border bg-surface shadow-sm overflow-hidden">
+                {/* Tabs header */}
+                <div className="sticky top-0 z-10 bg-surface">
+                    <div className="relative border-b border-border">
+                        <div
+                            ref={containerRef}
+                            className="flex flex-wrap gap-x-1 gap-y-1 min-w-0"
+                        >
+                            {tabs.map(tab => {
+                                const Icon = tab.icon;
+                                const isActive = active === tab.key;
 
-                            return (
-                                <button
-                                    key={tab.key}
-                                    data-key={tab.key}
-                                    onClick={() => setActive(tab.key)}
-                                    className={`
+                                return (
+                                    <button
+                                        key={tab.key}
+                                        data-key={tab.key}
+                                        onClick={() => setActive(tab.key)}
+                                        className={`
                                         group
                                         flex items-center gap-2
                                         px-4 py-2 text-sm
-                                        rounded-md
+                                        rounded-t-md
                                         transition-all duration-150
                                         ${isActive
-                                            ? 'text-blue-600 font-medium'
-                                            : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'}
+                                            ? 'text-brand font-semibold bg-brand-soft'
+                                            : 'text-ink-muted hover:text-brand hover:bg-brand-soft'}
                                             `}
-                                >
-                                    <Icon
-                                        size={16}
-                                        className={`
-                                            transition-colors
-                                            ${isActive 
-                                                ? 'text-blue-600' 
-                                                : 'text-gray-400 group-hover:text-blue-600'}
-                                        `}
-                                    />
-                                    <span>{tab.label}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
+                                    >
+                                        <span
+                                            ref={isActive ? activeContentRef : undefined}
+                                            className="inline-flex items-center gap-2"
+                                        >
+                                            <Icon
+                                                size={16}
+                                                className={`
+                                                    transition-colors
+                                                    ${isActive
+                                                        ? 'text-brand'
+                                                        : 'text-ink-soft group-hover:text-brand'}
+                                                    `}
+                                            />
+                                        <span>{tab.label}</span>
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
 
-                    {/* underline */}
-                    <div
-                        ref={indicatorRef}
-                        className="absolute bottom-0 h-0.5 bg-blue-600"
-                        style={{
-                            transition: 'transform 250ms ease, width 250ms ease',
-                        }}
-                    />
+                        {/* underline */}
+                        <div
+                            ref={indicatorRef}
+                            className="absolute bottom-0 h-0.5 bg-brand transition-[transform,width] duration-200"
+                        />
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div
+                    key={active}
+                    className="p-4 min-w-0 overflow-x-hidden animate-[fade-up_250ms_ease-out_both]"
+                >
+                    {active === 'details' && <ClaimDetailsTab claim={claim}/>}
+                    {active === 'history' && <ClaimHistoryTab claimId={claim.id}/>}
+                    {active === 'employees' && <ClaimEmployeesTab claimId={claim.id}/>}
+                    {active === 'parts' && <ClaimPartsTab claimId={claim.id}/>}
+                    {active === 'delivery' && <ClaimDeliveryTab claimId={claim.id}/>}
+                    {active === 'invoice' && <ClaimInvoiceTab claimId={claim.id}/>}
+                    {active === 'payment' && <ClaimPaymentTab claimId={claim.id}/>}
                 </div>
             </div>
-
-            {/* Content */}
-            <div
-                key={active}
-                className="p-4 rounded bg-white min-w-0 overflow-x-hidden"
-                style={{animation: 'fadeIn 200ms ease-out'}}
-            >
-                {active === 'details' && <ClaimDetailsTab claim={claim} />}
-                {active === 'history' && <ClaimHistoryTab claimId={claim.id} />}
-                {active === 'employees' && <ClaimEmployeesTab claimId={claim.id} />}
-                {active === 'parts' && <ClaimPartsTab claimId={claim.id} />}
-                {active === 'delivery' && <ClaimDeliveryTab claimId={claim.id} />}
-                {active === 'invoice' && <ClaimInvoiceTab claimId={claim.id} />}
-                {active === 'payment' && <ClaimPaymentTab claimId={claim.id} />}
-            </div>
-
-            {/* inline keyframes */}
-            <style>
-                {`
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                        transform: translateY(2px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                `}
-            </style>
         </div>
     );
 }

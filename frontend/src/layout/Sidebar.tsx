@@ -64,21 +64,21 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
     }
 
     return (
-        <div className="h-screen bg-slate-900 text-slate-200 flex flex-col border-r border-slate-800">
+        <div className="h-screen bg-gradient-to-b from-brand-strong to-[#082f37] text-white flex flex-col border-r border-white/10">
             {/* Logo + toggle */}
             <div
                 className={[
-                    'flex items-center h-12 border-b border-slate-800 px-3',
+                    'flex items-center h-14 border-b border-white/10 px-3',
                     collapsed ? 'justify-center' : 'justify-between',
                 ].join(' ')}
             >
                 {!collapsed && (
-                    <div className="font-semibold tracking-wide">
+                    <div className="font-semibold tracking-wide text-white">
                         MediRepairTrack
                     </div>
                 )}
 
-                <button onClick={onToggle} className="p-2 rounded-md hover:bg-slate-800 transition">
+                <button onClick={onToggle} className="p-2 rounded-md hover:bg-white/10 transition">
                     <FiMenu size={18} />
                 </button>
 
@@ -97,18 +97,18 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
                             to={item.to}
                             title={collapsed ? item.label : undefined}
                             className={[
-                                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                                'hover:bg-slate-800 hover:text-white',
+                                'group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                'hover:bg-white/10 hover:text-white',
                                 active
-                                    ? 'bg-slate-800 text-blue-300'
-                                    : 'text-slate-300',
+                                    ? 'bg-white/10 text-white'
+                                    : 'text-white/70',
                             ].join(' ')}
                         >
                             <Icon
                                 size={18}
                                 className={active
-                                    ? 'text-blue-400'
-                                    : 'text-slate-400 group-hover:text-white'}
+                                    ? 'text-accent'
+                                    : 'text-white/50 group-hover:text-white'}
                             />
 
                             {!collapsed && <span>{item.label}</span>}

@@ -2,7 +2,7 @@
 export default function Spinner({ size = 16 }: { size?: number }) {
     return (
         <svg
-            className="animate-spin text-gray-400"
+            className="animate-spin text-ink-soft"
             width={size}
             height={size}
             viewBox="0 0 24 24"

@@ -9,7 +9,7 @@ interface Props {
 
 export default function ClaimHeader({ claim, equipment }: Props) {
     return (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2">
             {/* Ліва частина */}
             <div className="flex flex-wrap items-center gap-6 text-sm">
                 <span className="text-lg font-bold">
@@ -24,24 +24,24 @@ export default function ClaimHeader({ claim, equipment }: Props) {
 
                 <span
                     className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        REPAIR_TYPE_COLORS?.[claim.repairType] ?? 'bg-gray-100 text-gray-700'
+                        REPAIR_TYPE_COLORS?.[claim.repairType] ?? 'bg-surface-muted text-ink-muted'
                     }`}
                 >
                     {REPAIR_TYPE_LABELS[claim.repairType]}
                 </span>
             </div>
 
-            {/* 🧰 Обладнання */}
+            {/* Обладнання */}
             {equipment && (
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-ink-muted">
                     {equipment.modelName}
-                    <span className="mx-2 text-gray-400">•</span>
+                    <span className="mx-2 text-ink-soft">•</span>
                     SN: <span className="font-mono">{equipment.serialNumber}</span>
                 </div>
             )}
 
             {/* Права частина */}
-            <div className="text-sm text-gray-700 whitespace-nowrap">
+            <div className="text-sm text-ink whitespace-nowrap">
                 ⏱ {claim.totalTimeSpent ?? 0} год
             </div>
         </div>

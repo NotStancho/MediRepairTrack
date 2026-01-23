@@ -55,8 +55,8 @@ export default function Header() {
     if (!user) return null;
 
     return (
-        <header className="h-12 bg-white border-b border-gray-200 flex items-center px-4 z-30">
-            <div className="font-medium text-gray-700">
+        <header className="h-14 bg-white/80 backdrop-blur border-b border-border flex items-center px-4 z-30 shadow-sm shadow-black/5">
+            <div className="font-medium text-ink">
                 {getCabinetTitle(user)}
             </div>
 
@@ -69,11 +69,11 @@ export default function Header() {
                     onClick={() => setOpen(v => !v)}
                     className="
                         flex items-center gap-2
-                        text-sm text-gray-800
+                        text-sm text-ink
                         px-3 py-1.5
                         rounded-md
-                        hover:bg-gray-100
-                        focus:outline-none focus:ring-2 focus:ring-blue-500
+                        hover:bg-brand-soft
+                        focus:outline-none focus:ring-2 focus:ring-brand-ring
                         transition
                     "
                 >
@@ -84,7 +84,7 @@ export default function Header() {
                     <FiChevronDown
                         size={16}
                         className={`
-                            text-gray-500
+                            text-ink-muted
                             transition-transform duration-200
                             ${open ? 'rotate-180' : ''}
                         `}
@@ -95,10 +95,10 @@ export default function Header() {
                     <div
                         className="
                             absolute right-0 mt-1 w-44
-                            bg-white
-                            border border-gray-200
-                            rounded-md
-                            shadow-md
+                            bg-surface
+                            border border-border
+                            rounded-lg
+                            shadow-lg shadow-black/10
                         "
                     >
                         <button
@@ -106,8 +106,8 @@ export default function Header() {
                             className="
                                 w-full text-left
                                 px-4 py-2
-                                text-sm text-gray-700
-                                hover:bg-gray-50
+                                text-sm text-ink
+                                hover:bg-surface-muted
                             "
                         >
                             Вийти
