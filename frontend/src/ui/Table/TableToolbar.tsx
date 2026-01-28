@@ -6,6 +6,7 @@ import { autoUpdate, flip, offset, shift, useDismiss, useFloating, useInteractio
 import Portal from '../Portal';
 import Input from '../Input';
 import Button from '../Button';
+import { FiX } from 'react-icons/fi';
 
 interface Props<TData> {
     table: Table<TData>;
@@ -56,13 +57,7 @@ export default function TableToolbar<TData>({
     };
 
     return (
-        <div
-            className={`
-                flex flex-wrap items-center gap-3
-                px-3 py-3
-                ${className}
-            `}
-        >
+        <div className={`flex flex-wrap items-center gap-3 px-3 py-3 ${className}`}>
             {enableGlobalFilter && (
                 <div className="relative w-full md:w-72">
                     <Input
@@ -79,14 +74,18 @@ export default function TableToolbar<TData>({
                         <button
                             onClick={() => table.setGlobalFilter('')}
                             className="
-                                absolute inset-y-0 right-2
+                                absolute right-2 top-1/2 -translate-y-1/2
                                 flex items-center
-                                text-ink-soft text-sm
+                                text-ink-soft
                                 hover:text-ink
+                                hover:bg-surface-muted
+                                rounded
+                                p-1
+                                transition-colors
                             "
                             aria-label="Очистити пошук"
                         >
-                            ×
+                            <FiX size={16} />
                         </button>
                     )}
                 </div>
@@ -145,7 +144,15 @@ export default function TableToolbar<TData>({
                                 <div className="flex items-center justify-between px-1 py-1 text-xs font-semibold text-ink">
                                     <span>Відображення колонок</span>
                                     <button
-                                        onClick={() => columns.forEach(col => col.toggleVisibility(true))}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+
+                                            const allVisible = Object.fromEntries(
+                                                table.getAllLeafColumns().map(col => [col.id, true])
+                                            );
+
+                                            table.setColumnVisibility(allVisible);
+                                        }}
                                         className="text-brand hover:underline"
                                     >
                                         Всі
