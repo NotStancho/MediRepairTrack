@@ -28,5 +28,9 @@ declare module '@tanstack/table-core' {
          * Short label for column visibility menu.
          */
         shortLabel?: string;
+        /**
+         * Hide header icons (sort/pin/drag) when column width is below this value (px).
+         */
+        iconHideWidth?: number;
     }
 }

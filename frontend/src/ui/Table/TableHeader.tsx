@@ -52,6 +52,8 @@ export default function TableHeader<TData>({
                     const isDragging = draggingColumnId === header.column.id;
 
                     const sizePx = header.getSize?.();
+                    const iconHideWidth = header.column.columnDef.meta?.iconHideWidth ?? 88;
+                    const hideIcons = typeof sizePx === 'number' && sizePx < iconHideWidth;
                     const pin = header.column.getIsPinned?.() ?? false;
                     const pinnedOffset = pin === 'left'
                         ? pinnedOffsets.left.get(header.column.id)
@@ -129,8 +131,8 @@ export default function TableHeader<TData>({
                                     z-0
                                   `}
                             />
-                            <div className="relative z-10 inline-flex items-center gap-1">
-                                {enableColumnReorder && (
+                            <div className="relative z-10 inline-flex items-center gap-1 min-w-0">
+                                {enableColumnReorder && !hideIcons && (
                                     <span
                                         draggable
                                         onDragStart={(e) => {
@@ -162,13 +164,16 @@ export default function TableHeader<TData>({
 
                                 <span
                                     onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
-                                    className={canSort ? 'cursor-pointer hover:text-ink' : ''}
+                                    className={`
+                                        ${canSort ? 'cursor-pointer hover:text-ink' : ''}
+                                        truncate max-w-full
+                                    `}
                                 >
                                     {flexRender(header.column.columnDef.header, header.getContext())}
                                 </span>
-                                {canSort && <TableSortIcon direction={sortDirection}/>}
+                                {canSort && !hideIcons && <TableSortIcon direction={sortDirection}/>}
 
-                                {enableColumnPinning && header.column.getCanPin?.() && (
+                                {enableColumnPinning && header.column.getCanPin?.() && !hideIcons && (
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
