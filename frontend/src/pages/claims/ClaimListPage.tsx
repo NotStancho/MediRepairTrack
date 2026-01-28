@@ -1,22 +1,24 @@
-import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+//src/pages/ClaimListPage.tsx
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import {useAuth} from '../../context/AuthContext';
-import {getAllClaims, getClaimsByClient} from '../../api/claim';
-import {getAssignedActiveClaims} from '../../api/claimEmployee';
+import { useAuth } from '../../context/AuthContext';
+import { getAllClaims, getClaimsByClient } from '../../api/claim';
+import { getAssignedActiveClaims } from '../../api/claimEmployee';
 
-import type {Claim} from '../../types/claim/claim';
-import type {AssignedActiveClaim} from "../../types/claim/assignedClaim";
+import type { Claim } from '../../types/claim/claim';
+import type { AssignedActiveClaim } from '../../types/claim/assignedClaim';
 
-import {CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS, STATUS_COLORS} from '../../utils/claimLabels';
-import {ROLE_IN_CLAIM_LABELS, ROLE_IN_CLAIM_COLORS} from '../../utils/roleInClaimLabels';
+import { CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS, STATUS_COLORS } from '../../utils/claimLabels';
+import { ROLE_IN_CLAIM_LABELS, ROLE_IN_CLAIM_COLORS } from '../../utils/roleInClaimLabels';
 
 import Button from '../../ui/Button';
+import { Table, TableToolbar, type TableColumnDef } from '../../ui/Table';
 
-import {formatDateTime} from '../../utils/dateFormat';
+import { formatDateTime } from '../../utils/dateFormat';
 
 export default function ClaimListPage() {
-    const {user} = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     const [claims, setClaims] = useState<Claim[]>([]);
@@ -57,13 +59,177 @@ export default function ClaimListPage() {
     }, [user]);
 
 
-    const openClaim = (id: number) => {
+    const openClaim = useCallback((id: number) => {
         if (user?.role === 'CLIENT') navigate(`/client/claims/${id}`);
         else if (user?.role === 'EMPLOYEE') navigate(`/employee/claims/${id}`);
         else navigate(`/claims/${id}`);
-    };
+    }, [navigate, user?.role]);
 
-    if (loading) return <div>Завантаження заявок…</div>;
+    const claimColumns = useMemo<TableColumnDef<Claim>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: '№',
+            meta: { label: 'Номер' },
+            cell: ({ row }) => <span className="font-semibold">{row.original.id}</span>,
+        },
+        {
+            accessorKey: 'repairType',
+            header: 'Тип ремонту',
+            meta: { label: 'Тип' },
+            cell: ({ row }) => REPAIR_TYPE_LABELS[row.original.repairType],
+        },
+        {
+            accessorKey: 'status',
+            header: 'Статус',
+            meta: { align: 'center' },
+            cell: ({ row }) => (
+                <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[row.original.status]}`}>
+                    {CLAIM_STATUS_LABELS[row.original.status]}
+                </span>
+            ),
+        },
+        {
+            accessorKey: 'defectDescription',
+            header: 'Опис дефекту',
+            meta: { label: 'Опис', headerClassName: 'min-w-[180px]' },
+            cell: ({ row }) => (
+                <span className="line-clamp-1 text-ink">
+                    {row.original.defectDescription}
+                </span>
+            ),
+        },
+        {
+            accessorKey: 'createdAt',
+            header: 'Створено',
+            meta: { align: 'center' },
+            cell: ({ row }) => formatDateTime(row.original.createdAt),
+        },
+        {
+            accessorKey: 'closedAt',
+            header: 'Закрито',
+            meta: { align: 'center' },
+            cell: ({ row }) => row.original.closedAt ? formatDateTime(row.original.closedAt) : '—',
+        },
+        {
+            id: 'actions',
+            header: 'Дії',
+            meta: { align: 'center', headerClassName: 'w-24' },
+            enableSorting: false,
+            enableGlobalFilter: false,
+            cell: ({ row }) => (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        openClaim(row.original.id);
+                    }}
+                    className="text-brand hover:underline text-sm"
+                >
+                    Деталі →
+                </button>
+            ),
+        },
+    ], [openClaim]);
+
+    const assignedColumns = useMemo<TableColumnDef<AssignedActiveClaim>[]>(() => [
+        {
+            accessorKey: 'claimId',
+            header: '№',
+            meta: { label: 'Номер', headerClassName: 'w-16' },
+            cell: ({ row }) => <span className="font-semibold">{row.original.claimId}</span>,
+        },
+        {
+            accessorKey: 'repairType',
+            header: 'Тип',
+            cell: ({ row }) => REPAIR_TYPE_LABELS[row.original.repairType],
+        },
+        {
+            accessorKey: 'status',
+            header: 'Статус',
+            meta: { align: 'center' },
+            cell: ({ row }) => (
+                <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[row.original.status]}`}>
+                    {CLAIM_STATUS_LABELS[row.original.status]}
+                </span>
+            ),
+        },
+        {
+            accessorKey: 'role',
+            header: 'Моя роль',
+            meta: { align: 'center' },
+            cell: ({ row }) => (
+                <span
+                    className={`
+                        inline-flex items-center
+                        px-2 py-0.5
+                        rounded-full
+                        text-xs font-medium
+                        ${ROLE_IN_CLAIM_COLORS[row.original.role]}
+                    `}
+                >
+                    {ROLE_IN_CLAIM_LABELS[row.original.role]}
+                </span>
+            ),
+        },
+        {
+            accessorKey: 'hoursWorked',
+            header: 'Мої години',
+            meta: { align: 'center' },
+        },
+        {
+            accessorKey: 'totalTimeSpent',
+            header: 'Всього годин',
+            meta: { align: 'center' },
+        },
+        {
+            accessorKey: 'createdAt',
+            header: 'Створено',
+            meta: { align: 'center' },
+            cell: ({ row }) => formatDateTime(row.original.createdAt),
+        },
+        {
+            accessorKey: 'closedAt',
+            header: 'Закрито',
+            meta: { align: 'center' },
+            cell: ({ row }) => row.original.closedAt ? formatDateTime(row.original.closedAt) : '—',
+        },
+        {
+            accessorKey: 'defectDescription',
+            header: 'Дефект',
+            meta: { headerClassName: 'min-w-[180px]' },
+            cell: ({ row }) => (
+                <span className="line-clamp-1 text-ink">
+                    {row.original.defectDescription}
+                </span>
+            ),
+        },
+        {
+            id: 'actions',
+            header: 'Дії',
+            meta: { align: 'center', headerClassName: 'w-24' },
+            enableSorting: false,
+            enableGlobalFilter: false,
+            cell: ({ row }) => (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/employee/claims/${row.original.claimId}`);
+                    }}
+                    className="text-brand hover:underline text-sm"
+                >
+                    Деталі →
+                </button>
+            ),
+        },
+    ], [navigate]);
+
+    if (loading && (!claims.length && !assignedClaims.length)) {
+        return (
+            <div className="p-4">
+                <div className="text-sm text-ink-muted">Завантаження заявок…</div>
+            </div>
+        );
+    }
+
     if (!user) return null;
 
     return (
@@ -100,156 +266,41 @@ export default function ClaimListPage() {
             </div>
 
             {user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER' ? (
-                assignedClaims.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                        <h2 className="text-lg font-semibold text-ink">
-                            Наразі немає призначених заявок
-                        </h2>
-                    </div>
-                ) : (
-                    <table className="w-full text-sm">
-                        <thead className="bg-surface-muted">
-                        <tr>
-                            <th className="p-2 border">№</th>
-                            <th className="p-2 border">Тип</th>
-                            <th className="p-2 border">Статус</th>
-                            <th className="p-2 border">Моя роль</th>
-                            <th className="p-2 border">Мої години</th>
-                            <th className="p-2 border">Всього години</th>
-                            <th className="p-2 border">Створено</th>
-                            <th className="p-2 border">Закрито</th>
-                            <th className="p-2 border">Дефект</th>
-                            <th className="p-2 border">Дії</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        {assignedClaims.map(c => (
-                            <tr
-                                key={c.claimId}
-                                onClick={() => navigate(`/employee/claims/${c.claimId}`)}
-                                className="cursor-pointer hover:bg-brand-soft"
-                            >
-                                <td className="p-2 border">№{c.claimId}</td>
-                                <td className="p-2 border">
-                                    {REPAIR_TYPE_LABELS[c.repairType]}
-                                </td>
-                                <td className="p-2 border">
-                        <span className={`px-2 py-0.5 rounded text-xs ${STATUS_COLORS[c.status]}`}>
-                            {CLAIM_STATUS_LABELS[c.status]}
-                        </span>
-                                </td>
-                                <td className="p-2 border">
-                                <span
-                                    className={`
-                                        inline-flex items-center
-                                        px-2 py-0.5
-                                        rounded-full
-                                        text-xs font-medium
-                                        ${ROLE_IN_CLAIM_COLORS[c.role]}
-                                    `}
-                                >
-                                    {ROLE_IN_CLAIM_LABELS[c.role]}
-                                </span>
-                                </td>
-                                <td className="p-2 border text-center">
-                                    {c.hoursWorked}
-                                </td>
-                                <td className="p-2 border text-center">
-                                    {c.totalTimeSpent}
-                                </td>
-                                <td className="p-2 border">
-                                    {formatDateTime(c.createdAt)}
-                                </td>
-                                <td className="p-2 border">
-                                    {c.closedAt ? formatDateTime(c.closedAt) : '—'}
-                                </td>
-                                <td className="p-2 border max-w-xs truncate">
-                                    {c.defectDescription}
-                                </td>
-                                <td className="p-2 border">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/employee/claims/${c.claimId}`);
-                                        }}
-                                        className="text-brand hover:underline"
-                                    >
-                                        Деталі →
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                )
+                <Table
+                    data={assignedClaims}
+                    columns={assignedColumns}
+                    loading={loading}
+                    density="compact"
+                    storageKey="claim-list-table"
+                    onRowClick={(row) => navigate(`/employee/claims/${row.original.claimId}`)}
+                    renderToolbar={(table) => (
+                        <TableToolbar
+                            table={table}
+                            globalFilterPlaceholder="Пошук за номером, статусом чи описом"
+                        />
+                    )}
+                    initialState={{
+                        sorting: [{ id: 'createdAt', desc: true }],
+                    }}
+                />
             ) : (
-                /* таблиця для CLIENT / MANAGER */
-                <div className="overflow-x-auto rounded border border-border">
-                    <table className="w-full text-sm">
-                        <thead className="bg-surface-muted text-left">
-                        <tr>
-                            <th className="p-2 border">№</th>
-                            <th className="p-2 border">Тип ремонту</th>
-                            <th className="p-2 border">Статус</th>
-                            <th className="p-2 border">Опис дефекту</th>
-                            <th className="p-2 border">Створено</th>
-                            <th className="p-2 border">Закрито</th>
-                            <th className="p-2 border w-20 text-center">Дії</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        {claims.map(c => (
-                            <tr
-                                key={c.id}
-                                onClick={() => openClaim(c.id)}
-                                className="cursor-pointer hover:bg-brand-soft transition"
-                            >
-                                <td className="p-2 border font-medium">
-                                    №{c.id}
-                                </td>
-
-                                <td className="p-2 border">
-                                    {REPAIR_TYPE_LABELS[c.repairType]}
-                                </td>
-
-                                <td className="p-2 border">
-                                <span
-                                    className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[c.status]}`}
-                                >
-                                    {CLAIM_STATUS_LABELS[c.status]}
-                                </span>
-                                </td>
-
-                                <td className="p-2 border max-w-xs truncate">
-                                    {c.defectDescription}
-                                </td>
-
-                                <td className="p-2 border whitespace-nowrap">
-                                    {formatDateTime(c.createdAt)}
-                                </td>
-
-                                <td className="p-2 border whitespace-nowrap">
-                                    {formatDateTime(c.closedAt)}
-                                </td>
-
-                                <td className="p-2 border">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // важливо
-                                            openClaim(c.id);
-                                        }}
-                                        className="text-brand hover:underline text-sm"
-                                    >
-                                        Деталі →
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
+                <Table
+                    data={claims}
+                    columns={claimColumns}
+                    loading={loading}
+                    density="compact"
+                    storageKey="assigned-claims-table"
+                    onRowClick={(row) => openClaim(row.original.id)}
+                    renderToolbar={(table) => (
+                        <TableToolbar
+                            table={table}
+                            globalFilterPlaceholder="Пошук за номером або описом"
+                        />
+                    )}
+                    initialState={{
+                        sorting: [{ id: 'createdAt', desc: true }],
+                    }}
+                />
             )}
         </div>
     );
