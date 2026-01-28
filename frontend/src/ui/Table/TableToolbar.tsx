@@ -13,6 +13,7 @@ interface Props<TData> {
     globalFilterPlaceholder?: string;
     enableGlobalFilter?: boolean;
     enableColumnVisibility?: boolean;
+    enableResetAll?: boolean;
     leftSlot?: ReactNode;
     rightSlot?: ReactNode;
     className?: string;
@@ -23,6 +24,7 @@ export default function TableToolbar<TData>({
     globalFilterPlaceholder = 'Пошук…',
     enableGlobalFilter = true,
     enableColumnVisibility = true,
+    enableResetAll = true,
     leftSlot,
     rightSlot,
     className = '',
@@ -186,6 +188,30 @@ export default function TableToolbar<TData>({
                                         </label>
                                     ))}
                                 </div>
+
+                                {enableResetAll && (
+                                    <div className="mt-2 border-t border-border pt-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                table.resetColumnPinning();
+                                                table.resetColumnSizing();
+                                                table.resetColumnOrder();
+                                                table.resetColumnVisibility();
+                                                table.resetSorting();
+                                                setOpenColumns(false);
+                                            }}
+                                            className="
+                                                w-full text-left
+                                                rounded-md px-2 py-1.5
+                                                text-sm text-ink
+                                                hover:bg-surface-muted
+                                            "
+                                        >
+                                            Скинути налаштування таблиці
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </Portal>
                     )}
