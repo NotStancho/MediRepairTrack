@@ -3,8 +3,16 @@ import type { ReactNode } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel,
-    type ColumnFiltersState, type ColumnPinningState, type PaginationState, type Row, type SortingState,
-    type Table, type TableState, type VisibilityState, useReactTable,
+    type ColumnFiltersState,
+    type ColumnPinningState,
+    type ColumnSizingState,
+    type PaginationState,
+    type Row,
+    type SortingState,
+    type Table,
+    type TableState,
+    type VisibilityState,
+    useReactTable,
 } from '@tanstack/react-table';
 
 import TablePagination from './TablePagination';
@@ -12,6 +20,7 @@ import TableEmpty from './TableEmpty';
 import TableHeader from './TableHeader';
 import TableBody from './TableBody';
 import {createFuzzyTextFilter, resolveUpdater} from './tableUtils';
+import { readPersistedTableState, useTableStatePersistence } from './tablePersistence';
 import type { TableColumnDef } from './types';
 
 type Density = 'comfortable' | 'compact';
@@ -115,6 +124,10 @@ interface Props<TData> {
         overscan?: number;
     };
 
+    // LocalStorage key to persist table state (sorting, visibility, order, pinning, sizing).
+    storageKey?: string;
+    persistState?: boolean;
+
     /* ======================
      * State change callbacks
      * ====================== */
@@ -155,23 +168,36 @@ export default function Table<TData>({
     enableColumnReorder = true,
     enableColumnPinning = true,
     virtualization,
+    storageKey,
+    persistState = true,
     onSortingChange,
     onColumnFiltersChange,
     onGlobalFilterChange,
     onPaginationChange,
 }: Props<TData>) {
-    const [sorting, setSorting] = useState<SortingState>(initialState?.sorting ?? []);
+    const persistedState = useMemo(() => readPersistedTableState(storageKey), [storageKey]);
+
+    const [sorting, setSorting] = useState<SortingState>(
+        persistedState?.sorting ?? initialState?.sorting ?? [],
+    );
     const fuzzyFilter = createFuzzyTextFilter<TData>();
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(initialState?.columnFilters ?? []);
     const [globalFilter, setGlobalFilter] = useState<string>((initialState?.globalFilter as string) ?? '');
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialState?.columnVisibility ?? {});
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+        persistedState?.columnVisibility ?? initialState?.columnVisibility ?? {},
+    );
     const [pagination, setPagination] = useState<PaginationState>(
         initialState?.pagination ?? { pageIndex: 0, pageSize: 10 },
     );
     const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(
-        initialState?.columnPinning ?? { left: [], right: [] },
+        persistedState?.columnPinning ?? initialState?.columnPinning ?? { left: [], right: [] },
     );
-    const [columnOrder, setColumnOrder] = useState<string[]>([]);
+    const [columnOrder, setColumnOrder] = useState<string[]>(
+        persistedState?.columnOrder ?? [],
+    );
+    const [columnSizing, setColumnSizing] = useState<ColumnSizingState>(
+        persistedState?.columnSizing ?? initialState?.columnSizing ?? {},
+    );
     const [draggingColumnId, setDraggingColumnId] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -200,6 +226,18 @@ export default function Table<TData>({
         });
     }, [resolvedColumnIds]);
 
+    useTableStatePersistence({
+        storageKey,
+        enabled: persistState,
+        state: {
+            sorting,
+            columnVisibility,
+            columnOrder,
+            columnPinning,
+            columnSizing,
+        },
+    });
+
     // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable<TData>({
         data,
@@ -212,6 +250,7 @@ export default function Table<TData>({
             pagination,
             columnOrder,
             columnPinning,
+            columnSizing,
         },
         onSortingChange: updater => {
             const next = resolveUpdater(updater, sorting);
@@ -244,6 +283,10 @@ export default function Table<TData>({
         onColumnOrderChange: updater => {
             const next = resolveUpdater(updater, columnOrder);
             setColumnOrder(next);
+        },
+        onColumnSizingChange: updater => {
+            const next = resolveUpdater(updater, columnSizing);
+            setColumnSizing(next);
         },
         manualPagination,
         manualSorting,
@@ -292,7 +335,6 @@ export default function Table<TData>({
 
     const leftPinnedColumns = table.getLeftLeafColumns();
     const rightPinnedColumns = table.getRightLeafColumns();
-    const columnSizing = table.getState().columnSizing;
 
     const pinnedOffsets = useMemo(() => {
         const left = new Map<string, number>();
