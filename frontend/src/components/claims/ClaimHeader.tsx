@@ -1,6 +1,7 @@
 import type { Claim } from '../../types/claim/claim';
-import type {EquipmentFull} from "../../types/equipment/equipmentFull";
-import {CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS, STATUS_COLORS, REPAIR_TYPE_COLORS } from '../../utils/claimLabels';
+import type { EquipmentFull } from "../../types/equipment/equipmentFull";
+import { CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS, STATUS_COLORS, REPAIR_TYPE_COLORS } from '../../utils/claimLabels';
+import { FiClock } from "react-icons/fi";
 
 interface Props {
     claim: Claim;
@@ -41,8 +42,9 @@ export default function ClaimHeader({ claim, equipment }: Props) {
             )}
 
             {/* Права частина */}
-            <div className="text-sm text-ink whitespace-nowrap">
-                ⏱ {claim.totalTimeSpent ?? 0} год
+            <div className="text-sm text-ink flex whitespace-nowrap items-center gap-1">
+                <FiClock />
+                {claim.totalTimeSpent ?? 0} год
             </div>
         </div>
     );

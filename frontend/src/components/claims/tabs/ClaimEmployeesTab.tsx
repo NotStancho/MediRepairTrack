@@ -1,7 +1,9 @@
-import {useEffect, useState} from 'react';
-import {getClaimEmployees} from '../../../api/claimEmployee';
-import type {ClaimEmployee} from '../../../types/claimEmployee';
-import {ROLE_IN_CLAIM_COLORS, ROLE_IN_CLAIM_LABELS } from "../../../utils/roleInClaimLabels.ts";
+import { useEffect, useMemo, useState } from 'react';
+import { getClaimEmployees } from '../../../api/claimEmployee';
+import type { ClaimEmployee } from '../../../types/claimEmployee';
+import { ROLE_IN_CLAIM_COLORS, ROLE_IN_CLAIM_LABELS } from "../../../utils/roleInClaimLabels";
+import { EMPLOYEE_POSITION_COLORS, EMPLOYEE_POSITION_LABELS } from "../../../utils/employeeLabels";
+import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
 
 interface Props {
     claimId: number;
@@ -17,55 +19,97 @@ export default function ClaimEmployeesTab({claimId}: Props) {
             .finally(() => setLoading(false));
     }, [claimId]);
 
-    if (loading) return <div>Завантаження працівників…</div>;
-    if (!items.length)
-        return <div className="text-sm text-ink-muted">Працівники не призначені</div>;
+    const columns = useMemo<TableColumnDef<ClaimEmployee>[]>(() => [
+        {
+            id: 'employee',
+            header: 'Працівник',
+            accessorFn: row => `${row.lastName} ${row.firstName}`,
+            cell: ({ row }) => (
+                <span className="font-medium">
+                {row.original.lastName} {row.original.firstName}
+            </span>
+            ),
+        },
+        {
+            id: 'position',
+            header: 'Посада',
+            accessorFn: row => EMPLOYEE_POSITION_LABELS[row.position],
+            cell: ({ row }) => (
+                <span
+                    className={`
+                    inline-flex items-center
+                    px-2 py-0.5
+                    rounded-full
+                    text-xs font-medium
+                    ${EMPLOYEE_POSITION_COLORS[row.original.position]}
+                `}
+                >
+                {EMPLOYEE_POSITION_LABELS[row.original.position]}
+            </span>
+            ),
+        },
+        {
+            id: 'roleInClaim',
+            header: 'Роль у заявці',
+            accessorFn: row => ROLE_IN_CLAIM_LABELS[row.roleInClaim],
+            meta: { align: 'center' },
+            cell: ({ row }) => (
+                <span
+                    className={`
+                    inline-flex items-center
+                    px-2 py-0.5
+                    rounded-full
+                    text-xs font-medium
+                    ${ROLE_IN_CLAIM_COLORS[row.original.roleInClaim]}
+                `}
+                >
+                {ROLE_IN_CLAIM_LABELS[row.original.roleInClaim]}
+            </span>
+            ),
+        },
+        {
+            id: 'hoursWorked',
+            header: 'Години',
+            accessorFn: row =>
+                row.hoursWorked != null ? String(row.hoursWorked) : '',
+            meta: { align: 'center' },
+            cell: ({ row }) => row.original.hoursWorked ?? '–',
+        },
+        {
+            id: 'notes',
+            header: 'Примітки',
+            accessorFn: row => row.notes ?? '',
+            meta: { cellClassName: 'text-ink-muted max-w-xs truncate' },
+            cell: ({ row }) =>
+                row.original.notes ? (
+                    <span className="whitespace-pre-line">
+                    {row.original.notes}
+                </span>
+                ) : (
+                    <span className="text-ink-soft">–</span>
+                ),
+        },
+    ], []);
 
     return (
-        <div className="overflow-x-auto">
-            <table className="w-full text-sm border border-border rounded-lg">
-                <thead className="bg-surface-muted text-left">
-                <tr>
-                    <th className="p-2 border">Працівник</th>
-                    <th className="p-2 border">Посада</th>
-                    <th className="p-2 border">Роль у заявці</th>
-                    <th className="p-2 border">Години</th>
-                    <th className="p-2 border">Примітки</th>
-                </tr>
-                </thead>
-                <tbody>
-                {items.map(e => (
-                    <tr key={e.employeeId}>
-                        <td className="p-2 border font-medium">
-                            {e.lastName} {e.firstName}
-                        </td>
-                        <td className="p-2 border">{e.position}</td>
-                        {/*<td className="p-2 border">{e.roleInClaim}</td>*/}
-                        <td className="p-2 border">
-                                <span
-                                    className={`
-                                        inline-flex items-center
-                                        px-2 py-0.5
-                                        rounded-full
-                                        text-xs font-medium
-                                        ${ROLE_IN_CLAIM_COLORS[e.roleInClaim]}
-                                    `}
-                                >
-                                    {ROLE_IN_CLAIM_LABELS[e.roleInClaim]}
-                                </span>
-                        </td>
-                        <td className="p-2 border ">
-                            {e.hoursWorked ?? '—'}
-                        </td>
-                        <td className="p-2 border text-ink-muted max-w-xs truncate">
-                            {e.notes ? (<span className="whitespace-pre-line">{e.notes}</span>) : (
-                                <span className="text-ink-soft">-</span>
-                            )}
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-        </div>
+        <Table
+            data={items}
+            columns={columns}
+            loading={loading}
+            density="compact"
+            storageKey="claim-employees-tab"
+            showPagination={false}
+            renderToolbar={(table) => (
+                <TableToolbar
+                    table={table}
+                    globalFilterPlaceholder="Пошук за ПІБ, посадою, роллю або нотатками"
+                />
+            )}
+            renderEmptyState={
+                <div className="text-sm text-ink-muted">
+                    Працівники не призначені
+                </div>
+            }
+        />
     );
 }
