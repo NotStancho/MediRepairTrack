@@ -1,5 +1,5 @@
 import { api } from './api';
-import type { Claim } from '../types/claim/claim.ts';
+import type { Claim, ClaimStatus } from '../types/claim/claim.ts';
 import type {CreateClaimByClientPayload, CreateClaimByEmployeePayload} from "../types/claim/CreateClaimPayload";
 
 export const getClaimsByClient = async (clientId: number) =>
@@ -16,3 +16,17 @@ export const createClaimByClient = async (payload: CreateClaimByClientPayload) =
 
 export const createClaimByEmployee = async (payload: CreateClaimByEmployeePayload) =>
     (await api.post<Claim>('/api/claim/employee', payload)).data;
+
+export const getAllowedClaimStatuses = async (claimId: number) =>
+    (await api.get<ClaimStatus[]>(`/api/claim/${claimId}/allowed-statuses`)).data;
+
+export const updateClaimStatus = async (
+    claimId: number,
+    employeeId: number,
+    status: ClaimStatus
+) =>
+    (await api.patch<Claim>(
+        `/api/claim/${claimId}/status`,
+        { status },
+        { params: { employeeId } }
+    )).data;

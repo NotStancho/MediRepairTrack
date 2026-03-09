@@ -233,6 +233,8 @@ export default function Select<T, V extends string | number = number>({
                         className="
                             rounded-xl border border-border bg-surface
                             shadow-lg shadow-black/10
+                            text-ink
+                            z-60
                             flex flex-col overflow-hidden
                         "
                     >

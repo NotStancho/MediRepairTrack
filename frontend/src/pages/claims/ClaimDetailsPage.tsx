@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 import type { Claim } from '../../types/claim/claim';
 import ClaimHeader from '../../components/claims/ClaimHeader';
 import ClaimTabs from '../../components/claims/ClaimTabs';
+import ClaimStatusUpdate from '../../components/claims/ClaimStatusUpdate';
 import { getClaimById } from '../../api/claim';
 
-import {getEquipmentFullById} from "../../api/equipment";
+import { getEquipmentFullById } from "../../api/equipment";
 import type { EquipmentFull } from "../../types/equipment/equipmentFull";
 
 export default function ClaimDetailsPage() {
@@ -42,15 +43,16 @@ export default function ClaimDetailsPage() {
     }
 
     return (
-        <div>
+        <div className="space-y-4">
             <ClaimHeader
                 claim={claim}
                 equipment={equipment}
+                actions={
+                    <ClaimStatusUpdate claim={claim} onUpdated={setClaim} />
+                }
             />
 
-            <div>
-                <ClaimTabs claim={claim} />
-            </div>
+            <ClaimTabs claim={claim} />
         </div>
     );
 }
