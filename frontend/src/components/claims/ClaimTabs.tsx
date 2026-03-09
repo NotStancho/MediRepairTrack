@@ -68,6 +68,12 @@ export default function ClaimTabs({ claim }: Props) {
         };
     }, [updateIndicator]);
 
+    useLayoutEffect(() => {
+        requestAnimationFrame(() => {
+            updateIndicator();
+        });
+    }, [active, updateIndicator]);
+
     return (
         <div>
             <div className="rounded-xl border border-border bg-surface shadow-sm overflow-hidden">
@@ -127,10 +133,7 @@ export default function ClaimTabs({ claim }: Props) {
                 </div>
 
                 {/* Content */}
-                <div
-                    key={active}
-                    className="p-4 min-w-0 overflow-x-hidden animate-[fade-up_250ms_ease-out_both]"
-                >
+                <div className="p-4 min-w-0 overflow-x-hidden animate-[fade-up_250ms_ease-out_both]">
                     {active === 'details' && <ClaimDetailsTab claim={claim}/>}
                     {active === 'history' && <ClaimHistoryTab claimId={claim.id}/>}
                     {active === 'employees' && <ClaimEmployeesTab claimId={claim.id}/>}

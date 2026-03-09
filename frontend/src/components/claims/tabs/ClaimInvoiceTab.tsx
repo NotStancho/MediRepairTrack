@@ -3,7 +3,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { formatDateTime } from '../../../utils/dateFormat';
 import { formatMoney } from '../../../utils/moneyFormat';
 import ConfirmBox from '../../../ui/ConfirmBox';
-import { useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useInvoice } from '../../../hooks/useInvoice';
 import type { InvoiceDetail } from '../../../types/invoice';
 
@@ -12,6 +12,7 @@ import ModalFooter from '../../../ui/Modal/ModalFooter';
 import RowActionsMenu from '../../../ui/RowActionsMenu';
 import FormField from '../../../ui/FormField';
 import { inputBase, primaryButton, secondaryButton } from '../../../ui/formStyles';
+import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
 
 interface Props {
     claimId: number;
@@ -65,7 +66,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
         setOtherModalOpen(true);
     };
 
-    const openEditOther = (item: InvoiceDetail) => {
+    const openEditOther = useCallback((item: InvoiceDetail) => {
         setEditingItem(item);
         setForm({
             description: item.description,
@@ -74,7 +75,77 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
             pricePerUnit: item.pricePerUnit,
         });
         setOtherModalOpen(true);
-    };
+    }, []);
+
+    const itemColumns = useMemo<TableColumnDef<InvoiceDetail>[]>(() => {
+        const cols: TableColumnDef<InvoiceDetail>[] = [
+            {
+                id: 'itemType',
+                header: 'Тип',
+                accessorFn: row => INVOICE_ITEM_LABELS[row.itemType],
+                cell: ({ row }) => INVOICE_ITEM_LABELS[row.original.itemType],
+            },
+            {
+                id: 'description',
+                header: 'Опис',
+                accessorFn: row => row.description ?? '',
+                cell: ({ row }) => row.original.description,
+            },
+            {
+                id: 'quantity',
+                header: 'Кількість',
+                accessorFn: row =>
+                    `${row.quantity} ${row.unitName}`,
+                meta: { align: 'right' },
+                cell: ({ row }) => (
+                    <span className="font-mono">
+                    {row.original.quantity} {row.original.unitName}
+                </span>
+                ),
+            },
+            {
+                id: 'price',
+                header: 'Ціна',
+                accessorFn: row => String(row.pricePerUnit),
+                meta: { align: 'right' },
+                cell: ({ row }) => (
+                    <span className="font-mono">
+                    {formatMoney(row.original.pricePerUnit)}
+                </span>
+                ),
+            },
+            {
+                id: 'sum',
+                header: 'Сума',
+                accessorFn: row => String(row.totalPrice),
+                meta: { align: 'right' },
+                cell: ({ row }) => (
+                    <span className="font-mono font-semibold">
+                    {formatMoney(row.original.totalPrice)}
+                </span>
+                ),
+            },
+        ];
+
+        if (hasEditableOtherItems) {
+            cols.push({
+                id: 'actions',
+                header: 'Дії',
+                meta: { align: 'center', headerClassName: 'w-10' },
+                enableSorting: false,
+                enableGlobalFilter: false,
+                cell: ({ row }) =>
+                    row.original.itemType === 'OTHER' ? (
+                        <RowActionsMenu
+                            onEdit={() => openEditOther(row.original)}
+                            onDelete={() => setDeleteId(row.original.id)}
+                        />
+                    ) : null,
+            });
+        }
+
+        return cols;
+    }, [hasEditableOtherItems, openEditOther]);
 
     if (loading) return <div>Завантаження рахунку…</div>;
 
@@ -186,67 +257,25 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
             )}
 
             {/* Items */}
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm border border-border rounded-lg">
-                    <thead className="bg-surface-muted">
-                    <tr>
-                        <th className="p-2 border">Тип</th>
-                        <th className="p-2 border">Опис</th>
-                        <th className="p-2 border text-right">Кількість</th>
-                        <th className="p-2 border text-right">Ціна</th>
-                        <th className="p-2 border text-right">Сума</th>
-                        {hasEditableOtherItems && (
-                            <th className="p-2 border w-10">Дії </th>
-                        )}
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {invoice.items.map((i) => (
-                        <tr key={i.id}>
-                            <td className="p-2 border">
-                                {INVOICE_ITEM_LABELS[i.itemType]}
-                            </td>
-                            <td className="p-2 border">
-                                {i.description}
-                            </td>
-                            <td className="p-2 border text-right">
-                                {i.quantity} {i.unitName}
-                            </td>
-                            <td className="p-2 border text-right font-mono">
-                                {formatMoney(i.pricePerUnit)}
-                            </td>
-                            <td className="p-2 border text-right font-mono font-semibold">
-                                {formatMoney(i.totalPrice)}
-                            </td>
-
-                            {/*{hasEditableOtherItems &&*/}
-                            {/*    i.itemType === 'OTHER' && (*/}
-                            {/*        <td className="p-2 border text-right">*/}
-                            {/*            <RowActionsMenu*/}
-                            {/*                onEdit={() => openEditOther(i) }*/}
-                            {/*                onDelete={() => setDeleteId(i.id) }*/}
-                            {/*            />*/}
-                            {/*        </td>*/}
-                            {/*    )}*/}
-
-                            {hasEditableOtherItems && (
-                                i.itemType === 'OTHER' ? (
-                                    <td className="p-2 border text-right">
-                                        <RowActionsMenu
-                                            onEdit={() => openEditOther(i)}
-                                            onDelete={() => setDeleteId(i.id)}
-                                        />
-                                    </td>
-                                ) : (
-                                    <td className="p-2 border" />
-                                )
-                            )}
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+            <Table
+                data={invoice.items}
+                columns={itemColumns}
+                loading={loading}
+                density="compact"
+                storageKey="claim-invoice-tab"
+                showPagination={false}
+                renderToolbar={(table) => (
+                    <TableToolbar
+                        table={table}
+                        globalFilterPlaceholder="Пошук за типом або описом"
+                    />
+                )}
+                renderEmptyState={
+                    <div className="text-sm text-ink-muted">
+                        Немає позицій
+                    </div>
+                }
+            />
 
             {/* Totals */}
             <div className="flex justify-end text-sm">

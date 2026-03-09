@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { PaymentMethod } from '../../../types/payment';
+import { useMemo, useState } from 'react';
+import type { Payment, PaymentMethod } from '../../../types/payment';
 import { PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_COLORS } from '../../../utils/paymentLabels';
 import { useInvoice } from '../../../hooks/useInvoice';
 import { usePayments } from '../../../hooks/usePayments';
@@ -7,10 +7,11 @@ import { usePayments } from '../../../hooks/usePayments';
 import { formatDateTime } from '../../../utils/dateFormat';
 import { formatMoney } from '../../../utils/moneyFormat';
 
-import {inputBase, primaryButton, secondaryButton, selectBase} from "../../../ui/formStyles";
+import { inputBase, primaryButton, secondaryButton, selectBase } from "../../../ui/formStyles";
 import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from "../../../ui/Modal/ModalFooter";
-import FormField from "../../../ui/FormField.tsx";
+import FormField from "../../../ui/FormField";
+import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
 
 interface Props {
     claimId: number;
@@ -18,7 +19,7 @@ interface Props {
 
 export default function ClaimPaymentTab({ claimId }: Props) {
     const { invoice, loading, reload } = useInvoice(claimId);
-    const { payments, addPayment } = usePayments(invoice?.id);
+    const { payments, loading: paymentsLoading, addPayment } = usePayments(invoice?.id);
 
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -26,6 +27,88 @@ export default function ClaimPaymentTab({ claimId }: Props) {
     const [method, setMethod] = useState<PaymentMethod>('CASH');
     const [provider, setProvider] = useState('');
     const [externalRef, setExternalRef] = useState('');
+
+    const columns = useMemo<TableColumnDef<Payment>[]>(() => [
+        {
+            id: 'createdAt',
+            header: 'Створено',
+            accessorFn: row => formatDateTime(row.createdAt),
+            cell: ({ row }) => formatDateTime(row.original.createdAt),
+        },
+        {
+            id: 'paidAt',
+            header: 'Оплачено',
+            accessorFn: row =>
+                row.paidAt ? formatDateTime(row.paidAt) : '',
+            cell: ({ row }) =>
+                row.original.paidAt
+                    ? formatDateTime(row.original.paidAt)
+                    : '—',
+        },
+        {
+            id: 'method',
+            header: 'Метод',
+            accessorFn: row => PAYMENT_METHOD_LABELS[row.method], // 🔑
+            cell: ({ row }) => PAYMENT_METHOD_LABELS[row.original.method],
+        },
+        {
+            id: 'details',
+            header: 'Деталі',
+            accessorFn: row =>
+                row.method !== 'CASH'
+                    ? [
+                        row.provider,
+                        row.externalRef,
+                    ]
+                        .filter(Boolean)
+                        .join(' ')
+                    : '',
+            meta: { cellClassName: 'text-ink-muted text-sm' },
+            enableSorting: false,
+            cell: ({ row }) =>
+                row.original.method !== 'CASH' ? (
+                    <div className="flex flex-col">
+                        {row.original.provider && (
+                            <span>Провайдер: {row.original.provider}</span>
+                        )}
+                        {row.original.externalRef && (
+                            <span className="font-mono text-xs">
+                            Ref: {row.original.externalRef}
+                        </span>
+                        )}
+                        {!row.original.provider &&
+                            !row.original.externalRef &&
+                            '–'}
+                    </div>
+                ) : (
+                    '–'
+                ),
+        },
+        {
+            id: 'status',
+            header: 'Статус',
+            accessorFn: row => PAYMENT_STATUS_LABELS[row.status], // 🔑
+            meta: { align: 'center' },
+            cell: ({ row }) => (
+                <span
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${PAYMENT_STATUS_COLORS[row.original.status]}`}
+                >
+                {PAYMENT_STATUS_LABELS[row.original.status]}
+            </span>
+            ),
+        },
+        {
+            id: 'amount',
+            header: 'Сума',
+            accessorFn: row => String(row.amount),
+            meta: { align: 'right' },
+            cell: ({ row }) => (
+                <span className="font-mono font-semibold">
+                {formatMoney(row.original.amount)}
+            </span>
+            ),
+        },
+    ], []);
 
     if (loading || !invoice) {
         return <div>Завантаження оплати…</div>;
@@ -99,69 +182,25 @@ export default function ClaimPaymentTab({ claimId }: Props) {
             )}
 
             {/* Payments table */}
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm border border-border rounded-lg">
-                    <thead className="bg-surface-muted">
-                    <tr>
-                        <th className="p-2 border">Створено</th>
-                        <th className="p-2 border">Оплачено</th>
-                        <th className="p-2 border">Метод</th>
-                        <th className="p-2 border">Деталі</th>
-                        <th className="p-2 border">Статус</th>
-                        <th className="p-2 border text-right">Сума</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {payments.map(p => (
-                        <tr key={p.id} className="hover:bg-surface-muted">
-                            <td className="p-2 border">
-                                {formatDateTime(p.createdAt)}
-                            </td>
-
-                            <td className="p-2 border">
-                                {formatDateTime(p.paidAt)}
-                            </td>
-
-                            <td className="p-2 border">
-                                {PAYMENT_METHOD_LABELS[p.method]}
-                            </td>
-
-                            <td className="p-2 border text-ink-muted text-sm">
-                                {p.method !== 'CASH' ? (
-                                    <div className="flex flex-col">
-                                        {p.provider && (
-                                            <span>
-                                                Провайдер: {p.provider}
-                                            </span>
-                                        )}
-                                        {p.externalRef && (
-                                            <span className="font-mono text-xs">
-                                                Ref: {p.externalRef}
-                                            </span>
-                                        )}
-                                        {!p.provider &&
-                                            !p.externalRef &&
-                                            '–'}
-                                    </div>
-                                ) : (
-                                    '–'
-                                )}
-                            </td>
-
-                            <td className="p-2 border">
-                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${PAYMENT_STATUS_COLORS[p.status]}`}>
-                                    {PAYMENT_STATUS_LABELS[p.status]}
-                                </span>
-                            </td>
-
-                            <td className="p-2 border text-right font-mono font-semibold">
-                                {formatMoney(p.amount)}
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+            <Table
+                data={payments}
+                columns={columns}
+                loading={paymentsLoading}
+                density="compact"
+                storageKey="claim-payment-tab"
+                showPagination={false}
+                renderToolbar={(table) => (
+                    <TableToolbar
+                        table={table}
+                        globalFilterPlaceholder="Пошук за методом, статусом або деталями"
+                    />
+                )}
+                renderEmptyState={
+                    <div className="text-sm text-ink-muted">
+                        Оплати відсутні
+                    </div>
+                }
+            />
 
             {/* Create payment modal */}
             {modalOpen && (

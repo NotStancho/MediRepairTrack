@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react';
 import type { ClaimHistory } from '../../../types/claim/claimHistory';
 import type { Employee } from '../../../types/employee';
+
 import { getClaimHistory } from '../../../api/claimHistory';
 import { getEmployeeById } from '../../../api/employee';
+
+import { FiClock } from 'react-icons/fi';
 import { formatDateTime } from '../../../utils/dateFormat';
 import { HISTORY_ICONS } from '../../../utils/claimHistoryLabels';
+import { EMPLOYEE_POSITION_LABELS, EMPLOYEE_POSITION_COLORS } from '../../../utils/employeeLabels';
+import { CLAIM_STATUS_LABELS, STATUS_COLORS } from '../../../utils/claimLabels';
 
 interface Props {
     claimId: number;
 }
+
+const STATUS_TRANSITION_REGEX = /([A-Z_]+)\s*→\s*([A-Z_]+)/;
 
 export default function ClaimHistoryTab({ claimId }: Props) {
     const [items, setItems] = useState<ClaimHistory[]>([]);
@@ -65,6 +72,20 @@ export default function ClaimHistoryTab({ claimId }: Props) {
     if (loading) return <div>Завантаження історії…</div>;
     if (!items.length) return <div className="text-sm text-ink-muted">Історія порожня</div>;
 
+    function parseStatusTransition(text: string): {
+        from: keyof typeof CLAIM_STATUS_LABELS;
+        to: keyof typeof CLAIM_STATUS_LABELS;
+    } | null {
+        const match = text.match(STATUS_TRANSITION_REGEX);
+
+        if (!match) return null;
+
+        return {
+            from: match[1] as keyof typeof CLAIM_STATUS_LABELS,
+            to: match[2] as keyof typeof CLAIM_STATUS_LABELS,
+        };
+    }
+
     return (
         <div className="relative pl-8 space-y-6">
             <div className="absolute left-3 top-0 bottom-0 w-px bg-border" />
@@ -73,12 +94,14 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                 const employee = employees[item.employeeId];
                 const meta = HISTORY_ICONS[item.actionType];
 
+                const statusTransition =
+                    item.actionType === 'STATUS_CHANGE'
+                        ? parseStatusTransition(item.description)
+                        : null;
+
                 return (
                     <div key={item.id} className="relative flex gap-4">
-                        <div
-                            className={`absolute left-0 top-1 flex items-center justify-center
-                                        w-6 h-6 rounded-full text-white text-xs ${meta.color}`}
-                        >
+                        <div className={`absolute left-0 top-1 flex items-center justify-center w-6 h-6 rounded-full text-white text-xs ${meta.color}`}>
                             {meta.icon}
                         </div>
 
@@ -95,17 +118,49 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                                 <div className="text-xs text-ink-muted">
                                     {employee.userLastName} {employee.userFirstName}
                                     {' • '}
-                                    {employee.position}
+                                    <span
+                                        className={`
+                                            inline-flex items-center
+                                            px-2 py-0.5
+                                            rounded-full
+                                            text-xs font-medium
+                                            ${EMPLOYEE_POSITION_COLORS[employee.position]}
+                                        `}
+                                                                        >
+                                        {EMPLOYEE_POSITION_LABELS[employee.position]}
+                                    </span>
                                 </div>
                             )}
 
-                            <div className="text-sm text-ink whitespace-pre-line mt-1">
-                                {item.description}
-                            </div>
+                            {statusTransition && (
+                                <div className="text-sm mt-1 text-ink-muted">
+                                    Статус заявки змінено:{' '}
+                                    <span
+                                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mx-1
+                                            ${STATUS_COLORS[statusTransition.from]}`}
+                                                                >
+                                        {CLAIM_STATUS_LABELS[statusTransition.from]}
+                                    </span>
+                                    →
+                                    <span
+                                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ml-1
+                                            ${STATUS_COLORS[statusTransition.to]}`}
+                                                                >
+                                        {CLAIM_STATUS_LABELS[statusTransition.to]}
+                                    </span>
+                                </div>
+                            )}
+
+                            {!statusTransition && item.description && (
+                                <div className="text-sm text-ink whitespace-pre-line mt-1">
+                                    {item.description}
+                                </div>
+                            )}
 
                             {item.timeSpent > 0 && (
-                                <div className="text-xs text-ink-muted mt-1">
-                                    ⏱ {item.timeSpent} год
+                                <div className="text-xs text-ink-muted mt-1 flex items-center gap-1">
+                                    <FiClock className="w-3.5 h-3.5" />
+                                    {item.timeSpent} год
                                 </div>
                             )}
                         </div>
