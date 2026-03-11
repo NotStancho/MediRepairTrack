@@ -217,7 +217,7 @@ public class DiagnosisService {
         return map(diagnosisRepository.save(diagnosis));
     }
 
-    private Diagnosis getDiagnosisEntity(Integer id) {
+    public Diagnosis getDiagnosisEntity(Integer id) {
         return diagnosisRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Діагностику з таким ID не знайдено"));
     }
