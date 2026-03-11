@@ -107,6 +107,11 @@ public class EmployeeService {
                 .orElseThrow(() -> new NotFoundException("Співробітник не знайдений"));
     }
 
+    public Employee getEmployeeEntity(Integer id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Співробітник не знайдений"));
+    }
+
     // --- Отримання по userId ---
     public EmployeeResponseDTO getByUserId(Integer userId) {
         return employeeRepository.findByUserId(userId)
