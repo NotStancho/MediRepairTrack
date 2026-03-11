@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.ComplexityLevelResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.CreateComplexityLevelDTO;
-import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel.ComplexityLevel;
+import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Repository.DSS.ComplexityLevelRepository;
 
