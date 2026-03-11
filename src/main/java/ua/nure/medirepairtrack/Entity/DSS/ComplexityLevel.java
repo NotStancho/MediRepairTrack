@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
+package ua.nure.medirepairtrack.Entity.DSS;
 
 import jakarta.persistence.*;
 import lombok.*;
