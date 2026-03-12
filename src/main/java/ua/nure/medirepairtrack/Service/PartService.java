@@ -288,6 +288,11 @@ public class PartService {
                 .toList();
     }
 
+    public Part getPartEntity(Integer partId) {
+        return partRepository.findById(partId)
+                .orElseThrow(() -> new NotFoundException("Запчастина не знайдена"));
+    }
+
     // -------------------- helpers --------------------
 
     private void validateQuantityByUnitType(Part part, BigDecimal qty) {
