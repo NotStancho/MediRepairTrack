@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.Entity.DSS;
+package ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarity;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;

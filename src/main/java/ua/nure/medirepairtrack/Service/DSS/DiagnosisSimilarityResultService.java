@@ -7,8 +7,8 @@ import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.CreateSimilarityResul
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.SimilarityResultResponseDTO;
 import ua.nure.medirepairtrack.Entity.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
-import ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarityResult;
-import ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarityResultId;
+import ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarity.DiagnosisSimilarityResult;
+import ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarity.DiagnosisSimilarityResultId;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisSimilarityResultRepository;
