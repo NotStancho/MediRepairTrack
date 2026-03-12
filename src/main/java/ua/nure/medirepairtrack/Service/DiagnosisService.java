@@ -1,6 +1,7 @@
 package ua.nure.medirepairtrack.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DiagnosisDTO.CreateAutoDiagnosisDTO;
@@ -12,6 +13,7 @@ import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.Diagnosis.DiagnosisStatus;
 import ua.nure.medirepairtrack.Entity.Diagnosis.DiagnosisType;
 import ua.nure.medirepairtrack.Entity.Employee.Employee;
+import ua.nure.medirepairtrack.Event.Diagnosis.DiagnosisCreatedEvent;
 import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.InvalidStatusTransitionException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
@@ -31,6 +33,8 @@ public class DiagnosisService {
     private final DiagnosisRepository diagnosisRepository;
     private final ClaimService claimService;
     private final EmployeeService employeeService;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     private final DiagnosisStatusMachine diagnosisStatusMachine;
 
@@ -94,7 +98,13 @@ public class DiagnosisService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return map(diagnosisRepository.save(diagnosis));
+        Diagnosis saved = diagnosisRepository.save(diagnosis);
+
+        eventPublisher.publishEvent(
+                new DiagnosisCreatedEvent(saved.getId())
+        );
+
+        return map(saved);
     }
 
     @Transactional
