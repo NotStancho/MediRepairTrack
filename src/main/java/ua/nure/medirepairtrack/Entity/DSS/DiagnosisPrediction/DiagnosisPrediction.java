@@ -40,8 +40,8 @@ public class DiagnosisPrediction {
     @Column(name = "predicted_time_hours", nullable = false)
     private BigDecimal predictedTimeHours;
 
-    @Column(name = "predicted_root_cause", nullable = false, columnDefinition = "TEXT")
-    private String predictedRootCause;
+    @Column(name = "prediction_explanation", nullable = false, columnDefinition = "TEXT")
+    private String predictionExplanation;
 
     @Column(name = "predicted_warranty_probability", nullable = false)
     private BigDecimal predictedWarrantyProbability;
@@ -51,9 +51,6 @@ public class DiagnosisPrediction {
 
     @Column(name = "model_version", nullable = false)
     private String modelVersion;
-
-    @Column(name = "input_snapshot", nullable = false, columnDefinition = "json")
-    private String inputSnapshot;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

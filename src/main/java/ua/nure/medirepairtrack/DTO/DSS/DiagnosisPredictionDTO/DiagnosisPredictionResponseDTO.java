@@ -22,15 +22,13 @@ public class DiagnosisPredictionResponseDTO {
     private BigDecimal predictedCost;
     private BigDecimal predictedTimeHours;
 
-    private String predictedRootCause;
+    private String predictionExplanation;
 
     private BigDecimal predictedWarrantyProbability;
 
     private BigDecimal confidenceScore;
 
     private String modelVersion;
-
-    private String inputSnapshot;
 
     private LocalDateTime createdAt;
 }

@@ -24,7 +24,7 @@ public class CreateDiagnosisPredictionDTO {
     private BigDecimal predictedTimeHours;
 
     @NotNull
-    private String predictedRootCause;
+    private String predictionExplanation;
 
     @NotNull
     private BigDecimal predictedWarrantyProbability;
@@ -34,7 +34,4 @@ public class CreateDiagnosisPredictionDTO {
 
     @NotNull
     private String modelVersion;
-
-    @NotNull
-    private String inputSnapshot;
 }

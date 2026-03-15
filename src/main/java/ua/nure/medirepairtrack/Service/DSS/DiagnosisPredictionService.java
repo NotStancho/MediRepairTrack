@@ -41,11 +41,10 @@ public class DiagnosisPredictionService {
                 .predictionSource(PredictionSource.AUTOMATED)
                 .predictedCost(dto.getPredictedCost())
                 .predictedTimeHours(dto.getPredictedTimeHours())
-                .predictedRootCause(dto.getPredictedRootCause())
+                .predictionExplanation(dto.getPredictionExplanation())
                 .predictedWarrantyProbability(dto.getPredictedWarrantyProbability())
                 .confidenceScore(dto.getConfidenceScore())
                 .modelVersion(dto.getModelVersion())
-                .inputSnapshot(dto.getInputSnapshot())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -68,11 +67,10 @@ public class DiagnosisPredictionService {
                 .predictionSource(PredictionSource.AUTOMATED)
                 .predictedCost(BigDecimal.ZERO)
                 .predictedTimeHours(BigDecimal.ZERO)
-                .predictedRootCause("AI analysis pending")
+                .predictionExplanation("AI analysis pending")
                 .predictedWarrantyProbability(BigDecimal.ZERO)
                 .confidenceScore(BigDecimal.ZERO)
                 .modelVersion("similarity-v1")
-                .inputSnapshot("{}")
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -105,11 +103,10 @@ public class DiagnosisPredictionService {
                 .predictionSource(p.getPredictionSource())
                 .predictedCost(p.getPredictedCost())
                 .predictedTimeHours(p.getPredictedTimeHours())
-                .predictedRootCause(p.getPredictedRootCause())
+                .predictionExplanation(p.getPredictionExplanation())
                 .predictedWarrantyProbability(p.getPredictedWarrantyProbability())
                 .confidenceScore(p.getConfidenceScore())
                 .modelVersion(p.getModelVersion())
-                .inputSnapshot(p.getInputSnapshot())
                 .createdAt(p.getCreatedAt())
                 .build();
     }
