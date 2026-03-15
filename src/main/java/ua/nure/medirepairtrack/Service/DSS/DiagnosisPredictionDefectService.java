@@ -52,15 +52,18 @@ public class DiagnosisPredictionDefectService {
             Integer claimId = result.getClaimId();
             double similarity = result.getSimilarityScore().doubleValue();
 
-            var defect = claimDefectCategoryService.getByClaimId(claimId);
+            var defects = claimDefectCategoryService.getByClaimId(claimId);
 
-            if (defect == null) {
+            if (defects.isEmpty()) {
                 continue;
             }
 
-            Integer defectCategoryId = defect.getDefectCategory().getId();
+            for(var defect : defects) {
 
-            defectScores.merge(defectCategoryId, similarity, Double::sum);
+                Integer defectCategoryId = defect.getDefectCategory().getId();
+
+                defectScores.merge(defectCategoryId, similarity, Double::sum);
+            }
         }
 
         if (defectScores.isEmpty()) {
