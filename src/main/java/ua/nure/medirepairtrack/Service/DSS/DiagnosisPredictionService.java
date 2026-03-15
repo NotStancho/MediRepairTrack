@@ -29,6 +29,7 @@ public class DiagnosisPredictionService {
     private final DiagnosisSimilarityResultService similarityResultService;
     private final DiagnosisPredictedPartService predictedPartService;
     private final DiagnosisPredictedOperationService predictedOperationService;
+    private final DiagnosisPredictionDefectService predictedDefectService;
 
     @Transactional
     public DiagnosisPredictionResponseDTO createPrediction(CreateDiagnosisPredictionDTO dto) {
@@ -56,6 +57,7 @@ public class DiagnosisPredictionService {
         similarityResultService.generateSimilarityResults(savedPrediction);
         predictedPartService.generatePredictedParts(savedPrediction);
         predictedOperationService.generatePredictedOperations(savedPrediction);
+        predictedDefectService.generatePredictedDefects(savedPrediction);
 
         return map(savedPrediction);
     }
@@ -87,6 +89,7 @@ public class DiagnosisPredictionService {
         similarityResultService.generateSimilarityResults(savedPrediction);
         predictedPartService.generatePredictedParts(savedPrediction);
         predictedOperationService.generatePredictedOperations(savedPrediction);
+        predictedDefectService.generatePredictedDefects(savedPrediction);
 
         return savedPrediction;
     }
