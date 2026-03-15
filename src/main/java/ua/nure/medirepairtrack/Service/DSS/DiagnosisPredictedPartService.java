@@ -85,11 +85,8 @@ public class DiagnosisPredictedPartService {
             for (var part : usedParts) {
 
                 Integer partId = part.getPartId();
-                double quantity = part.getQuantity().doubleValue();
 
-                double score = similarity * quantity;
-
-                partScores.merge(partId, score, Double::sum);
+                partScores.merge(partId, similarity, Double::sum);
             }
         }
 

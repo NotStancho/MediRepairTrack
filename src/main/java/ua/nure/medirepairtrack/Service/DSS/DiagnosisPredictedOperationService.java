@@ -47,8 +47,8 @@ public class DiagnosisPredictedOperationService {
         }
 
         Map<Integer, Double> operationScores = new HashMap<>();
-        Map<Integer, Double> operationTimes = new HashMap<>();
-        Map<Integer, Integer> operationCounts = new HashMap<>();
+        Map<Integer, Double> operationWeightedTimeSums = new HashMap<>();
+        Map<Integer, Double> operationSimilaritySums = new HashMap<>();
 
         for (var result : similarityResults) {
 
@@ -57,16 +57,24 @@ public class DiagnosisPredictedOperationService {
 
             var operations = claimRepairOperationService.getClaimOperations(claimId);
 
+            Map<Integer, Double> operationTimesInClaim = new HashMap<>();
+
             for (var op : operations) {
 
                 Integer operationId = op.getOperation().getId();
                 double timeSpent = op.getTimeSpent().doubleValue();
 
-                double score = similarity * timeSpent;
+                operationTimesInClaim.merge(operationId, timeSpent, Double::sum);
+            }
 
-                operationScores.merge(operationId, score, Double::sum);
-                operationTimes.merge(operationId, timeSpent, Double::sum);
-                operationCounts.merge(operationId, 1, Integer::sum);
+            for (var entry : operationTimesInClaim.entrySet()) {
+
+                Integer operationId = entry.getKey();
+                double totalTimeInClaim = entry.getValue();
+
+                operationScores.merge(operationId, similarity, Double::sum);
+                operationWeightedTimeSums.merge(operationId, similarity * totalTimeInClaim, Double::sum);
+                operationSimilaritySums.merge(operationId, similarity, Double::sum);
             }
         }
 
@@ -103,10 +111,10 @@ public class DiagnosisPredictedOperationService {
                 continue;
             }
 
-            double totalTime = operationTimes.get(operationId);
-            int count = operationCounts.get(operationId);
+            double weightedTimeSum = operationWeightedTimeSums.get(operationId);
+            double similaritySum = operationSimilaritySums.get(operationId);
 
-            double avgTime = totalTime / count;
+            double predictedTime = weightedTimeSum / similaritySum;
 
             repository.save(
                     DiagnosisPredictedOperation.builder()
@@ -116,12 +124,16 @@ public class DiagnosisPredictedOperationService {
                             .probabilityScore(probability)
                             .rankPosition(rank++)
                             .predictedTimeSpent(
-                                    BigDecimal.valueOf(avgTime).setScale(2, RoundingMode.HALF_UP)
+                                    BigDecimal.valueOf(predictedTime).setScale(2, RoundingMode.HALF_UP)
                             )
                             .createdAt(LocalDateTime.now())
                             .build()
             );
         }
+    }
+
+    public List<DiagnosisPredictedOperation> getByPrediction(Integer predictionId) {
+        return repository.findByPredictionIdOrderByRankPosition(predictionId);
     }
 
 }
