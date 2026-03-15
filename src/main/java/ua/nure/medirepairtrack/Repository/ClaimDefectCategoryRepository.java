@@ -4,10 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ua.nure.medirepairtrack.Entity.ClaimDefectCategory.ClaimDefectCategory;
 import ua.nure.medirepairtrack.Entity.ClaimDefectCategory.ClaimDefectCategoryId;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface ClaimDefectCategoryRepository extends JpaRepository<ClaimDefectCategory, ClaimDefectCategoryId> {
 
-    Optional<ClaimDefectCategory> findByClaimId(Integer claimId);
+    List<ClaimDefectCategory> findAllByClaimId(Integer claimId);
 
+    List<ClaimDefectCategory> findAllByClaimIdOrderByCreatedAt(Integer claimId);
 }

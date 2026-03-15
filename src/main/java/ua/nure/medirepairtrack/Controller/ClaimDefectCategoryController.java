@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ua.nure.medirepairtrack.DTO.ClaimDefectCategory.*;
 import ua.nure.medirepairtrack.Service.ClaimDefectCategoryService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/claim-defect-category")
 @RequiredArgsConstructor
@@ -18,13 +20,13 @@ public class ClaimDefectCategoryController {
         return service.create(dto);
     }
 
-    @PutMapping("/claim/{claimId}")
-    public ClaimDefectCategoryResponseDTO update(@PathVariable Integer claimId, @Valid @RequestBody UpdateClaimDefectCategoryDTO dto) {
-        return service.update(claimId, dto);
+    @DeleteMapping("/claim/{claimId}/defect/{defectCategoryId}")
+    public void delete(@PathVariable Integer claimId, @PathVariable Integer defectCategoryId) {
+        service.delete(claimId, defectCategoryId);
     }
 
-    @DeleteMapping("/claim/{claimId}")
-    public void delete(@PathVariable Integer claimId) {
-        service.delete(claimId);
+    @GetMapping("/claim/{claimId}")
+    public List<ClaimDefectCategoryResponseDTO> getByClaim(@PathVariable Integer claimId) {
+        return service.getByClaim(claimId);
     }
 }
