@@ -3,7 +3,7 @@ package ua.nure.medirepairtrack.Service.DSS;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.nure.medirepairtrack.Client.Gemini.GeminiEmbeddingClient;
+import ua.nure.medirepairtrack.Client.GeminiEmbedded.GeminiEmbeddingClient;
 import ua.nure.medirepairtrack.Entity.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.ClaimEmbedding.ClaimEmbedding;
 import ua.nure.medirepairtrack.Repository.ClaimEmbeddingRepository;

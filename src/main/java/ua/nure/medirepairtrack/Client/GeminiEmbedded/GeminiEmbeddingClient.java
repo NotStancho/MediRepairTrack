@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.Client.Gemini;
+package ua.nure.medirepairtrack.Client.GeminiEmbedded;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

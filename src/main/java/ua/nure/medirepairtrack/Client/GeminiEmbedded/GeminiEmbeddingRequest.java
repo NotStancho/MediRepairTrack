@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.Client.Gemini;
+package ua.nure.medirepairtrack.Client.GeminiEmbedded;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
