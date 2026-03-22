@@ -112,4 +112,8 @@ public class DiagnosisPredictionDefectService {
         }
     }
 
+    public List<DiagnosisPredictionDefect> getByPrediction(Integer predictionId) {
+        return repository.findByPredictionIdOrderByRankPosition(predictionId);
+    }
+
 }
