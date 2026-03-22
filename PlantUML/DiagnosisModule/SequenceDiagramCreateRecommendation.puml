@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor Engineer
+
+boundary diagnosisView as "diagnosisView: DiagnosisView"
+control diagnosisController as "diagnosisController: DiagnosisController"
+entity diagnosis as "diagnosis: Diagnosis"
+entity prediction as "prediction: DiagnosisPrediction"
+entity claim as "claim: Claim"
+
+Engineer -> diagnosisView : натискає "Сформувати рекомендації"
+activate diagnosisView
+
+diagnosisView -> diagnosisController : generateRecommendations(claimId)
+activate diagnosisController
+
+diagnosisController -> claim : getDefectDescription()
+activate claim
+claim --> diagnosisController : defectDescription
+deactivate claim
+
+diagnosisController -> diagnosis : generateRecommendations(defectDescription)
+activate diagnosis
+
+diagnosis -> prediction : calculatePrediction(defectDescription)
+activate prediction
+
+prediction -> prediction : save()
+
+prediction --> diagnosis : recommendations, estimates
+deactivate prediction
+
+diagnosis -> diagnosis : setRecommendations(recommendations)
+diagnosis -> diagnosis : save()
+
+diagnosis --> diagnosisController : результат рекомендацій
+deactivate diagnosis
+
+diagnosisController --> diagnosisView : результат рекомендацій
+deactivate diagnosisController
+
+diagnosisView --> Engineer : відображення рекомендацій
+deactivate diagnosisView
+
+@enduml

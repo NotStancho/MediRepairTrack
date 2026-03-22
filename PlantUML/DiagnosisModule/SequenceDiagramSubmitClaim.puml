@@ -1,0 +1,31 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+
+actor Client
+
+boundary claimListView as "claimListView: ClaimListView"
+control claimController as "claimController: ClaimController"
+entity claim as "claim: Claim"
+
+Client -> claimListView : натискає "Подати заявку"
+activate claimListView
+
+claimListView -> claimController : createClaim(data)
+activate claimController
+
+claimController -> claim : <<create>>
+activate claim
+
+claim -> claim : save()
+
+claim --> claimController : результат збереження
+deactivate claim
+
+claimController --> claimListView : результат створення
+deactivate claimController
+
+claimListView --> Client : відображення нової заявки
+deactivate claimListView
+
+@enduml

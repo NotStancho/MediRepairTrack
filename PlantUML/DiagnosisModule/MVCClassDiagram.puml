@@ -1,0 +1,158 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+@startuml
+skinparam classAttributeIconSize 0
+
+' =======================
+' MODEL
+' =======================
+
+package "Model" {
+
+class Client {
+  id : Integer
+  name : String
+  phone : String
+}
+
+class Employee {
+  id : Integer
+  name : String
+  position : String
+}
+
+class Claim {
+  id : Integer
+  client: Client
+  employee: Employee
+  description : String
+  status : String
+  createdAt : DateTime
+}
+
+class Diagnosis {
+  id : Integer
+  claim : Claim
+  engineer : Employee
+  preliminaryConclusion : String
+  finalConclusion : String
+  status : String
+}
+
+class DiagnosisPrediction {
+    id : Integer
+    diagnosis : Diagnosis
+  predictedCost : Double
+  predictedTime : Double
+  confidenceScore : Double
+}
+
+class Part {
+  id : Integer
+  name : String
+}
+
+class Operation {
+  id : Integer
+  name : String
+  duration : Double
+}
+
+class Invoice {
+  id : Integer
+  totalAmount : Double
+  status : String
+}
+
+}
+
+' =======================
+' VIEW
+' =======================
+
+package "View" {
+
+class ClaimListView <<boundary>> {
+  claims : List<Claim>
+}
+
+class ClaimDetailsView <<boundary>> {
+  claim : Claim
+  diagnosis : Diagnosis
+  status : String
+}
+
+class DiagnosisView <<boundary>> {
+  diagnosisResult : String
+  recommendations : String
+}
+
+class InvoiceView <<boundary>> {
+  invoiceData : Invoice
+  totalAmount : Double
+}
+
+}
+
+' =======================
+' CONTROLLER
+' =======================
+
+package "Controller" {
+
+class ClaimController <<control>> {
+  createClaim() : void
+  getClaims() : List<Claim>
+  getClaimDetails() : Claim
+}
+
+class DiagnosisController <<control>> {
+  analyzeDescription() : DiagnosisPrediction
+  generateRecommendations() : String
+  saveDiagnosis() : void
+}
+
+class RepairController <<control>> {
+  defineOperations() : List<Operation>
+  addCompletedWork() : void
+  updateRepairStatus() : void
+}
+
+class InvoiceController <<control>> {
+  calculateCost() : Double
+  generateInvoice() : Invoice
+  approveInvoice() : void
+}
+
+}
+
+' =======================
+' RELATIONS
+' =======================
+
+Client --> Claim
+Employee --> Claim
+Employee --> Diagnosis
+
+Claim --> Diagnosis
+Diagnosis --> DiagnosisPrediction
+
+Diagnosis --> Operation
+Diagnosis --> Part
+
+Claim --> Invoice
+
+ClaimController --> Claim
+DiagnosisController --> Diagnosis
+RepairController --> Operation
+InvoiceController --> Invoice
+
+ClaimController --> ClaimListView
+ClaimController --> ClaimDetailsView
+
+DiagnosisController --> DiagnosisView
+
+InvoiceController --> InvoiceView
+
+@enduml

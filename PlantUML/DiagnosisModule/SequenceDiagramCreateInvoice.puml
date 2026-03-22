@@ -1,0 +1,58 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor Manager
+
+boundary invoiceView as "invoiceView: InvoiceView"
+control invoiceController as "invoiceController: InvoiceController"
+entity claim as "claim: Claim"
+entity operation as "operation: Operation"
+entity part as "part: Part"
+entity invoice as "invoice: Invoice"
+
+Manager -> invoiceView : натискає "Сформувати рахунок"
+activate invoiceView
+
+invoiceView -> invoiceController : generateInvoice(claimId)
+activate invoiceController
+
+
+
+invoiceController -> claim : getOperations(claimId)
+activate claim
+claim -> operation : getOperations()
+activate operation
+operation --> claim : List<Operation>
+deactivate operation
+claim --> invoiceController : List<Operation>
+deactivate claim
+
+
+invoiceController -> claim : getParts(claimId)
+activate claim
+claim -> part : getParts()
+activate part
+part --> claim : List<Part>
+deactivate part
+claim --> invoiceController : List<Part>
+deactivate claim
+
+
+invoiceController -> invoice : <<create>>
+activate invoice
+
+invoice -> invoice : calculateTotal()
+invoice -> invoice : save()
+
+invoice --> invoiceController : invoiceData
+deactivate invoice
+
+invoiceController --> invoiceView : сформований рахунок
+deactivate invoiceController
+
+invoiceView --> Manager : відображення рахунку
+deactivate invoiceView
+
+@enduml

@@ -1,0 +1,61 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+skinparam componentStyle rectangle
+
+package "Public" {
+  [Login Page]
+}
+
+package "Client" {
+  [Client Dashboard]
+  [My Claims]
+  [Claim Details]
+  [Create Claim]
+  [Invoice View]
+
+  [Client Dashboard] --> [My Claims]
+  [My Claims] --> [Claim Details]
+  [My Claims] --> [Create Claim]
+  [Claim Details] --> [Invoice View]
+}
+
+package "Manager" {
+  [Manager Dashboard]
+  [All Claims]
+  [Claim Details]
+  [Invoice Management]
+  [Invoice View]
+
+  [Manager Dashboard] --> [All Claims]
+  [All Claims] --> [Claim Details]
+  [Claim Details] --> [Invoice Management]
+  [Invoice Management] --> [Invoice View]
+}
+
+package "Engineer" {
+  [Engineer Dashboard]
+  [Assigned Claims]
+  [Claim Details]
+  [Diagnosis View]
+  [Repair Process]
+
+  [Engineer Dashboard] --> [Assigned Claims]
+  [Assigned Claims] --> [Claim Details]
+  [Claim Details] --> [Diagnosis View]
+  [Diagnosis View] --> [Repair Process]
+}
+
+package "Admin" {
+  [Admin Dashboard]
+
+  [Admin Dashboard] ---> [Invoice Management]
+}
+
+' === LOGIN ROUTING ===
+[Login Page] --> [Client Dashboard]
+[Login Page] --> [Manager Dashboard]
+[Login Page] --> [Engineer Dashboard]
+[Login Page] --> [Admin Dashboard]
+
+@enduml

@@ -1,0 +1,44 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+left to right direction
+
+actor "Сервісний інженер" as Engineer
+
+rectangle {
+
+  usecase "Переглядати призначені\nзаявки" as UC1
+  usecase "Переглядати конкретну\nзаявку" as UC2
+
+
+  usecase "Аналізувати опис\nнесправності" as UC4
+  usecase "Формувати діагностичні\nрекомендації" as UC5
+  usecase "Фіксувати результати\nдіагностики" as UC6
+
+  usecase "Переглядати стан\nремонту" as UC7
+  usecase "Визначати перелік\nремонтних робіт" as UC8
+  usecase "Фіксувати виконані\nремонтні роботи" as UC9
+  usecase "Оновлювати статус\nремонту" as UC10
+}
+
+' ---------------- ACTOR ----------------
+
+Engineer --> UC1
+
+' ---------------- NAVIGATION ----------------
+
+UC2 ..> UC1 : <<extend>>
+
+' ---------------- DIAGNOSIS ----------------
+
+UC4 .> UC2 : <<extend>>
+UC5 .> UC4 : <<include>>
+UC6 .> UC5 : <<include>>
+
+' ---------------- REPAIR ----------------
+
+UC7 ..> UC2 : <<extend>>
+UC8 ..> UC7 : <<extend>>
+UC9 ..> UC7 : <<extend>>
+UC10 ..> UC7 : <<extend>>
+@enduml

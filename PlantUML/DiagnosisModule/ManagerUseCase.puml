@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+left to right direction
+
+actor "Менеджер" as Manager
+
+rectangle {
+
+  usecase "Переглядати список\nзаявок" as UC1
+  usecase "Переглядати конкретну\nзаявку" as UC2
+  usecase "Перевірити та\nвалідувати заявку" as UC3
+  usecase "Опрацювати заявку\nта встановити статус" as UC4
+
+  usecase "Переглядати рахунок" as UC5
+  usecase "Розраховувати вартість\nробіт та матеріалів" as UC6
+  usecase "Формувати рахунок" as UC7
+}
+
+Manager -right-> UC1
+Manager -right-> UC5
+
+UC2 ..> UC1 : <<extend>>
+UC3 .> UC2 : <<extend>>
+UC4 .> UC2 : <<extend>>
+
+UC5 ..>  UC2 : <<extend>>
+
+UC7 .> UC6 : <<include>>
+UC7 .> UC5 : <<extend>>
+
+@enduml
