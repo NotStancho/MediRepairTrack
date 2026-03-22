@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.SimilarityResultResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictionExplanation.PredictionContext;
 import ua.nure.medirepairtrack.DTO.PricingDTO.PricingConfigResponseDTO;
 import ua.nure.medirepairtrack.Entity.Claim.RepairType;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedOperation.DiagnosisPredictedOperation;
@@ -24,6 +25,7 @@ public class PredictionAggregationService {
     private final DiagnosisPredictedPartService predictedPartService;
     private final DiagnosisPredictedOperationService predictedOperationService;
     private final DiagnosisPredictionDefectService predictedDefectService;
+    private final PredictionExplanationService explanationService;
 
     private final ClaimService claimService;
     private final PartService partService;
@@ -51,6 +53,13 @@ public class PredictionAggregationService {
 
         // 4. rule-based complexity
         calculatePredictedComplexityLevel(prediction);
+
+        // 5. explanation (LLM)
+        PredictionContext context = explanationService.build(prediction);
+
+        String explanation = explanationService.generateExplanation(context);
+
+        prediction.setPredictionExplanation(explanation);
     }
 
     @Transactional
