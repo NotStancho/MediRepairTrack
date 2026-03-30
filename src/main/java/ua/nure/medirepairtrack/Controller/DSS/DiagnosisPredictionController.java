@@ -3,7 +3,7 @@ package ua.nure.medirepairtrack.Controller.DSS;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateDiagnosisPredictionDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateManualPredictionDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.DiagnosisPredictionResponseDTO;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisPredictionService;
 
@@ -18,7 +18,7 @@ public class DiagnosisPredictionController {
 
     // Ручне створення прогнозу інженером
     @PostMapping("/manual")
-    public DiagnosisPredictionResponseDTO createManual(@Valid @RequestBody CreateDiagnosisPredictionDTO dto) {
+    public DiagnosisPredictionResponseDTO createManual(@Valid @RequestBody CreateManualPredictionDTO dto) {
         return predictionService.createManualPrediction(dto);
     }
 

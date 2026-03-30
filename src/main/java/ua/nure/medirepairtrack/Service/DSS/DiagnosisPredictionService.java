@@ -3,7 +3,7 @@ package ua.nure.medirepairtrack.Service.DSS;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateDiagnosisPredictionDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateManualPredictionDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.DiagnosisPredictionResponseDTO;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
 import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
@@ -29,7 +29,7 @@ public class DiagnosisPredictionService {
     private final PredictionAggregationService predictionAggregationService;
 
     @Transactional
-    public DiagnosisPredictionResponseDTO createManualPrediction(CreateDiagnosisPredictionDTO dto) {
+    public DiagnosisPredictionResponseDTO createManualPrediction(CreateManualPredictionDTO dto) {
 
         Diagnosis diagnosis = diagnosisService.getDiagnosisEntity(dto.getDiagnosisId());
 
@@ -42,9 +42,9 @@ public class DiagnosisPredictionService {
                 .predictedCost(dto.getPredictedCost())
                 .predictedTimeHours(dto.getPredictedTimeHours())
                 .predictionExplanation(dto.getPredictionExplanation())
-                .predictedWarrantyProbability(dto.getPredictedWarrantyProbability())
-                .confidenceScore(dto.getConfidenceScore())
-                .modelVersion(dto.getModelVersion())
+                .predictedWarrantyProbability(BigDecimal.ZERO) // default
+                .confidenceScore(BigDecimal.ZERO) // default
+                .modelVersion("manual")
                 .createdAt(LocalDateTime.now())
                 .build();
 
