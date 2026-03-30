@@ -75,24 +75,12 @@ public class DiagnosisService {
 
         Claim claim = claimService.getClaim(dto.getClaimId());
 
-        String conclusion = dto.getPreliminaryConclusion() != null
-                ? dto.getPreliminaryConclusion()
-                : "";
-
-        BigDecimal cost = dto.getEstimatedCost() != null
-                ? dto.getEstimatedCost()
-                : BigDecimal.ZERO;
-
-        BigDecimal time = dto.getEstimatedTimeHours() != null
-                ? dto.getEstimatedTimeHours()
-                : BigDecimal.ZERO;
-
         Diagnosis diagnosis = Diagnosis.builder()
                 .claim(claim)
                 .engineer(null)
-                .preliminaryConclusion(conclusion)
-                .estimatedCost(cost)
-                .estimatedTimeHours(time)
+                .preliminaryConclusion("")
+                .estimatedCost(BigDecimal.ZERO)
+                .estimatedTimeHours(BigDecimal.ZERO)
                 .diagnosisType(DiagnosisType.AUTOMATED)
                 .status(DiagnosisStatus.PREDICTED)
                 .createdAt(LocalDateTime.now())
