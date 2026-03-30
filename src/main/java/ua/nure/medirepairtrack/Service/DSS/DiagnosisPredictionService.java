@@ -29,7 +29,7 @@ public class DiagnosisPredictionService {
     private final PredictionAggregationService predictionAggregationService;
 
     @Transactional
-    public DiagnosisPredictionResponseDTO createPrediction(CreateDiagnosisPredictionDTO dto) {
+    public DiagnosisPredictionResponseDTO createManualPrediction(CreateDiagnosisPredictionDTO dto) {
 
         Diagnosis diagnosis = diagnosisService.getDiagnosisEntity(dto.getDiagnosisId());
 
@@ -38,7 +38,7 @@ public class DiagnosisPredictionService {
         DiagnosisPrediction prediction = DiagnosisPrediction.builder()
                 .diagnosis(diagnosis)
                 .predictedComplexityLevel(complexity)
-                .predictionSource(PredictionSource.AUTOMATED)
+                .predictionSource(PredictionSource.MANUAL)
                 .predictedCost(dto.getPredictedCost())
                 .predictedTimeHours(dto.getPredictedTimeHours())
                 .predictionExplanation(dto.getPredictionExplanation())
@@ -81,8 +81,11 @@ public class DiagnosisPredictionService {
         return savedPrediction;
     }
 
+    public DiagnosisPredictionResponseDTO getById(Integer id) {
+        return map(getDiagnosisPredictionEntity(id));
+    }
 
-    public List<DiagnosisPredictionResponseDTO> getByDiagnosis(Integer diagnosisId) {
+    public List<DiagnosisPredictionResponseDTO> getAllByDiagnosisId(Integer diagnosisId) {
         return diagnosisPredictionRepository.findByDiagnosisIdOrderByCreatedAtDesc(diagnosisId)
                 .stream()
                 .map(this::map)
