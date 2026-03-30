@@ -15,6 +15,6 @@ public class DiagnosisPredictionListener {
     @EventListener
     public void handleDiagnosisCreated(DiagnosisCreatedEvent event) {
 
-        predictionService.generatePrediction(event.diagnosisId());
+        predictionService.generateAutoPrediction(event.diagnosisId());
     }
 }

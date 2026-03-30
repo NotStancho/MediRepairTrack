@@ -54,7 +54,7 @@ public class DiagnosisPredictionService {
     }
 
     @Transactional
-    public DiagnosisPrediction generatePrediction(Integer diagnosisId) {
+    public DiagnosisPrediction generateAutoPrediction(Integer diagnosisId) {
 
         Diagnosis diagnosis = diagnosisService.getDiagnosisEntity(diagnosisId);
 
