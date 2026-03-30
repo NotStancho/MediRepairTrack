@@ -23,6 +23,6 @@ public class CreateManualPredictionDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "Час повинен бути більшим за 0")
     private BigDecimal predictedTimeHours;
 
-    @NotNull
+    @NotNull(message = "Пояснення обовʼязкове")
     private String predictionExplanation;
 }
