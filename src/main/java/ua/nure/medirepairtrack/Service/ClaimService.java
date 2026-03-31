@@ -260,6 +260,13 @@ public class ClaimService {
                 .toList();
     }
 
+    public List<ClaimShortDTO> getAllClaimsShort() {
+        return claimRepository.findAll()
+                .stream()
+                .map(this::mapToShortDTO)
+                .toList();
+    }
+
     public void delete(Integer id) {
         if (!claimRepository.existsById(id)) {
             throw new NotFoundException("Заявка не знайдена");
@@ -344,6 +351,18 @@ public class ClaimService {
                 .createdAt(claim.getCreatedAt())
                 .closedAt(claim.getClosedAt())
                 .build();
+    }
+
+    private ClaimShortDTO mapToShortDTO(Claim claim) {
+        return new ClaimShortDTO(
+                claim.getId(),
+                claim.getEquipment().getModel().getModelName(),
+                claim.getEquipment().getSerialNumber(),
+                claim.getDefectDescription(),
+                claim.getRepairType().name(),
+                claim.getStatus().name(),
+                claim.getCreatedAt()
+        );
     }
 
     private void publishClaimCreatedEvent(Claim claim, Integer creatorEmployeeId) {
