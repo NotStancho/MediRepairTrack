@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateManualPredictionDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.DiagnosisPredictionResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.UpdatePredictionDTO;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisPredictionService;
 
 import java.util.List;
@@ -20,6 +21,16 @@ public class DiagnosisPredictionController {
     @PostMapping("/manual")
     public DiagnosisPredictionResponseDTO createManual(@Valid @RequestBody CreateManualPredictionDTO dto) {
         return predictionService.createManualPrediction(dto);
+    }
+
+    @PutMapping("/{predictionId}")
+    public DiagnosisPredictionResponseDTO update(@PathVariable Integer predictionId, @Valid @RequestBody UpdatePredictionDTO dto) {
+        return predictionService.updatePrediction(predictionId, dto);
+    }
+
+    @DeleteMapping("/{predictionId}")
+    public void delete(@PathVariable Integer predictionId) {
+        predictionService.deletePrediction(predictionId);
     }
 
     // Отримання конкретного прогнозу

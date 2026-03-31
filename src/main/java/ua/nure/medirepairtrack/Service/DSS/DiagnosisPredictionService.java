@@ -5,13 +5,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateManualPredictionDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.DiagnosisPredictionResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.UpdatePredictionDTO;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
 import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.PredictionSource;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.DiagnosisService;
+import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
+import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,10 +32,22 @@ public class DiagnosisPredictionService {
 
     private final PredictionAggregationService predictionAggregationService;
 
+    private final DiagnosisStatusMachine diagnosisStatusMachine;
+
     @Transactional
     public DiagnosisPredictionResponseDTO createManualPrediction(CreateManualPredictionDTO dto) {
 
         Diagnosis diagnosis = diagnosisService.getDiagnosisEntity(dto.getDiagnosisId());
+
+        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            "створювати прогноз діагностики",
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
+                    )
+            );
+        }
 
         ComplexityLevel complexity = complexityLevelService.getEntity(dto.getPredictedComplexityLevelId());
 
@@ -58,6 +74,16 @@ public class DiagnosisPredictionService {
 
         Diagnosis diagnosis = diagnosisService.getDiagnosisEntity(diagnosisId);
 
+        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            "генерувати прогноз діагностики",
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
+                    )
+            );
+        }
+
         // temporary
         ComplexityLevel complexity = complexityLevelService.getEntity(1);
 
@@ -81,6 +107,68 @@ public class DiagnosisPredictionService {
         return savedPrediction;
     }
 
+    @Transactional
+    public DiagnosisPredictionResponseDTO updatePrediction(Integer id, UpdatePredictionDTO dto) {
+
+        DiagnosisPrediction prediction = getDiagnosisPredictionEntity(id);
+
+        Diagnosis diagnosis = prediction.getDiagnosis();
+
+        // перевірка статусу
+        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            "редагувати прогноз діагностики",
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
+                    )
+            );
+        }
+
+        if (dto.getPredictedComplexityLevelId() != null) {
+            ComplexityLevel complexity = complexityLevelService.getEntity(dto.getPredictedComplexityLevelId());
+            prediction.setPredictedComplexityLevel(complexity);
+        }
+
+        if (dto.getPredictedCost() != null) {
+            prediction.setPredictedCost(dto.getPredictedCost());
+        }
+
+        if (dto.getPredictedTimeHours() != null) {
+            prediction.setPredictedTimeHours(dto.getPredictedTimeHours());
+        }
+
+        if (dto.getPredictionExplanation() != null) {
+            prediction.setPredictionExplanation(dto.getPredictionExplanation());
+        }
+
+        markAsHybridIfNeeded(prediction);
+
+        prediction.setUpdatedAt(LocalDateTime.now());
+
+        DiagnosisPrediction saved = diagnosisPredictionRepository.save(prediction);
+
+        return map(saved);
+    }
+
+    @Transactional
+    public void deletePrediction(Integer id) {
+        DiagnosisPrediction prediction = getDiagnosisPredictionEntity(id);
+        Diagnosis diagnosis = prediction.getDiagnosis();
+
+        if(!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            "видалити прогноз діагностики",
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
+                    )
+            );
+        }
+
+        diagnosisPredictionRepository.delete(prediction);
+    }
+
     public DiagnosisPredictionResponseDTO getById(Integer id) {
         return map(getDiagnosisPredictionEntity(id));
     }
@@ -95,6 +183,12 @@ public class DiagnosisPredictionService {
     public DiagnosisPrediction getDiagnosisPredictionEntity(Integer id) {
         return diagnosisPredictionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Прогноз діагностики з таким ID не знайдено"));
+    }
+
+    public void markAsHybridIfNeeded(DiagnosisPrediction prediction) {
+        if (prediction.getPredictionSource() == PredictionSource.AUTOMATED) {
+            prediction.setPredictionSource(PredictionSource.HYBRID);
+        }
     }
 
     private DiagnosisPredictionResponseDTO map(DiagnosisPrediction p) {
