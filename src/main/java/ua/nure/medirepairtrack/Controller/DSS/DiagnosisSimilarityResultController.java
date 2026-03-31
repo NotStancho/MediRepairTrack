@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.CreateSimilarityResultDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.SimilarityResultResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.UpdateSimilarityResultDTO;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisSimilarityResultService;
 
 import java.util.List;
@@ -22,7 +23,17 @@ public class DiagnosisSimilarityResultController {
     }
 
     @GetMapping("/prediction/{predictionId}")
-    public List<SimilarityResultResponseDTO> getByPrediction(@PathVariable Integer predictionId) {
-        return service.getByPrediction(predictionId);
+    public List<SimilarityResultResponseDTO> getAllByPrediction(@PathVariable Integer predictionId) {
+        return service.getAllByPredictionId(predictionId);
+    }
+
+    @PutMapping("/{predictionId}/{claimId}")
+    public SimilarityResultResponseDTO update(@PathVariable Integer predictionId, @PathVariable Integer claimId, @Valid @RequestBody UpdateSimilarityResultDTO dto) {
+        return service.update(predictionId, claimId, dto);
+    }
+
+    @DeleteMapping("/{predictionId}/{claimId}")
+    public void delete(@PathVariable Integer predictionId, @PathVariable Integer claimId) {
+        service.delete(predictionId, claimId);
     }
 }

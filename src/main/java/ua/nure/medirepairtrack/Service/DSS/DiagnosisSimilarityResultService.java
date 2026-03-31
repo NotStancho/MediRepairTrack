@@ -5,14 +5,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.CreateSimilarityResultDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.SimilarityResultResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.UpdateSimilarityResultDTO;
 import ua.nure.medirepairtrack.Entity.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarity.DiagnosisSimilarityResult;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarity.DiagnosisSimilarityResultId;
+import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisSimilarityResultRepository;
 import ua.nure.medirepairtrack.Service.ClaimService;
+import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
+import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,16 +33,35 @@ public class DiagnosisSimilarityResultService {
 
     private final SimilaritySearchService similaritySearchService;
 
+    private final PredictionStateService predictionStateService;
     private final DiagnosisPredictionRepository predictionRepository;
 
+    private final DiagnosisStatusMachine diagnosisStatusMachine;
 
     @Transactional
     public SimilarityResultResponseDTO create(CreateSimilarityResultDTO dto) {
 
         DiagnosisPrediction prediction = predictionRepository.findById(dto.getPredictionId())
-                .orElseThrow(() -> new NotFoundException("Prediction not found"));
+                .orElseThrow(() -> new NotFoundException("Прогноз не знайдений"));
+
+        Diagnosis diagnosis = prediction.getDiagnosis();
+
+        validateEditable(diagnosis, "додавати схожі заявки");
 
         Claim claim = claimService.getClaim(dto.getSimilarClaimId());
+
+        if (diagnosis.getClaim().getId().equals(dto.getSimilarClaimId())) {
+            throw new OperationNotAllowedException("Не можна додати поточну заявку як схожу");
+        }
+
+        if (diagnosisSimilarityResultRepository.existsById(new DiagnosisSimilarityResultId(dto.getPredictionId(), dto.getSimilarClaimId()))) {
+            throw new OperationNotAllowedException("Ця схожа заявка вже додана");
+        }
+
+        Integer maxRank = diagnosisSimilarityResultRepository
+                .findMaxRankByPredictionId(dto.getPredictionId());
+
+        int newRank = (maxRank != null ? maxRank : 0) + 1;
 
         DiagnosisSimilarityResult entity =
                 DiagnosisSimilarityResult.builder()
@@ -48,13 +72,18 @@ public class DiagnosisSimilarityResultService {
                         .prediction(prediction)
                         .similarClaim(claim)
                         .similarityScore(dto.getSimilarityScore())
-                        .rankPosition(dto.getRankPosition())
+                        .rankPosition(newRank)
                         .createdAt(LocalDateTime.now())
                         .build();
 
-        return map(diagnosisSimilarityResultRepository.save(entity));
+        DiagnosisSimilarityResult saved = diagnosisSimilarityResultRepository.save(entity);
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+
+        return map(saved);
     }
 
+    // DO NOT mark as HYBRID - system generated
     @Transactional
     public void generateSimilarityResults(DiagnosisPrediction prediction) {
 
@@ -66,22 +95,81 @@ public class DiagnosisSimilarityResultService {
 
         for (var sc : similarClaims) {
 
-            CreateSimilarityResultDTO dto = new CreateSimilarityResultDTO();
-            dto.setPredictionId(prediction.getId());
-            dto.setSimilarClaimId(sc.claimId());
-            dto.setSimilarityScore(BigDecimal.valueOf(sc.score()));
-            dto.setRankPosition(rank++);
+            DiagnosisSimilarityResult entity =
+                    DiagnosisSimilarityResult.builder()
+                            .id(new DiagnosisSimilarityResultId(
+                                    prediction.getId(),
+                                    sc.claimId()
+                            ))
+                            .prediction(prediction)
+                            .similarClaim(claimService.getClaim(sc.claimId()))
+                            .similarityScore(BigDecimal.valueOf(sc.score()))
+                            .rankPosition(rank++)
+                            .createdAt(LocalDateTime.now())
+                            .build();
 
-            create(dto);
+            diagnosisSimilarityResultRepository.save(entity);
         }
     }
 
-    public List<SimilarityResultResponseDTO> getByPrediction(Integer predictionId) {
+    @Transactional
+    public SimilarityResultResponseDTO update(Integer predictionId, Integer claimId, UpdateSimilarityResultDTO dto) {
+
+        DiagnosisSimilarityResultId id =
+                new DiagnosisSimilarityResultId(predictionId, claimId);
+
+        DiagnosisSimilarityResult entity =
+                diagnosisSimilarityResultRepository.findById(id)
+                        .orElseThrow(() -> new NotFoundException("Similarity result not found"));
+
+        DiagnosisPrediction prediction = entity.getPrediction();
+
+        validateEditable(prediction.getDiagnosis(), "редагувати схожі заявки");
+
+        if (dto.getSimilarityScore() != null) {
+            entity.setSimilarityScore(dto.getSimilarityScore());
+        }
+
+        DiagnosisSimilarityResult saved = diagnosisSimilarityResultRepository.save(entity);
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+
+        return map(saved);
+    }
+
+    @Transactional
+    public void delete(Integer predictionId, Integer claimId) {
+
+        DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
+                .orElseThrow(() -> new NotFoundException("Prediction not found"));
+
+        validateEditable(prediction.getDiagnosis(), "видаляти схожі заявки");
+
+        diagnosisSimilarityResultRepository.deleteById(
+                new DiagnosisSimilarityResultId(predictionId, claimId)
+        );
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+    }
+
+    public List<SimilarityResultResponseDTO> getAllByPredictionId(Integer predictionId) {
 
         return diagnosisSimilarityResultRepository.findByPredictionIdOrderByRankPosition(predictionId)
                 .stream()
                 .map(this::map)
                 .toList();
+    }
+
+    private void validateEditable(Diagnosis diagnosis, String action) {
+        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            action,
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
+                    )
+            );
+        }
     }
 
     private SimilarityResultResponseDTO map(DiagnosisSimilarityResult e) {
