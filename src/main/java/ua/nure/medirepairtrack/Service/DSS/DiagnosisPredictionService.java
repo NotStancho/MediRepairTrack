@@ -32,6 +32,8 @@ public class DiagnosisPredictionService {
 
     private final PredictionAggregationService predictionAggregationService;
 
+    private final PredictionStateService predictionStateService;
+
     private final DiagnosisStatusMachine diagnosisStatusMachine;
 
     @Transactional
@@ -142,7 +144,7 @@ public class DiagnosisPredictionService {
             prediction.setPredictionExplanation(dto.getPredictionExplanation());
         }
 
-        markAsHybridIfNeeded(prediction);
+        predictionStateService.markAsHybridIfNeeded(prediction);
 
         prediction.setUpdatedAt(LocalDateTime.now());
 
@@ -183,12 +185,6 @@ public class DiagnosisPredictionService {
     public DiagnosisPrediction getDiagnosisPredictionEntity(Integer id) {
         return diagnosisPredictionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Прогноз діагностики з таким ID не знайдено"));
-    }
-
-    public void markAsHybridIfNeeded(DiagnosisPrediction prediction) {
-        if (prediction.getPredictionSource() == PredictionSource.AUTOMATED) {
-            prediction.setPredictionSource(PredictionSource.HYBRID);
-        }
     }
 
     private DiagnosisPredictionResponseDTO map(DiagnosisPrediction p) {
