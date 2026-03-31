@@ -45,7 +45,7 @@ public class PredictionAggregationService {
         // 3. aggregated metrics
         calculatePredictedTimeHours(prediction);
 
-        var similarityResults = similarityResultService.getByPrediction(prediction.getId());
+        var similarityResults = similarityResultService.getAllByPredictionId(prediction.getId());
 
         calculatePredictedCost(prediction);
         calculateWarrantyProbability(prediction, similarityResults);

@@ -39,7 +39,7 @@ public class DiagnosisPredictionDefectService {
 
         Integer predictionId = prediction.getId();
 
-        var similarityResults = similarityResultService.getByPrediction(predictionId);
+        var similarityResults = similarityResultService.getAllByPredictionId(predictionId);
 
         if (similarityResults.isEmpty()) {
             return;

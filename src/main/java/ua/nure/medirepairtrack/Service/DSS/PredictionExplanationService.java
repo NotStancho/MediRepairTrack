@@ -51,7 +51,7 @@ public class PredictionExplanationService {
 
     private List<SimilarCaseContext> buildSimilarCases(DiagnosisPrediction prediction) {
 
-        var results = diagnosisSimilarityResultService.getByPrediction(prediction.getId());
+        var results = diagnosisSimilarityResultService.getAllByPredictionId(prediction.getId());
 
         return results.stream()
                 .limit(3)
