@@ -3,6 +3,7 @@ package ua.nure.medirepairtrack.Service.DSS;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.nure.medirepairtrack.DTO.ClaimDTO.ClaimShortDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.CreateSimilarityResultDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.SimilarityResultResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.UpdateSimilarityResultDTO;
@@ -22,6 +23,8 @@ import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,6 +84,13 @@ public class DiagnosisSimilarityResultService {
         predictionStateService.markAsHybridIfNeeded(prediction);
 
         return map(saved);
+    }
+
+    @Transactional
+    public List<SimilarityResultResponseDTO> createBatch(List<CreateSimilarityResultDTO> dtos) {
+        return dtos.stream()
+                .map(this::create) // reuse логіки
+                .toList();
     }
 
     // DO NOT mark as HYBRID - system generated
@@ -157,6 +167,26 @@ public class DiagnosisSimilarityResultService {
         return diagnosisSimilarityResultRepository.findByPredictionIdOrderByRankPosition(predictionId)
                 .stream()
                 .map(this::map)
+                .toList();
+    }
+
+    public List<ClaimShortDTO> getAvailableClaims(Integer predictionId) {
+
+        DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
+                .orElseThrow(() -> new NotFoundException("Прогноз не знайдений"));
+
+        Integer currentClaimId = prediction.getDiagnosis().getClaim().getId();
+
+        // вже додані
+        Set<Integer> usedClaimIds = diagnosisSimilarityResultRepository
+                .findByPredictionIdOrderByRankPosition(predictionId)
+                .stream()
+                .map(r -> r.getSimilarClaim().getId())
+                .collect(Collectors.toSet());
+
+        return claimService.getAllClaimsShort().stream()
+                .filter(c -> !c.getId().equals(currentClaimId)) // не саму себе
+                .filter(c -> !usedClaimIds.contains(c.getId())) // не дублікати
                 .toList();
     }
 
