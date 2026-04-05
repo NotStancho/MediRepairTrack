@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.RepairOperation.CreateRepairOperationDTO;
 import ua.nure.medirepairtrack.DTO.RepairOperation.RepairOperationResponseDTO;
+import ua.nure.medirepairtrack.DTO.RepairOperation.RepairOperationShortDTO;
 import ua.nure.medirepairtrack.DTO.RepairOperation.UpdateRepairOperationDTO;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
 import ua.nure.medirepairtrack.Entity.Employee.Employee;
@@ -79,6 +80,14 @@ public class RepairOperationService {
                 .toList();
     }
 
+    public List<RepairOperationShortDTO> getAllOperationsShort() {
+
+        return repository.findAll()
+                .stream()
+                .map(this::mapShort)
+                .toList();
+    }
+
     @Transactional
     public void delete(Integer id) {
 
@@ -107,4 +116,11 @@ public class RepairOperationService {
                 .build();
     }
 
+    private RepairOperationShortDTO mapShort(RepairOperation e) {
+        return RepairOperationShortDTO.builder()
+                .id(e.getId())
+                .name(e.getName())
+                .complexityLevelName(e.getComplexityLevel().getName())
+                .build();
+    }
 }
