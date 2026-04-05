@@ -170,6 +170,16 @@ public class DiagnosisSimilarityResultService {
                 .toList();
     }
 
+    public SimilarityResultResponseDTO getById(Integer predictionId, Integer claimId) {
+
+        DiagnosisSimilarityResultId id =
+                new DiagnosisSimilarityResultId(predictionId, claimId);
+
+        return diagnosisSimilarityResultRepository.findById(id)
+                .map(this::map)
+                .orElseThrow(() -> new NotFoundException("Similarity result not found"));
+    }
+
     public List<ClaimShortDTO> getAvailableClaims(Integer predictionId) {
 
         DiagnosisPrediction prediction = predictionRepository.findById(predictionId)

@@ -41,6 +41,10 @@ public class DiagnosisSimilarityResultController {
     public List<SimilarityResultResponseDTO> getAllByPrediction(@PathVariable Integer predictionId) {
         return service.getAllByPredictionId(predictionId);
     }
+    @GetMapping("/prediction/{predictionId}/claim/{claimId}")
+    public SimilarityResultResponseDTO getById(@PathVariable Integer predictionId, @PathVariable Integer claimId) {
+        return service.getById(predictionId, claimId);
+    }
     @GetMapping("/available/{predictionId}")
     public List<ClaimShortDTO> getAvailable(@PathVariable Integer predictionId) {
         return service.getAvailableClaims(predictionId);
