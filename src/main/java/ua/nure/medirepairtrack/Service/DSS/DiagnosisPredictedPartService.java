@@ -6,15 +6,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.PredictedPart.CreatePredictedPartDTO;
 import ua.nure.medirepairtrack.DTO.DSS.PredictedPart.PredictedPartResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedPart.UpdatePredictedPartDTO;
+import ua.nure.medirepairtrack.DTO.PartDTO.PartShortDTO;
 import ua.nure.medirepairtrack.Entity.DSS.*;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedPart.DiagnosisPredictedPart;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedPart.DiagnosisPredictedPartId;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
+import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.Part.Part;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictedPartRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.PartService;
+import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
+import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,31 +44,62 @@ public class DiagnosisPredictedPartService {
     private final PartService partService;
     private final DiagnosisSimilarityResultService similarityResultService;
 
+    private final PredictionStateService predictionStateService;
     private final DiagnosisPredictionRepository predictionRepository;
+
+    private final DiagnosisStatusMachine diagnosisStatusMachine;
 
 
     @Transactional
     public PredictedPartResponseDTO create(CreatePredictedPartDTO dto) {
+
         DiagnosisPrediction prediction = predictionRepository.findById(dto.getPredictionId())
                 .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
 
+        Diagnosis diagnosis = prediction.getDiagnosis();
+
+        validateEditable(diagnosis, "додавати прогнозовані запчастини");
+
         Part part = partService.getPartEntity(dto.getPartId());
 
+        DiagnosisPredictedPartId id = new DiagnosisPredictedPartId(
+                dto.getPredictionId(),
+                dto.getPartId()
+        );
+
+        if (repository.existsById(id)) {
+            throw new OperationNotAllowedException("Ця запчастина вже додана");
+        }
+
+        Integer maxRank = repository
+                .findMaxRankByPredictionId(dto.getPredictionId());
+
+        int newRank = (maxRank != null ? maxRank : 0) + 1;
+
         DiagnosisPredictedPart entity = DiagnosisPredictedPart.builder()
-                        .id(new DiagnosisPredictedPartId(
-                                dto.getPredictionId(),
-                                dto.getPartId()
-                        ))
+                        .id(id)
                         .prediction(prediction)
                         .part(part)
                         .probabilityScore(dto.getProbabilityScore())
-                        .rankPosition(dto.getRankPosition())
+                        .rankPosition(newRank)
                         .createdAt(LocalDateTime.now())
                         .build();
 
-        return map(repository.save(entity));
+        DiagnosisPredictedPart saved = repository.save(entity);
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+
+        return map(saved);
     }
 
+    @Transactional
+    public List<PredictedPartResponseDTO> createBatch(List<CreatePredictedPartDTO> dtos) {
+        return dtos.stream()
+                .map(this::create)
+                .toList();
+    }
+
+    // DO NOT mark as HYBRID - system generated
     @Transactional
     public void generatePredictedParts(DiagnosisPrediction prediction) {
 
@@ -115,21 +153,101 @@ public class DiagnosisPredictedPartService {
                 continue;
             }
 
-            CreatePredictedPartDTO dto = new CreatePredictedPartDTO();
-            dto.setPredictionId(predictionId);
-            dto.setPartId(partId);
-            dto.setProbabilityScore(probability);
-            dto.setRankPosition(rank++);
+            DiagnosisPredictedPart entity = DiagnosisPredictedPart.builder()
+                    .id(new DiagnosisPredictedPartId(
+                            predictionId,
+                            partId
+                    ))
+                    .prediction(prediction)
+                    .part(partService.getPartEntity(partId))
+                    .probabilityScore(probability)
+                    .rankPosition(rank++)
+                    .createdAt(LocalDateTime.now())
+                    .build();
 
-            create(dto);
+            repository.save(entity);
         }
     }
 
-    public List<PredictedPartResponseDTO> getByPrediction(Integer predictionId) {
+    @Transactional
+    public PredictedPartResponseDTO update(Integer predictionId, Integer partId, UpdatePredictedPartDTO dto) {
+
+        DiagnosisPredictedPartId id = new DiagnosisPredictedPartId(predictionId, partId);
+
+        DiagnosisPredictedPart entity = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Прогнозовану запчастину не знайдено"));
+
+        DiagnosisPrediction prediction = entity.getPrediction();
+
+        validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану запчастину");
+
+        if (dto.getProbabilityScore() != null) {
+            entity.setProbabilityScore(dto.getProbabilityScore());
+        }
+
+        DiagnosisPredictedPart saved = repository.save(entity);
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+
+        return map(saved);
+    }
+
+    @Transactional
+    public void delete(Integer predictionId, Integer partId) {
+
+        DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
+                .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
+
+        validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану запчастину");
+
+        repository.deleteById(new DiagnosisPredictedPartId(predictionId, partId));
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+    }
+
+    public List<PredictedPartResponseDTO> getAllByPredictionId(Integer predictionId) {
         return repository.findByPredictionIdOrderByRankPosition(predictionId)
                 .stream()
                 .map(this::map)
                 .toList();
+    }
+
+    public PredictedPartResponseDTO getById(Integer predictionId, Integer partId) {
+
+        DiagnosisPredictedPartId id =
+                new DiagnosisPredictedPartId(predictionId, partId);
+
+        return repository.findById(id)
+                .map(this::map)
+                .orElseThrow(() -> new NotFoundException("Прогнозована деталь не знайдена"));
+    }
+
+    public List<PartShortDTO> getAvailableParts(Integer predictionId) {
+
+       predictionRepository.findById(predictionId)
+                .orElseThrow(() -> new NotFoundException("Прогноз не знайдений"));
+
+        // уже використані
+        var usedPartIds = repository.findByPredictionIdOrderByRankPosition(predictionId)
+                .stream()
+                .map(e -> e.getPart().getId())
+                .collect(Collectors.toSet());
+
+        return partService.getAllPartsShort().stream()
+                .filter(p -> !usedPartIds.contains(p.getId()))
+                .toList();
+    }
+
+    private void validateEditable(Diagnosis diagnosis, String action) {
+        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            action,
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
+                    )
+            );
+        }
     }
 
     private PredictedPartResponseDTO map(DiagnosisPredictedPart e) {

@@ -106,7 +106,7 @@ public class PredictionExplanationService {
 
     private List<PredictedPartContext> buildParts(DiagnosisPrediction prediction) {
 
-        var parts = predictedPartService.getByPrediction(prediction.getId());
+        var parts = predictedPartService.getAllByPredictionId(prediction.getId());
 
         return parts.stream()
                 .map(p -> {

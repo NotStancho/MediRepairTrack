@@ -98,7 +98,7 @@ public class PredictionAggregationService {
 
         BigDecimal laborCost = predictedHours.multiply(config.getLaborPricePerHour());
 
-        var predictedParts = predictedPartService.getByPrediction(prediction.getId());
+        var predictedParts = predictedPartService.getAllByPredictionId(prediction.getId());
 
         BigDecimal partsCost = predictedParts.stream()
                 .map(p -> {
@@ -180,7 +180,7 @@ public class PredictionAggregationService {
         BigDecimal confidence = prediction.getConfidenceScore();
 
         int operationsCount = predictedOperationService.getByPrediction(prediction.getId()).size();
-        int partsCount = predictedPartService.getByPrediction(prediction.getId()).size();
+        int partsCount = predictedPartService.getAllByPredictionId(prediction.getId()).size();
 
         if (predictedHours.compareTo(BigDecimal.valueOf(6)) >= 0) {
             complexityScore += 3;
