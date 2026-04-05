@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.SimilarityResultResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedOperation.PredictedOperationResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.PredictionExplanation.PredictionContext;
 import ua.nure.medirepairtrack.DTO.PricingDTO.PricingConfigResponseDTO;
 import ua.nure.medirepairtrack.Entity.Claim.RepairType;
-import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedOperation.DiagnosisPredictedOperation;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Service.ClaimService;
 import ua.nure.medirepairtrack.Service.PartService;
@@ -65,7 +65,7 @@ public class PredictionAggregationService {
     @Transactional
     public void calculatePredictedTimeHours(DiagnosisPrediction prediction) {
 
-        var operations = predictedOperationService.getByPrediction(prediction.getId());
+        var operations = predictedOperationService.getAllByPredictionId(prediction.getId());
 
         if (operations.isEmpty()) {
             prediction.setPredictedTimeHours(BigDecimal.ZERO);
@@ -73,7 +73,7 @@ public class PredictionAggregationService {
         }
 
         BigDecimal totalTime = operations.stream()
-                .map(DiagnosisPredictedOperation::getPredictedTimeSpent)
+                .map(PredictedOperationResponseDTO::getPredictedTimeSpent)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         prediction.setPredictedTimeHours(
@@ -179,7 +179,7 @@ public class PredictionAggregationService {
         BigDecimal predictedCost = prediction.getPredictedCost();
         BigDecimal confidence = prediction.getConfidenceScore();
 
-        int operationsCount = predictedOperationService.getByPrediction(prediction.getId()).size();
+        int operationsCount = predictedOperationService.getAllByPredictionId(prediction.getId()).size();
         int partsCount = predictedPartService.getAllByPredictionId(prediction.getId()).size();
 
         if (predictedHours.compareTo(BigDecimal.valueOf(6)) >= 0) {
