@@ -72,7 +72,7 @@ public class PredictionExplanationService {
 
     private List<PredictedDefectContext> buildDefects(DiagnosisPrediction prediction) {
 
-        var defects = predictionDefectService.getByPrediction(prediction.getId());
+        var defects = predictionDefectService.getAllByPredictionId(prediction.getId());
 
         return defects.stream()
                 .map(d -> {
