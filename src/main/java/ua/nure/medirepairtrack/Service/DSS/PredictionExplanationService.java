@@ -6,6 +6,7 @@ import ua.nure.medirepairtrack.Client.GeminiText.GeminiTextClient;
 import ua.nure.medirepairtrack.DTO.DSS.PredictionExplanation.*;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Service.ClaimService;
+import ua.nure.medirepairtrack.Service.DefectCategoryService;
 import ua.nure.medirepairtrack.Service.PartService;
 import ua.nure.medirepairtrack.Service.RepairOperationService;
 
@@ -25,6 +26,7 @@ public class PredictionExplanationService {
     private final RepairOperationService repairOperationService;
 
     private final GeminiTextClient geminiTextClient;
+    private final DefectCategoryService defectCategoryService;
 
     public String generateExplanation(PredictionContext context) {
 
@@ -77,7 +79,7 @@ public class PredictionExplanationService {
         return defects.stream()
                 .map(d -> {
 
-                    var defect = d.getDefectCategory();
+                    var defect = defectCategoryService.getEntity(d.getDefectCategoryId());
 
                     return PredictedDefectContext.builder()
                             .name(defect.getName())
