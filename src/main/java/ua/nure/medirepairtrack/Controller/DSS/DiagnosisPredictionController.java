@@ -7,6 +7,7 @@ import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateManualPredic
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.DiagnosisPredictionResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.UpdatePredictionDTO;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisPredictionService;
+import ua.nure.medirepairtrack.Service.DSS.PredictionAggregationService;
 
 import java.util.List;
 
@@ -15,33 +16,39 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DiagnosisPredictionController {
 
-    private final DiagnosisPredictionService predictionService;
+    private final DiagnosisPredictionService service;
+    private final PredictionAggregationService predictionAggregationService;
 
     // Ручне створення прогнозу інженером
     @PostMapping("/manual")
     public DiagnosisPredictionResponseDTO createManual(@Valid @RequestBody CreateManualPredictionDTO dto) {
-        return predictionService.createManualPrediction(dto);
+        return service.createManualPrediction(dto);
     }
 
     @PutMapping("/{predictionId}")
     public DiagnosisPredictionResponseDTO update(@PathVariable Integer predictionId, @Valid @RequestBody UpdatePredictionDTO dto) {
-        return predictionService.updatePrediction(predictionId, dto);
+        return service.updatePrediction(predictionId, dto);
     }
 
     @DeleteMapping("/{predictionId}")
     public void delete(@PathVariable Integer predictionId) {
-        predictionService.deletePrediction(predictionId);
+        service.deletePrediction(predictionId);
+    }
+
+    @PostMapping("/{predictionId}/recalculate")
+    public void recalculatePredictions(@PathVariable Integer predictionId) {
+        predictionAggregationService.recalculate(predictionId);
     }
 
     // Отримання конкретного прогнозу
     @GetMapping("/{predictionId}")
     public DiagnosisPredictionResponseDTO getById(@PathVariable Integer predictionId) {
-        return predictionService.getById(predictionId);
+        return service.getById(predictionId);
     }
 
     // Отримання прогнозів для конкретної діагностики
     @GetMapping("/diagnosis/{diagnosisId}")
     public List<DiagnosisPredictionResponseDTO> getAllByDiagnosisId(@PathVariable Integer diagnosisId) {
-        return predictionService.getAllByDiagnosisId(diagnosisId);
+        return service.getAllByDiagnosisId(diagnosisId);
     }
 }

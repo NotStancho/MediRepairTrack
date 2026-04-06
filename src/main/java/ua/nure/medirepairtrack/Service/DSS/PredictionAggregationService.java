@@ -9,6 +9,9 @@ import ua.nure.medirepairtrack.DTO.DSS.PredictionExplanation.PredictionContext;
 import ua.nure.medirepairtrack.DTO.PricingDTO.PricingConfigResponseDTO;
 import ua.nure.medirepairtrack.Entity.Claim.RepairType;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
+import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.PredictionSource;
+import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
+import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.ClaimService;
 import ua.nure.medirepairtrack.Service.PartService;
 import ua.nure.medirepairtrack.Service.PricingConfigService;
@@ -16,6 +19,7 @@ import ua.nure.medirepairtrack.Service.PricingConfigService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,8 @@ public class PredictionAggregationService {
     private final PartService partService;
     private final PricingConfigService pricingConfigService;
     private final ComplexityLevelService complexityLevelService;
+
+    private final DiagnosisPredictionRepository diagnosisPredictionRepository;
 
     @Transactional
     public void generatePredictionData(DiagnosisPrediction prediction) {
@@ -89,7 +95,9 @@ public class PredictionAggregationService {
 
         PricingConfigResponseDTO config = pricingConfigService.getByRepairType(repairType);
 
-        BigDecimal predictedHours = prediction.getPredictedTimeHours();
+        BigDecimal predictedHours = Optional
+                .ofNullable(prediction.getPredictedTimeHours())
+                .orElse(BigDecimal.ZERO);
 
         if (config.getLaborMinHours() != null && predictedHours.compareTo(config.getLaborMinHours()) < 0) {
 
@@ -224,5 +232,19 @@ public class PredictionAggregationService {
         }
 
         prediction.setPredictedComplexityLevel(complexityLevelService.getEntity(complexityId));
+    }
+
+    @Transactional
+    public void recalculate(Integer predictionId) {
+        DiagnosisPrediction prediction = diagnosisPredictionRepository.findById(predictionId)
+                .orElseThrow(() -> new RuntimeException("Прогноз не знайдений"));
+
+        if (prediction.getPredictionSource() == PredictionSource.AUTOMATED) {
+            throw new OperationNotAllowedException("Автоматичний прогноз не потребує перерахунку");
+        }
+
+        calculatePredictedTimeHours(prediction);
+        calculatePredictedCost(prediction);
+        calculatePredictedComplexityLevel(prediction);
     }
 }
