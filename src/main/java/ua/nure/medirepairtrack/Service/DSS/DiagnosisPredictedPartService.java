@@ -19,8 +19,6 @@ import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictedPartRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.PartService;
-import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
-import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -47,8 +45,8 @@ public class DiagnosisPredictedPartService {
     private final PredictionStateService predictionStateService;
     private final DiagnosisPredictionRepository predictionRepository;
 
-    private final DiagnosisStatusMachine diagnosisStatusMachine;
 
+    private final DiagnosisPermissionService permissionService;
 
     @Transactional
     public PredictedPartResponseDTO create(CreatePredictedPartDTO dto) {
@@ -58,7 +56,7 @@ public class DiagnosisPredictedPartService {
 
         Diagnosis diagnosis = prediction.getDiagnosis();
 
-        validateEditable(diagnosis, "додавати прогнозовані запчастини");
+        permissionService.validateEditable(diagnosis, "додавати прогнозовані запчастини");
 
         Part part = partService.getPartEntity(dto.getPartId());
 
@@ -179,7 +177,7 @@ public class DiagnosisPredictedPartService {
 
         DiagnosisPrediction prediction = entity.getPrediction();
 
-        validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану запчастину");
+        permissionService.validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану запчастину");
 
         if (dto.getProbabilityScore() != null) {
             entity.setProbabilityScore(dto.getProbabilityScore());
@@ -198,7 +196,7 @@ public class DiagnosisPredictedPartService {
         DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
                 .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
 
-        validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану запчастину");
+        permissionService.validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану запчастину");
 
         repository.deleteById(new DiagnosisPredictedPartId(predictionId, partId));
 
@@ -219,7 +217,7 @@ public class DiagnosisPredictedPartService {
 
         return repository.findById(id)
                 .map(this::map)
-                .orElseThrow(() -> new NotFoundException("Прогнозована деталь не знайдена"));
+                .orElseThrow(() -> new NotFoundException("Прогнозовану запчастину не знайдено"));
     }
 
     public List<PartShortDTO> getAvailableParts(Integer predictionId) {
@@ -238,17 +236,6 @@ public class DiagnosisPredictedPartService {
                 .toList();
     }
 
-    private void validateEditable(Diagnosis diagnosis, String action) {
-        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
-            throw new OperationNotAllowedException(
-                    StatusMessageUtil.denied(
-                            action,
-                            diagnosis.getStatus(),
-                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
-                    )
-            );
-        }
-    }
 
     private PredictedPartResponseDTO map(DiagnosisPredictedPart e) {
         return PredictedPartResponseDTO.builder()

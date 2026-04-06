@@ -17,8 +17,6 @@ import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisSimilarityResultRepository;
 import ua.nure.medirepairtrack.Service.ClaimService;
-import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
-import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,10 +34,11 @@ public class DiagnosisSimilarityResultService {
 
     private final SimilaritySearchService similaritySearchService;
 
-    private final PredictionStateService predictionStateService;
     private final DiagnosisPredictionRepository predictionRepository;
 
-    private final DiagnosisStatusMachine diagnosisStatusMachine;
+    private final PredictionStateService predictionStateService;
+    private final DiagnosisPermissionService permissionService;
+
 
     @Transactional
     public SimilarityResultResponseDTO create(CreateSimilarityResultDTO dto) {
@@ -49,7 +48,7 @@ public class DiagnosisSimilarityResultService {
 
         Diagnosis diagnosis = prediction.getDiagnosis();
 
-        validateEditable(diagnosis, "додавати схожі заявки");
+        permissionService.validateEditable(diagnosis, "додавати схожі заявки");
 
         Claim claim = claimService.getClaim(dto.getSimilarClaimId());
 
@@ -130,11 +129,11 @@ public class DiagnosisSimilarityResultService {
 
         DiagnosisSimilarityResult entity =
                 diagnosisSimilarityResultRepository.findById(id)
-                        .orElseThrow(() -> new NotFoundException("Similarity result not found"));
+                        .orElseThrow(() -> new NotFoundException("Схожу заявку не знайдено"));
 
         DiagnosisPrediction prediction = entity.getPrediction();
 
-        validateEditable(prediction.getDiagnosis(), "редагувати схожі заявки");
+        permissionService.validateEditable(prediction.getDiagnosis(), "редагувати схожі заявки");
 
         if (dto.getSimilarityScore() != null) {
             entity.setSimilarityScore(dto.getSimilarityScore());
@@ -151,9 +150,9 @@ public class DiagnosisSimilarityResultService {
     public void delete(Integer predictionId, Integer claimId) {
 
         DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
-                .orElseThrow(() -> new NotFoundException("Prediction not found"));
+                .orElseThrow(() -> new NotFoundException("Прогноз не знайдений"));
 
-        validateEditable(prediction.getDiagnosis(), "видаляти схожі заявки");
+        permissionService.validateEditable(prediction.getDiagnosis(), "видаляти схожі заявки");
 
         diagnosisSimilarityResultRepository.deleteById(
                 new DiagnosisSimilarityResultId(predictionId, claimId)
@@ -177,7 +176,7 @@ public class DiagnosisSimilarityResultService {
 
         return diagnosisSimilarityResultRepository.findById(id)
                 .map(this::map)
-                .orElseThrow(() -> new NotFoundException("Similarity result not found"));
+                .orElseThrow(() -> new NotFoundException("Схожу заявку не знайдено"));
     }
 
     public List<ClaimShortDTO> getAvailableClaims(Integer predictionId) {
@@ -198,18 +197,6 @@ public class DiagnosisSimilarityResultService {
                 .filter(c -> !c.getId().equals(currentClaimId)) // не саму себе
                 .filter(c -> !usedClaimIds.contains(c.getId())) // не дублікати
                 .toList();
-    }
-
-    private void validateEditable(Diagnosis diagnosis, String action) {
-        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
-            throw new OperationNotAllowedException(
-                    StatusMessageUtil.denied(
-                            action,
-                            diagnosis.getStatus(),
-                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
-                    )
-            );
-        }
     }
 
     private SimilarityResultResponseDTO map(DiagnosisSimilarityResult e) {

@@ -19,8 +19,6 @@ import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictedOperationReposit
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.ClaimRepairOperationService;
 import ua.nure.medirepairtrack.Service.RepairOperationService;
-import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
-import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -48,17 +46,17 @@ public class DiagnosisPredictedOperationService {
     private final RepairOperationService repairOperationService;
 
     private final PredictionStateService predictionStateService;
-    private final DiagnosisStatusMachine diagnosisStatusMachine;
+    private final DiagnosisPermissionService permissionService;
 
     @Transactional
     public PredictedOperationResponseDTO create(CreatePredictedOperationDTO dto) {
 
         DiagnosisPrediction prediction = predictionRepository.findById(dto.getPredictionId())
-                .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
+                .orElseThrow(() -> new NotFoundException("Прогноз не знайдено"));
 
         Diagnosis diagnosis = prediction.getDiagnosis();
 
-        validateEditable(diagnosis, "додавати прогнозовані операції");
+        permissionService.validateEditable(diagnosis, "додавати прогнозовані операції");
 
         RepairOperation operation = repairOperationService.getOperationEntity(dto.getOperationId());
 
@@ -177,6 +175,10 @@ public class DiagnosisPredictedOperationService {
             double weightedTimeSum = operationWeightedTimeSums.get(operationId);
             double similaritySum = operationSimilaritySums.get(operationId);
 
+            if (similaritySum == 0) {
+                continue;
+            }
+
             double predictedTime = weightedTimeSum / similaritySum;
 
             DiagnosisPredictedOperation entity = DiagnosisPredictedOperation.builder()
@@ -206,7 +208,7 @@ public class DiagnosisPredictedOperationService {
 
         DiagnosisPrediction prediction = entity.getPrediction();
 
-        validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану операцію");
+        permissionService.validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану операцію");
 
         if (dto.getProbabilityScore() != null) {
             entity.setProbabilityScore(dto.getProbabilityScore());
@@ -229,7 +231,7 @@ public class DiagnosisPredictedOperationService {
         DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
                 .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
 
-        validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану операцію");
+        permissionService.validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану операцію");
 
         repository.deleteById(new DiagnosisPredictedOperationId(predictionId, operationId));
 
@@ -268,17 +270,6 @@ public class DiagnosisPredictedOperationService {
                 .toList();
     }
 
-    private void validateEditable(Diagnosis diagnosis, String action) {
-        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
-            throw new OperationNotAllowedException(
-                    StatusMessageUtil.denied(
-                            action,
-                            diagnosis.getStatus(),
-                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
-                    )
-            );
-        }
-    }
 
     private PredictedOperationResponseDTO map(DiagnosisPredictedOperation e) {
         return PredictedOperationResponseDTO.builder()

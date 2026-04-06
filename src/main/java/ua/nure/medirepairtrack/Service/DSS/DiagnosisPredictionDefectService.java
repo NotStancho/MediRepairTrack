@@ -18,8 +18,6 @@ import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionDefectRepositor
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.ClaimDefectCategoryService;
 import ua.nure.medirepairtrack.Service.DefectCategoryService;
-import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
-import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -46,8 +44,8 @@ public class DiagnosisPredictionDefectService {
     private final ClaimDefectCategoryService claimDefectCategoryService;
     private final DefectCategoryService defectCategoryService;
 
-    private final DiagnosisStatusMachine diagnosisStatusMachine;
     private final PredictionStateService predictionStateService;
+    private final DiagnosisPermissionService permissionService;
 
     @Transactional
     public PredictedDefectResponseDTO create(CreatePredictedDefectDTO dto) {
@@ -57,7 +55,7 @@ public class DiagnosisPredictionDefectService {
 
         Diagnosis diagnosis = prediction.getDiagnosis();
 
-        validateEditable(diagnosis, "додавати прогнозовані категорії дефектів");
+        permissionService.validateEditable(diagnosis, "додавати прогнозовані категорії дефектів");
 
         DefectCategory defectCategory = defectCategoryService.getEntity(dto.getDefectCategoryId());
 
@@ -185,7 +183,7 @@ public class DiagnosisPredictionDefectService {
 
         DiagnosisPrediction prediction = entity.getPrediction();
 
-        validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану категорію дефекту");
+        permissionService.validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану категорію дефекту");
 
         if (dto.getProbabilityScore() != null) {
             entity.setProbabilityScore(dto.getProbabilityScore());
@@ -204,7 +202,7 @@ public class DiagnosisPredictionDefectService {
         DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
                 .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
 
-        validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану категорію дефекту");
+        permissionService.validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану категорію дефекту");
 
         repository.deleteById(new DiagnosisPredictionDefectId(predictionId, defectCategoryId));
 
@@ -243,17 +241,6 @@ public class DiagnosisPredictionDefectService {
                 .toList();
     }
 
-    private void validateEditable(Diagnosis diagnosis, String action) {
-        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
-            throw new OperationNotAllowedException(
-                    StatusMessageUtil.denied(
-                            action,
-                            diagnosis.getStatus(),
-                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
-                    )
-            );
-        }
-    }
 
     private PredictedDefectResponseDTO map(DiagnosisPredictionDefect e) {
         return PredictedDefectResponseDTO.builder()
