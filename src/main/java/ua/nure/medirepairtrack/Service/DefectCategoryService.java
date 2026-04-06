@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DefectCategoryDTO.CreateDefectCategoryDTO;
 import ua.nure.medirepairtrack.DTO.DefectCategoryDTO.DefectCategoryResponseDTO;
+import ua.nure.medirepairtrack.DTO.DefectCategoryDTO.DefectCategoryShortResponseDTO;
 import ua.nure.medirepairtrack.DTO.DefectCategoryDTO.UpdateDefectCategoryDTO;
 import ua.nure.medirepairtrack.Entity.DefectCategory.DefectCategory;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
@@ -61,6 +62,13 @@ public class DefectCategoryService {
                 .toList();
     }
 
+    public List<DefectCategoryShortResponseDTO> getAllDefectCategoryShort() {
+        return repository.findAll()
+                .stream()
+                .map(this::mapShort)
+                .toList();
+    }
+
     public DefectCategory getEntity(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Категорію дефекту не знайдено"));
@@ -75,6 +83,14 @@ public class DefectCategoryService {
                 .typicalSymptoms(e.getTypicalSymptoms())
                 .createdAt(e.getCreatedAt())
                 .updatedAt(e.getUpdatedAt())
+                .build();
+    }
+
+    private DefectCategoryShortResponseDTO mapShort (DefectCategory e) {
+        return DefectCategoryShortResponseDTO.builder()
+                .id(e.getId())
+                .name(e.getName())
+                .typicalSymptoms(e.getTypicalSymptoms())
                 .build();
     }
 }
