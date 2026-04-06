@@ -4,11 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedDefect.CreatePredictedDefectDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedDefect.PredictedDefectResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedDefect.UpdatePredictedDefectDTO;
+import ua.nure.medirepairtrack.DTO.DefectCategoryDTO.DefectCategoryShortResponseDTO;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictionDefect.*;
+import ua.nure.medirepairtrack.Entity.DefectCategory.DefectCategory;
+import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
+import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionDefectRepository;
+import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.ClaimDefectCategoryService;
 import ua.nure.medirepairtrack.Service.DefectCategoryService;
+import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
+import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +40,62 @@ public class DiagnosisPredictionDefectService {
     private double minProbability;
 
     private final DiagnosisPredictionDefectRepository repository;
+    private final DiagnosisPredictionRepository predictionRepository;
 
     private final DiagnosisSimilarityResultService similarityResultService;
-
     private final ClaimDefectCategoryService claimDefectCategoryService;
     private final DefectCategoryService defectCategoryService;
 
+    private final DiagnosisStatusMachine diagnosisStatusMachine;
+    private final PredictionStateService predictionStateService;
+
+    @Transactional
+    public PredictedDefectResponseDTO create(CreatePredictedDefectDTO dto) {
+
+        DiagnosisPrediction prediction = predictionRepository.findById(dto.getPredictionId())
+                .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
+
+        Diagnosis diagnosis = prediction.getDiagnosis();
+
+        validateEditable(diagnosis, "додавати прогнозовані категорії дефектів");
+
+        DefectCategory defectCategory = defectCategoryService.getEntity(dto.getDefectCategoryId());
+
+        DiagnosisPredictionDefectId id = new DiagnosisPredictionDefectId(
+                dto.getPredictionId(),
+                dto.getDefectCategoryId()
+        );
+
+        if (repository.existsById(id)) {
+            throw new OperationNotAllowedException("Ця категорія дефекту вже додана");
+        }
+
+        Integer maxRank = repository.findMaxRankByPredictionId(dto.getPredictionId());
+        int newRank = (maxRank != null ? maxRank : 0) + 1;
+
+        DiagnosisPredictionDefect entity = DiagnosisPredictionDefect.builder()
+                .id(id)
+                .prediction(prediction)
+                .defectCategory(defectCategory)
+                .probabilityScore(dto.getProbabilityScore())
+                .rankPosition(newRank)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        DiagnosisPredictionDefect saved = repository.save(entity);
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+
+        return map(saved);
+    }
+    @Transactional
+    public List<PredictedDefectResponseDTO> createBatch(List<CreatePredictedDefectDTO> dtos) {
+        return dtos.stream()
+                .map(this::create)
+                .toList();
+    }
+
+    // DO NOT mark as HYBRID - system generated
     @Transactional
     public void generatePredictedDefects(DiagnosisPrediction prediction) {
 
@@ -99,21 +161,107 @@ public class DiagnosisPredictionDefectService {
                 continue;
             }
 
-            repository.save(
-                    DiagnosisPredictionDefect.builder()
+            DiagnosisPredictionDefect entity = DiagnosisPredictionDefect.builder()
                             .id(new DiagnosisPredictionDefectId(predictionId, defectCategoryId))
                             .prediction(prediction)
                             .defectCategory(defectCategoryService.getEntity(defectCategoryId))
                             .probabilityScore(probability)
                             .rankPosition(rank++)
                             .createdAt(LocalDateTime.now())
-                            .build()
+                            .build();
+
+            repository.save(entity);
+        }
+    }
+
+    @Transactional
+    public PredictedDefectResponseDTO update(Integer predictionId, Integer defectCategoryId, UpdatePredictedDefectDTO dto) {
+
+        DiagnosisPredictionDefectId id =
+                new DiagnosisPredictionDefectId(predictionId, defectCategoryId);
+
+        DiagnosisPredictionDefect entity = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Прогнозовану категорію дефекту не знайдено"));
+
+        DiagnosisPrediction prediction = entity.getPrediction();
+
+        validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану категорію дефекту");
+
+        if (dto.getProbabilityScore() != null) {
+            entity.setProbabilityScore(dto.getProbabilityScore());
+        }
+
+        DiagnosisPredictionDefect saved = repository.save(entity);
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+
+        return map(saved);
+    }
+
+    @Transactional
+    public void delete(Integer predictionId, Integer defectCategoryId) {
+
+        DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
+                .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
+
+        validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану категорію дефекту");
+
+        repository.deleteById(new DiagnosisPredictionDefectId(predictionId, defectCategoryId));
+
+        predictionStateService.markAsHybridIfNeeded(prediction);
+    }
+
+    public List<PredictedDefectResponseDTO> getAllByPredictionId(Integer predictionId) {
+        return repository.findByPredictionIdOrderByRankPosition(predictionId)
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    public PredictedDefectResponseDTO getById(Integer predictionId, Integer defectCategoryId) {
+
+        DiagnosisPredictionDefectId id =
+                new DiagnosisPredictionDefectId(predictionId, defectCategoryId);
+
+        return repository.findById(id)
+                .map(this::map)
+                .orElseThrow(() -> new NotFoundException("Прогнозовану категорію дефекту не знайдено"));
+    }
+
+    public List<DefectCategoryShortResponseDTO> getAvailableDefects(Integer predictionId) {
+
+        predictionRepository.findById(predictionId)
+                .orElseThrow(() -> new NotFoundException("Прогноз не знайдений"));
+
+        var usedDefectIds = repository.findByPredictionIdOrderByRankPosition(predictionId)
+                .stream()
+                .map(e -> e.getDefectCategory().getId())
+                .collect(Collectors.toSet());
+
+        return defectCategoryService.getAllDefectCategoryShort().stream()
+                .filter(d -> !usedDefectIds.contains(d.getId()))
+                .toList();
+    }
+
+    private void validateEditable(Diagnosis diagnosis, String action) {
+        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            action,
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
+                    )
             );
         }
     }
 
-    public List<DiagnosisPredictionDefect> getAllByPredictionId(Integer predictionId) {
-        return repository.findByPredictionIdOrderByRankPosition(predictionId);
+    private PredictedDefectResponseDTO map(DiagnosisPredictionDefect e) {
+        return PredictedDefectResponseDTO.builder()
+                .predictionId(e.getPrediction().getId())
+                .defectCategoryId(e.getDefectCategory().getId())
+                .probabilityScore(e.getProbabilityScore())
+                .rankPosition(e.getRankPosition())
+                .createdAt(e.getCreatedAt())
+                .build();
     }
-
 }
