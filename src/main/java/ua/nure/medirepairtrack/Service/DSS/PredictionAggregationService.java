@@ -186,9 +186,17 @@ public class PredictionAggregationService {
 
         int complexityScore = 0;
 
-        BigDecimal predictedHours = prediction.getPredictedTimeHours();
-        BigDecimal predictedCost = prediction.getPredictedCost();
-        BigDecimal confidence = prediction.getConfidenceScore();
+        BigDecimal predictedHours = Optional
+                .ofNullable(prediction.getPredictedTimeHours())
+                .orElse(BigDecimal.ZERO);
+
+        BigDecimal predictedCost = Optional
+                .ofNullable(prediction.getPredictedCost())
+                .orElse(BigDecimal.ZERO);
+
+        BigDecimal confidence = Optional
+                .ofNullable(prediction.getConfidenceScore())
+                .orElse(BigDecimal.ZERO);
 
         int operationsCount = predictedOperationService.getAllByPredictionId(prediction.getId()).size();
         int partsCount = predictedPartService.getAllByPredictionId(prediction.getId()).size();
