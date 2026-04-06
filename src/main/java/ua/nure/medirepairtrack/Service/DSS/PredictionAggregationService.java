@@ -39,6 +39,8 @@ public class PredictionAggregationService {
 
     private final DiagnosisPredictionRepository diagnosisPredictionRepository;
 
+    private final DiagnosisPermissionService permissionService;
+
     @Transactional
     public void generatePredictionData(DiagnosisPrediction prediction) {
         // 1. similarity search
@@ -243,6 +245,8 @@ public class PredictionAggregationService {
         if (prediction.getPredictionSource() == PredictionSource.AUTOMATED) {
             throw new OperationNotAllowedException("Автоматичний прогноз не потребує перерахунку");
         }
+
+        permissionService.validateEditable(prediction.getDiagnosis(), "перераховувати оцінки прогнозу");
 
         calculatePredictedTimeHours(prediction);
         calculatePredictedCost(prediction);
