@@ -10,6 +10,7 @@ import ua.nure.medirepairtrack.DTO.PricingDTO.PricingConfigResponseDTO;
 import ua.nure.medirepairtrack.Entity.Claim.RepairType;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.PredictionSource;
+import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.ClaimService;
@@ -237,7 +238,7 @@ public class PredictionAggregationService {
     @Transactional
     public void recalculate(Integer predictionId) {
         DiagnosisPrediction prediction = diagnosisPredictionRepository.findById(predictionId)
-                .orElseThrow(() -> new RuntimeException("Прогноз не знайдений"));
+                .orElseThrow(() -> new NotFoundException("Прогноз не знайдений"));
 
         if (prediction.getPredictionSource() == PredictionSource.AUTOMATED) {
             throw new OperationNotAllowedException("Автоматичний прогноз не потребує перерахунку");
