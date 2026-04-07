@@ -1,5 +1,7 @@
 // types/diagnosis/DSS/diagnosisPrediction.ts
 
+import type { Probability } from '../../common/valueObjects'
+
 export type PredictionSource =
     | 'AUTOMATED'
     | 'MANUAL'
@@ -17,8 +19,8 @@ export interface DiagnosisPrediction {
     predictedTimeHours: number;
     predictionExplanation: string;
 
-    predictedWarrantyProbability: number;
-    confidenceScore: number;
+    predictedWarrantyProbability: Probability;
+    confidenceScore: Probability;
 
     modelVersion: string;
 
