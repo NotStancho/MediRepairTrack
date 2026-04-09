@@ -48,7 +48,7 @@ public class GeminiTextClient {
                                             ))
                             )
                             .bodyToMono(GeminiTextResponse.class)
-                            .block(Duration.ofSeconds(20));
+                            .block(Duration.ofSeconds(120));
 
             if (response == null) {
                 throw new ExternalServiceException("Gemini API returned null response");
