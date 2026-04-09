@@ -14,6 +14,7 @@ import {
 } from '../../api/diagnosis/diagnosis';
 
 import type {
+    CreateAutoDiagnosisPayload,
     CreateManualDiagnosisPayload,
     UpdateDiagnosisPayload
 } from '../../types/diagnosis/diagnosisPayloads';
@@ -67,10 +68,10 @@ export function useDiagnosis(claimId: number) {
         }
     };
 
-    const createAuto = async (claimId: number) => {
+    const createAuto = async (payload: CreateAutoDiagnosisPayload) => {
         setCreating(true);
         try {
-            const created = await createAutoDiagnosis(claimId);
+            const created = await createAutoDiagnosis(payload);
             setData(prev => [created, ...prev]);
             return created;
         } finally {

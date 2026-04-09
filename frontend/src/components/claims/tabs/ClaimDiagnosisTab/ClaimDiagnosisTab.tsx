@@ -1,0 +1,127 @@
+// components/claims/tabs/ClaimDiagnosisTab/ClaimDiagnosisTab.tsx
+
+import { useMemo, useState } from 'react';
+import { FiActivity } from 'react-icons/fi';
+
+import { useAuth } from '../../../../context/AuthContext';
+
+import { useDiagnosis } from '../../../../hooks/diagnosis/useDiagnoses';
+import DiagnosisList from './DiagnosisList';
+// import DiagnosisActions from './DiagnosisActions';
+import PredictionSection from './PredictionSection';
+
+import Button from '../../../../ui/Button';
+import CreateDiagnosisModal from '../ClaimDiagnosisTab/modals/CreateDiagnosisModal';
+
+interface Props {
+    claimId: number;
+}
+
+export default function ClaimDiagnosisTab({ claimId }: Props) {
+    const { user } = useAuth();
+
+    const isEngineer = user?.position === 'SERVICE_ENGINEER';
+    const isManager = user?.position === 'MANAGER';
+
+    const canCreate = isEngineer || isManager;
+
+    const {
+        data: diagnoses,
+        loading,
+        // creating,
+        // updating,
+        // confirming,
+        // rejecting,
+        // archiving,
+        // createManual,
+        // createAuto,
+        // update,
+        // confirm,
+        // reject,
+        // archive,
+        refresh,
+    } = useDiagnosis(claimId);
+
+    const [selectedDiagnosisId, setSelectedDiagnosisId] = useState<number | null>(null);
+
+    const [createOpen, setCreateOpen] = useState(false);
+
+    const selectedDiagnosis = useMemo(
+        () => diagnoses.find(d => d.id === selectedDiagnosisId) ?? null,
+        [diagnoses, selectedDiagnosisId]
+    );
+
+    if (loading) {
+        return (
+            <div className="rounded-lg border border-border bg-surface p-4 text-sm text-ink-muted">
+                Завантаження діагностик…
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            <section className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                <div className="flex items-center justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-2">
+                        <FiActivity className="text-brand" size={18} />
+                        <h3 className="font-semibold text-ink">
+                            Діагностика
+                        </h3>
+                    </div>
+
+                    <div className="flex gap-2">
+                        {canCreate && (
+                            <Button variant="primary" onClick={() => setCreateOpen(true)}>
+                                + Додати
+                            </Button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Потім сюди підключимо DiagnosisActions */}
+                {/* <DiagnosisActions ... /> */}
+
+                <DiagnosisList
+                    diagnoses={diagnoses}
+                    selectedDiagnosisId={selectedDiagnosisId}
+                    onSelect={(id) =>
+                        setSelectedDiagnosisId(prev => (prev === id ? null : id))
+                    }
+                />
+            </section>
+
+            <section className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+                <h3 className="font-semibold text-ink mb-3">
+                    Прогнози та результати DSS
+                </h3>
+
+                {!selectedDiagnosis ? (
+                    <div className="text-sm text-ink-muted italic">
+                        Діагностику ще не вибрано
+                    </div>
+                ) : (
+                    <>
+                        <div className="text-sm text-ink-muted mb-2">
+                            Активна діагностика #{selectedDiagnosis.id}
+                        </div>
+
+                        <PredictionSection diagnosisId={selectedDiagnosis.id} />
+                    </>
+                )}
+            </section>
+
+            {createOpen && (
+                <CreateDiagnosisModal
+                    claimId={claimId}
+                    onClose={() => setCreateOpen(false)}
+                    onCreated={async (newDiagnosis) => {
+                        setCreateOpen(false);
+                        await refresh();
+                        setSelectedDiagnosisId(newDiagnosis.id);
+                    }}
+                />
+            )}
+        </div>
+    );
+}

@@ -3,6 +3,7 @@ import {useCallback, useLayoutEffect, useRef, useState} from 'react';
 import type { Claim } from '../../types/claim/claim';
 import ClaimDetailsTab from "./tabs/ClaimDetailsTab.tsx";
 import ClaimHistoryTab from "./tabs/ClaimHistoryTab.tsx";
+import ClaimDiagnosisTab from "./tabs/ClaimDiagnosisTab/ClaimDiagnosisTab.tsx";
 import ClaimEmployeesTab from "./tabs/ClaimEmployeesTab";
 import ClaimPartsTab from "./tabs/ClaimPartsTab";
 import ClaimDeliveryTab from "./tabs/ClaimDeliveryTab";
@@ -10,7 +11,7 @@ import ClaimInvoiceTab from "./tabs/ClaimInvoiceTab";
 import ClaimPaymentTab from "./tabs/ClaimPaymentTab";
 
 import type {IconType} from "react-icons";
-import { FiInfo, FiClock, FiUsers, FiPackage, FiTruck, FiFileText, FiCreditCard } from 'react-icons/fi';
+import { FiInfo, FiClock, FiActivity, FiUsers, FiPackage, FiTruck, FiFileText, FiCreditCard } from 'react-icons/fi';
 
 interface Props {
     claim: Claim;
@@ -19,6 +20,7 @@ interface Props {
 const tabs: { key: string; label: string; icon: IconType }[] = [
     { key: 'details', label: 'Деталі', icon: FiInfo },
     { key: 'history', label: 'Історія', icon: FiClock },
+    { key: 'diagnosis', label: 'Діагностика', icon: FiActivity },
     { key: 'employees', label: 'Працівники', icon: FiUsers },
     { key: 'parts', label: 'Запчастини', icon: FiPackage },
     { key: 'delivery', label: 'Доставка', icon: FiTruck },
@@ -136,6 +138,7 @@ export default function ClaimTabs({ claim }: Props) {
                 <div className="p-4 min-w-0 overflow-x-hidden animate-[fade-up_250ms_ease-out_both]">
                     {active === 'details' && <ClaimDetailsTab claim={claim}/>}
                     {active === 'history' && <ClaimHistoryTab claimId={claim.id}/>}
+                    {active === 'diagnosis' && <ClaimDiagnosisTab claimId={claim.id}/>}
                     {active === 'employees' && <ClaimEmployeesTab claimId={claim.id}/>}
                     {active === 'parts' && <ClaimPartsTab claimId={claim.id}/>}
                     {active === 'delivery' && <ClaimDeliveryTab claimId={claim.id}/>}

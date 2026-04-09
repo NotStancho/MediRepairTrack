@@ -2,10 +2,14 @@
 
 import { api } from '../api';
 import type { Diagnosis } from '../../types/diagnosis/diagnosis';
-import type { CreateManualDiagnosisPayload, UpdateDiagnosisPayload } from '../../types/diagnosis/diagnosisPayloads';
+import type {
+    CreateAutoDiagnosisPayload,
+    CreateManualDiagnosisPayload,
+    UpdateDiagnosisPayload
+} from '../../types/diagnosis/diagnosisPayloads';
 
-export const createAutoDiagnosis = async (claimId: number): Promise<Diagnosis> => {
-    const res = await api.post<Diagnosis>(`/api/diagnosis/auto`, { claimId });
+export const createAutoDiagnosis = async (payload: CreateAutoDiagnosisPayload): Promise<Diagnosis> => {
+    const res = await api.post<Diagnosis>(`/api/diagnosis/auto`, payload);
     return res.data;
 };
 
