@@ -12,6 +12,8 @@ import PredictionSection from './PredictionSection';
 
 import Button from '../../../../ui/Button';
 import CreateDiagnosisModal from '../ClaimDiagnosisTab/modals/CreateDiagnosisModal';
+import EditDiagnosisModal from '../ClaimDiagnosisTab/modals/EditDiagnosisModal';
+import type { Diagnosis } from "../../../../types/diagnosis/diagnosis";
 
 interface Props {
     claimId: number;
@@ -29,13 +31,13 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
         data: diagnoses,
         loading,
         // creating,
-        // updating,
+        updating,
         // confirming,
         // rejecting,
         // archiving,
         // createManual,
         // createAuto,
-        // update,
+        update,
         // confirm,
         // reject,
         // archive,
@@ -45,6 +47,7 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
     const [selectedDiagnosisId, setSelectedDiagnosisId] = useState<number | null>(null);
 
     const [createOpen, setCreateOpen] = useState(false);
+    const [editDiagnosis, setEditDiagnosis] = useState<Diagnosis | null>(null);
 
     const selectedDiagnosis = useMemo(
         () => diagnoses.find(d => d.id === selectedDiagnosisId) ?? null,
@@ -88,6 +91,7 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                     onSelect={(id) =>
                         setSelectedDiagnosisId(prev => (prev === id ? null : id))
                     }
+                    onEdit={(diagnosis) => setEditDiagnosis(diagnosis)}
                 />
             </section>
 
@@ -119,6 +123,17 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                         setCreateOpen(false);
                         await refresh();
                         setSelectedDiagnosisId(newDiagnosis.id);
+                    }}
+                />
+            )}
+
+            {editDiagnosis && (
+                <EditDiagnosisModal
+                    diagnosis={editDiagnosis}
+                    updating={updating}
+                    onClose={() => setEditDiagnosis(null)}
+                    onSave={async (payload) => {
+                        await update(editDiagnosis.id, payload);
                     }}
                 />
             )}

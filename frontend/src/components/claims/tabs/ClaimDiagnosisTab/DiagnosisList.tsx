@@ -7,12 +7,14 @@ interface Props {
     diagnoses: Diagnosis[];
     selectedDiagnosisId: number | null;
     onSelect: (id: number) => void;
+    onEdit: (diagnosis: Diagnosis) => void;
 }
 
 export default function DiagnosisList({
                                           diagnoses,
                                           selectedDiagnosisId,
                                           onSelect,
+                                          onEdit
                                       }: Props) {
     if (!diagnoses.length) {
         return (
@@ -30,6 +32,7 @@ export default function DiagnosisList({
                     diagnosis={diagnosis}
                     selected={diagnosis.id === selectedDiagnosisId}
                     onClick={() => onSelect(diagnosis.id)}
+                    onEdit={() => onEdit(diagnosis)}
                 />
             ))}
         </div>

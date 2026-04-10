@@ -9,22 +9,26 @@ import {
     DIAGNOSIS_TYPE_COLORS,
 } from '../../../../utils/diagnosisLabels';
 import { formatMoney } from '../../../../utils/moneyFormat';
+import { FiEdit2 } from 'react-icons/fi';
 
 interface Props {
     diagnosis: Diagnosis;
     selected?: boolean;
     onClick?: () => void;
+    onEdit?: () => void;
 }
 
 export default function DiagnosisCard({
                                           diagnosis,
                                           selected = false,
                                           onClick,
+                                          onEdit
                                       }: Props) {
     return (
         <div
             onClick={onClick}
             className={`
+            relative
             w-full text-left rounded-lg border p-4 transition-all cursor-pointer
             ${selected
                 ? 'border-brand bg-brand-soft shadow-sm'
@@ -90,7 +94,28 @@ export default function DiagnosisCard({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm shrink-0">
+                {onEdit && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit();
+                        }}
+                        className="
+                            absolute top-3 right-3
+                            flex items-center justify-center
+                            w-8 h-8
+                            rounded-lg border border-border
+                            bg-surface
+                            hover:bg-brand-soft hover:border-brand
+                            transition
+                            shadow-sm
+                        "
+                    >
+                        <FiEdit2 size={14} className="text-ink-muted" />
+                    </button>
+                )}
+
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm shrink-0 pr-12">
                     <div>
                         <div>
                             <div className="text-ink-muted">Оцінка вартості</div>
