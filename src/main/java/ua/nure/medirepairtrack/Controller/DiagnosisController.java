@@ -7,9 +7,11 @@ import ua.nure.medirepairtrack.DTO.DiagnosisDTO.CreateAutoDiagnosisDTO;
 import ua.nure.medirepairtrack.DTO.DiagnosisDTO.CreateManualDiagnosisDTO;
 import ua.nure.medirepairtrack.DTO.DiagnosisDTO.DiagnosisResponseDTO;
 import ua.nure.medirepairtrack.DTO.DiagnosisDTO.UpdateDiagnosisDTO;
+import ua.nure.medirepairtrack.Entity.Diagnosis.DiagnosisStatus;
 import ua.nure.medirepairtrack.Service.DiagnosisService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/diagnosis")
@@ -46,6 +48,11 @@ public class DiagnosisController {
     @PostMapping("/{id}/reject")
     public DiagnosisResponseDTO reject(@PathVariable Integer id) {
         return diagnosisService.rejectDiagnosis(id);
+    }
+
+    @GetMapping("/{id}/allowed-statuses")
+    public Set<DiagnosisStatus> getAllowedStatuses(@PathVariable Integer id) {
+        return diagnosisService.getAllowedNextStatuses(id);
     }
 
     // Архівація

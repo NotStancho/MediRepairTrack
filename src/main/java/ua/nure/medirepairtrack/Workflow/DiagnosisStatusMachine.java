@@ -23,8 +23,14 @@ public class DiagnosisStatusMachine {
                     DiagnosisStatus.ARCHIVED
             ),
 
+            DiagnosisStatus.REJECTED, Set.of(),
+
             DiagnosisStatus.ARCHIVED, Set.of()
     );
+
+    public Set<DiagnosisStatus> getAllowedNextStatuses(DiagnosisStatus from) {
+        return TRANSITIONS.getOrDefault(from, Set.of());
+    }
 
     public boolean canTransition(DiagnosisStatus from, DiagnosisStatus to) {
         return TRANSITIONS.getOrDefault(from, Set.of()).contains(to);

@@ -24,7 +24,9 @@ import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -140,7 +142,6 @@ public class DiagnosisService {
     public DiagnosisResponseDTO confirmDiagnosis(Integer id, Integer engineerId) {
 
         Diagnosis diagnosis = getDiagnosisEntity(id);
-
         Employee engineer = employeeService.getEmployeeEntity(engineerId);
 
         if (!diagnosisStatusMachine.allowsDiagnosisConfirm(diagnosis.getStatus())) {
@@ -153,16 +154,22 @@ public class DiagnosisService {
             );
         }
 
+        List<String> errors = new ArrayList<>();
+
         if (diagnosis.getFinalConclusion() == null || diagnosis.getFinalConclusion().isBlank()) {
-            throw new BadRequestException("Потрібно вказати остаточний висновок діагностики");
+            errors.add("Не вказано остаточний висновок");
         }
 
         if (diagnosis.getEstimatedCost().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BadRequestException("Оцінка вартості повинна бути більшою за нуль");
+            errors.add("Оцінка вартості повинна бути більшою за нуль");
         }
 
         if (diagnosis.getEstimatedTimeHours().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BadRequestException("Оцінка часу ремонту повинна бути більшою за нуль");
+            errors.add("Оцінка часу ремонту повинна бути більшою за нуль");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new BadRequestException(String.join("; ", errors));
         }
 
         diagnosis.setEngineer(engineer);
@@ -213,6 +220,11 @@ public class DiagnosisService {
         diagnosis.setUpdatedAt(LocalDateTime.now());
 
         return map(diagnosisRepository.save(diagnosis));
+    }
+
+    public Set<DiagnosisStatus> getAllowedNextStatuses(Integer diagnosisId) {
+        DiagnosisStatus status = getDiagnosisEntity(diagnosisId).getStatus();
+        return diagnosisStatusMachine.getAllowedNextStatuses(status);
     }
 
     public Diagnosis getDiagnosisEntity(Integer id) {
