@@ -7,7 +7,6 @@ import { useAuth } from '../../../../context/AuthContext';
 
 import { useDiagnosis } from '../../../../hooks/diagnosis/useDiagnoses';
 import DiagnosisList from './DiagnosisList';
-// import DiagnosisActions from './DiagnosisActions';
 import PredictionSection from './PredictionSection';
 
 import Button from '../../../../ui/Button';
@@ -32,15 +31,19 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
         loading,
         // creating,
         updating,
-        // confirming,
-        // rejecting,
-        // archiving,
+
+        confirmingId, rejectingId, archivingId,
+        confirm, reject, archive,
+
         // createManual,
         // createAuto,
+
         update,
-        // confirm,
-        // reject,
-        // archive,
+
+        allowedStatuses,
+        allowedStatusesLoading,
+        loadAllowedStatuses,
+
         refresh,
     } = useDiagnosis(claimId);
 
@@ -82,16 +85,42 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                     </div>
                 </div>
 
-                {/* Потім сюди підключимо DiagnosisActions */}
-                {/* <DiagnosisActions ... /> */}
-
                 <DiagnosisList
                     diagnoses={diagnoses}
                     selectedDiagnosisId={selectedDiagnosisId}
+
+                    allowedStatuses={allowedStatuses}
+                    allowedStatusesLoading={allowedStatusesLoading}
+
+                    confirmingId={confirmingId}
+                    rejectingId={rejectingId}
+                    archivingId={archivingId}
+
                     onSelect={(id) =>
-                        setSelectedDiagnosisId(prev => (prev === id ? null : id))
+                        setSelectedDiagnosisId(prev => {
+                            const next = prev === id ? null : id;
+                            void loadAllowedStatuses(next);
+                            return next;
+                        })
                     }
+
                     onEdit={(diagnosis) => setEditDiagnosis(diagnosis)}
+
+                    onConfirm={async (diagnosis) => {
+                        if (!user?.employeeId) return;
+                        await confirm(diagnosis.id, user.employeeId);
+                        await loadAllowedStatuses(diagnosis.id);
+                    }}
+
+                    onReject={async (diagnosis) => {
+                        await reject(diagnosis.id);
+                        await loadAllowedStatuses(diagnosis.id);
+                    }}
+
+                    onArchive={async (diagnosis) => {
+                        await archive(diagnosis.id);
+                        await loadAllowedStatuses(diagnosis.id);
+                    }}
                 />
             </section>
 
@@ -123,6 +152,7 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                         setCreateOpen(false);
                         await refresh();
                         setSelectedDiagnosisId(newDiagnosis.id);
+                        await loadAllowedStatuses(newDiagnosis.id);
                     }}
                 />
             )}

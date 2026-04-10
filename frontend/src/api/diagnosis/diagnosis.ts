@@ -1,7 +1,7 @@
 // api/diagnosis.ts
 
 import { api } from '../api';
-import type { Diagnosis } from '../../types/diagnosis/diagnosis';
+import type { Diagnosis, DiagnosisStatus } from '../../types/diagnosis/diagnosis';
 import type {
     CreateAutoDiagnosisPayload,
     CreateManualDiagnosisPayload,
@@ -47,6 +47,13 @@ export const rejectDiagnosis = async (id: number): Promise<Diagnosis> => {
 
 export const archiveDiagnosis = async (id: number): Promise<Diagnosis> => {
     const res = await api.post<Diagnosis>(`/api/diagnosis/${id}/archive`);
+    return res.data;
+};
+
+export const getAllowedDiagnosisStatuses = async (
+    id: number
+): Promise<DiagnosisStatus[]> => {
+    const res = await api.get<DiagnosisStatus[]>(`/api/diagnosis/${id}/allowed-statuses`);
     return res.data;
 };
 

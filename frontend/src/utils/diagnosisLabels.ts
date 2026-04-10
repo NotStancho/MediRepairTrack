@@ -10,6 +10,13 @@ export const DIAGNOSIS_STATUS_LABELS: Record<DiagnosisStatus, string> = {
     ARCHIVED: 'Архівовано',
 };
 
+export const DIAGNOSIS_STATUS_ACTION_LABELS: Partial<Record<DiagnosisStatus, string>> = {
+    CONFIRMED: 'Підтвердити',
+    REJECTED: 'Відхилити',
+    ARCHIVED: 'Архівувати',
+};
+
+
 export const DIAGNOSIS_TYPE_LABELS: Record<DiagnosisType, string> = {
     AUTOMATED: 'Автоматична',
     MANUAL: 'Ручна',

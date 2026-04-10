@@ -1,14 +1,17 @@
 // components/claims/tabs/ClaimDiagnosisTab/DiagnosisCard.tsx
 
-import type { Diagnosis } from '../../../../types/diagnosis/diagnosis';
-import { formatDateTime } from '../../../../utils/dateFormat';
+import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
+
 import {
-    DIAGNOSIS_STATUS_LABELS,
-    DIAGNOSIS_STATUS_COLORS,
     DIAGNOSIS_TYPE_LABELS,
     DIAGNOSIS_TYPE_COLORS,
 } from '../../../../utils/diagnosisLabels';
+
+import { formatDateTime } from '../../../../utils/dateFormat';
 import { formatMoney } from '../../../../utils/moneyFormat';
+
+import DiagnosisStatusActions from './DiagnosisStatusActions';
+
 import { FiEdit2 } from 'react-icons/fi';
 
 interface Props {
@@ -16,13 +19,29 @@ interface Props {
     selected?: boolean;
     onClick?: () => void;
     onEdit?: () => void;
+
+    allowedStatuses?: DiagnosisStatus[];
+    allowedStatusesLoading?: boolean;
+
+    confirming?: boolean;
+    rejecting?: boolean;
+    archiving?: boolean;
+
+    onConfirm?: () => Promise<void>;
+    onReject?: () => Promise<void>;
+    onArchive?: () => Promise<void>;
 }
 
 export default function DiagnosisCard({
                                           diagnosis,
                                           selected = false,
                                           onClick,
-                                          onEdit
+                                          onEdit,
+
+                                          allowedStatuses, allowedStatusesLoading,
+
+                                          confirming, rejecting, archiving,
+                                          onConfirm, onReject, onArchive,
                                       }: Props) {
     return (
         <div
@@ -48,11 +67,19 @@ export default function DiagnosisCard({
                             {DIAGNOSIS_TYPE_LABELS[diagnosis.diagnosisType]}
                         </span>
 
-                        <span
-                            className={`px-2 py-0.5 rounded text-xs font-medium ${DIAGNOSIS_STATUS_COLORS[diagnosis.status]}`}
-                        >
-                            {DIAGNOSIS_STATUS_LABELS[diagnosis.status]}
-                        </span>
+                        <DiagnosisStatusActions
+                            diagnosis={diagnosis}
+                            allowedStatuses={allowedStatuses ?? []}
+                            allowedStatusesLoading={allowedStatusesLoading ?? false}
+
+                            confirming={confirming ?? false}
+                            rejecting={rejecting ?? false}
+                            archiving={archiving ?? false}
+
+                            onConfirm={onConfirm ?? (async () => {})}
+                            onReject={onReject ?? (async () => {})}
+                            onArchive={onArchive ?? (async () => {})}
+                        />
                     </div>
 
                     <div className="text-sm text-ink-muted">

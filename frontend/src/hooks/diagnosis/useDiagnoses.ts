@@ -1,10 +1,11 @@
 // hooks/diagnosis/useDiagnoses.ts
 
 import { useCallback, useEffect, useState } from 'react';
-import type { Diagnosis } from '../../types/diagnosis/diagnosis';
+import type {Diagnosis, DiagnosisStatus} from '../../types/diagnosis/diagnosis';
 
 import {
     getDiagnosesByClaim,
+    getAllowedDiagnosisStatuses,
     createManualDiagnosis,
     createAutoDiagnosis,
     updateDiagnosis,
@@ -25,9 +26,13 @@ export function useDiagnosis(claimId: number) {
 
     const [creating, setCreating] = useState(false);
     const [updating, setUpdating] = useState(false);
-    const [confirming, setConfirming] = useState(false);
-    const [rejecting, setRejecting] = useState(false);
-    const [archiving, setArchiving] = useState(false);
+
+    const [confirmingId, setConfirmingId] = useState<number | null>(null);
+    const [rejectingId, setRejectingId] = useState<number | null>(null);
+    const [archivingId, setArchivingId] = useState<number | null>(null);
+
+    const [allowedStatuses, setAllowedStatuses] = useState<DiagnosisStatus[]>([]);
+    const [allowedStatusesLoading, setAllowedStatusesLoading] = useState(false);
 
     const load = useCallback(async (cancelled?: () => boolean) => {
         if (!claimId) {
@@ -46,6 +51,21 @@ export function useDiagnosis(claimId: number) {
             if (!cancelled?.()) setLoading(false);
         }
     }, [claimId]);
+
+    const loadAllowedStatuses = async (diagnosisId: number | null) => {
+        if (!diagnosisId) {
+            setAllowedStatuses([]);
+            return;
+        }
+
+        setAllowedStatusesLoading(true);
+        try {
+            const res = await getAllowedDiagnosisStatuses(diagnosisId);
+            setAllowedStatuses(res);
+        } finally {
+            setAllowedStatusesLoading(false);
+        }
+    };
 
     useEffect(() => {
         let cancelled = false;
@@ -93,7 +113,7 @@ export function useDiagnosis(claimId: number) {
     };
 
     const confirm = async (id: number, engineerId: number) => {
-        setConfirming(true);
+        setConfirmingId(id);
         try {
             const updated = await confirmDiagnosis(id, engineerId);
             setData(prev =>
@@ -101,12 +121,12 @@ export function useDiagnosis(claimId: number) {
             );
             return updated;
         } finally {
-            setConfirming(false);
+            setConfirmingId(null);
         }
     };
 
     const reject = async (id: number) => {
-        setRejecting(true);
+        setRejectingId(id);
         try {
             const updated = await rejectDiagnosis(id);
             setData(prev =>
@@ -114,12 +134,12 @@ export function useDiagnosis(claimId: number) {
             );
             return updated;
         } finally {
-            setRejecting(false);
+            setRejectingId(null);
         }
     };
 
     const archive = async (id: number) => {
-        setArchiving(true);
+        setArchivingId(id);
         try {
             const updated = await archiveDiagnosis(id);
             setData(prev =>
@@ -127,7 +147,7 @@ export function useDiagnosis(claimId: number) {
             );
             return updated;
         } finally {
-            setArchiving(false);
+            setArchivingId(null);
         }
     };
 
@@ -137,9 +157,10 @@ export function useDiagnosis(claimId: number) {
 
         creating,
         updating,
-        confirming,
-        rejecting,
-        archiving,
+
+        confirmingId,
+        rejectingId,
+        archivingId,
 
         createManual,
         createAuto,
@@ -147,6 +168,10 @@ export function useDiagnosis(claimId: number) {
         confirm,
         reject,
         archive,
+
+        allowedStatuses,
+        allowedStatusesLoading,
+        loadAllowedStatuses,
 
         refresh: load
     };
