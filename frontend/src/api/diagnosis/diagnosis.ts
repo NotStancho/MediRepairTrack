@@ -28,6 +28,10 @@ export const updateDiagnosis = async (
     return res.data;
 };
 
+export const deleteDiagnosis = async (id: number): Promise<void> => {
+    await api.delete(`/api/diagnosis/${id}`);
+};
+
 export const confirmDiagnosis = async (
     id: number,
     engineerId: number

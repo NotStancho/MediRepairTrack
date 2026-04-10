@@ -32,8 +32,8 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
         // creating,
         updating,
 
-        confirmingId, rejectingId, archivingId,
-        confirm, reject, archive,
+        confirmingId, rejectingId, archivingId, deletingId,
+        confirm, reject, archive, remove,
 
         // createManual,
         // createAuto,
@@ -120,6 +120,15 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                     onArchive={async (diagnosis) => {
                         await archive(diagnosis.id);
                         await loadAllowedStatuses(diagnosis.id);
+                    }}
+
+                    deletingId={deletingId}
+                    onDelete={async (diagnosis) => {
+                        await remove(diagnosis.id);
+
+                        setSelectedDiagnosisId(prev =>
+                            prev === diagnosis.id ? null : prev
+                        );
                     }}
                 />
             </section>

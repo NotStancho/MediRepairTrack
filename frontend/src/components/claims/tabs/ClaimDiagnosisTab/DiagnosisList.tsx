@@ -16,10 +16,12 @@ interface Props {
     confirmingId: number | null;
     rejectingId: number | null;
     archivingId: number | null;
+    deletingId: number | null;
 
     onConfirm: (diagnosis: Diagnosis) => Promise<void>;
     onReject: (diagnosis: Diagnosis) => Promise<void>;
     onArchive: (diagnosis: Diagnosis) => Promise<void>;
+    onDelete: (diagnosis: Diagnosis) => void;
 }
 
 export default function DiagnosisList({
@@ -31,8 +33,8 @@ export default function DiagnosisList({
 
                                           allowedStatuses, allowedStatusesLoading,
 
-                                          confirmingId, rejectingId, archivingId,
-                                          onConfirm, onReject, onArchive,
+                                          confirmingId, rejectingId, archivingId, deletingId,
+                                          onConfirm, onReject, onArchive, onDelete
                                       }: Props) {
     if (!diagnoses.length) {
         return (
@@ -62,10 +64,12 @@ export default function DiagnosisList({
                     confirming={confirmingId === diagnosis.id}
                     rejecting={rejectingId === diagnosis.id}
                     archiving={archivingId === diagnosis.id}
+                    deleting={deletingId === diagnosis.id}
 
                     onConfirm={() => onConfirm(diagnosis)}
                     onReject={() => onReject(diagnosis)}
                     onArchive={() => onArchive(diagnosis)}
+                    onDelete={() => onDelete(diagnosis)}
                 />
             ))}
         </div>

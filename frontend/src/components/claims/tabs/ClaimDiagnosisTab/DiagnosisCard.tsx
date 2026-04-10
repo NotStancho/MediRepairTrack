@@ -1,5 +1,7 @@
 // components/claims/tabs/ClaimDiagnosisTab/DiagnosisCard.tsx
 
+import { useState } from 'react';
+
 import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
 
 import {
@@ -12,7 +14,10 @@ import { formatMoney } from '../../../../utils/moneyFormat';
 
 import DiagnosisStatusActions from './DiagnosisStatusActions';
 
+import ConfirmBox from '../../../../ui/ConfirmBox';
+
 import { FiEdit2 } from 'react-icons/fi';
+import { FiTrash2 } from 'react-icons/fi';
 
 interface Props {
     diagnosis: Diagnosis;
@@ -26,10 +31,12 @@ interface Props {
     confirming?: boolean;
     rejecting?: boolean;
     archiving?: boolean;
+    deleting?: boolean;
 
     onConfirm?: () => Promise<void>;
     onReject?: () => Promise<void>;
     onArchive?: () => Promise<void>;
+    onDelete?: () => Promise<void> | void;
 }
 
 export default function DiagnosisCard({
@@ -40,9 +47,12 @@ export default function DiagnosisCard({
 
                                           allowedStatuses, allowedStatusesLoading,
 
-                                          confirming, rejecting, archiving,
-                                          onConfirm, onReject, onArchive,
+                                          confirming, rejecting, archiving, deleting,
+                                          onConfirm, onReject, onArchive, onDelete,
                                       }: Props) {
+
+    const [deleteOpen, setDeleteOpen] = useState(false);
+
     return (
         <div
             onClick={onClick}
@@ -121,6 +131,30 @@ export default function DiagnosisCard({
                     </div>
                 </div>
 
+                {diagnosis.status === 'DRAFT' && onDelete && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteOpen(true);
+                        }}
+                        disabled={deleting}
+                        className="
+                            absolute top-3 right-12
+                            flex items-center justify-center
+                            w-8 h-8
+                            rounded-lg border border-border
+                            bg-surface
+                            hover:bg-red-50 hover:border-red-300
+                            transition
+                            shadow-sm
+                            disabled:opacity-60
+                            disabled:cursor-not-allowed
+                        "
+                    >
+                        <FiTrash2 size={14} className="text-red-500" />
+                    </button>
+                )}
+
                 {onEdit && (
                     <button
                         onClick={(e) => {
@@ -177,6 +211,20 @@ export default function DiagnosisCard({
                     </div>
                 </div>
             </div>
+
+            {deleteOpen && (
+                <ConfirmBox
+                    title="Видалити діагностику?"
+                    description="Цю дію неможливо скасувати."
+                    confirmText="Так, видалити"
+                    confirmVariant="danger"
+                    onConfirm={async () => {
+                        await onDelete?.();
+                        setDeleteOpen(false);
+                    }}
+                    onCancel={() => setDeleteOpen(false)}
+                />
+            )}
         </div>
     );
 }

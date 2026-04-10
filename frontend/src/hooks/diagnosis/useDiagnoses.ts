@@ -9,6 +9,7 @@ import {
     createManualDiagnosis,
     createAutoDiagnosis,
     updateDiagnosis,
+    deleteDiagnosis,
     confirmDiagnosis,
     rejectDiagnosis,
     archiveDiagnosis
@@ -26,6 +27,7 @@ export function useDiagnosis(claimId: number) {
 
     const [creating, setCreating] = useState(false);
     const [updating, setUpdating] = useState(false);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const [confirmingId, setConfirmingId] = useState<number | null>(null);
     const [rejectingId, setRejectingId] = useState<number | null>(null);
@@ -112,6 +114,16 @@ export function useDiagnosis(claimId: number) {
         }
     };
 
+    const remove = async (id: number) => {
+        setDeletingId(id);
+        try {
+            await deleteDiagnosis(id);
+            setData(prev => prev.filter(d => d.id !== id));
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     const confirm = async (id: number, engineerId: number) => {
         setConfirmingId(id);
         try {
@@ -157,10 +169,13 @@ export function useDiagnosis(claimId: number) {
 
         creating,
         updating,
+        remove,
+
 
         confirmingId,
         rejectingId,
         archivingId,
+        deletingId,
 
         createManual,
         createAuto,
