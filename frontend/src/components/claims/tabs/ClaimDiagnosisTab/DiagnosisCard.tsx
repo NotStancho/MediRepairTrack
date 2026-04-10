@@ -8,6 +8,7 @@ import {
     DIAGNOSIS_TYPE_LABELS,
     DIAGNOSIS_TYPE_COLORS,
 } from '../../../../utils/diagnosisLabels';
+import { formatMoney } from '../../../../utils/moneyFormat';
 
 interface Props {
     diagnosis: Diagnosis;
@@ -54,9 +55,11 @@ export default function DiagnosisCard({
                         Створено: {formatDateTime(diagnosis.createdAt)}
                     </div>
 
-                    <div className="text-sm text-ink-muted">
-                        Підтверджено: {diagnosis.confirmedAt ? formatDateTime(diagnosis.confirmedAt) : '-'}
-                    </div>
+                    {diagnosis.confirmedAt && (
+                        <div className="text-sm text-ink-muted">
+                            Підтверджено: {formatDateTime(diagnosis.confirmedAt)}
+                        </div>
+                    )}
 
                     <div className="space-y-2 text-sm text-ink">
                         {diagnosis.finalConclusion?.trim() && (
@@ -89,16 +92,24 @@ export default function DiagnosisCard({
 
                 <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm shrink-0">
                     <div>
-                        <div className="text-ink-muted">Оцінка вартості</div>
-                        <div className="font-medium text-ink">
-                            {diagnosis.estimatedCost ?? 0}
+                        <div>
+                            <div className="text-ink-muted">Оцінка вартості</div>
+                            <div className="font-medium text-ink">
+                                {diagnosis.estimatedCost != null
+                                    ? `${formatMoney(diagnosis.estimatedCost)} ₴`
+                                    : <span className="text-ink-muted italic">не вказано</span>
+                                }
+                            </div>
                         </div>
                     </div>
 
                     <div>
                         <div className="text-ink-muted">Оцінка часу</div>
                         <div className="font-medium text-ink">
-                            {diagnosis.estimatedTimeHours ?? 0} год
+                            {diagnosis.estimatedTimeHours != null
+                                ? `${diagnosis.estimatedTimeHours} год`
+                                : <span className="text-ink-muted italic">не вказано</span>
+                            }
                         </div>
                     </div>
 
