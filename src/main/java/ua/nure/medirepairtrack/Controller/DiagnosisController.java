@@ -38,6 +38,11 @@ public class DiagnosisController {
         return diagnosisService.updateDiagnosis(id, dto);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        diagnosisService.deleteDiagnosis(id);
+    }
+
     // Підтвердження діагнозу
     @PostMapping("/{id}/confirm")
     public DiagnosisResponseDTO confirm(@PathVariable Integer id, @RequestParam Integer engineerId) {

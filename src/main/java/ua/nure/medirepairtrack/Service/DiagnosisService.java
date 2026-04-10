@@ -139,6 +139,24 @@ public class DiagnosisService {
     }
 
     @Transactional
+    public void deleteDiagnosis(Integer id) {
+
+        Diagnosis diagnosis = getDiagnosisEntity(id);
+
+        if (!diagnosisStatusMachine.allowsDiagnosisDelete(diagnosis.getStatus())) {
+            throw new InvalidStatusTransitionException(
+                    StatusMessageUtil.denied(
+                            "видалити діагностику",
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisDeleteStatuses()
+                    )
+            );
+        }
+
+        diagnosisRepository.delete(diagnosis);
+    }
+
+    @Transactional
     public DiagnosisResponseDTO confirmDiagnosis(Integer id, Integer engineerId) {
 
         Diagnosis diagnosis = getDiagnosisEntity(id);

@@ -49,6 +49,18 @@ public class DiagnosisStatusMachine {
         );
     }
 
+    // ---------- DELETE ----------
+
+    public boolean allowsDiagnosisDelete(DiagnosisStatus status) {
+        return allowedDiagnosisDeleteStatuses().contains(status);
+    }
+
+    public Set<DiagnosisStatus> allowedDiagnosisDeleteStatuses() {
+        return Set.of(
+                DiagnosisStatus.DRAFT
+        );
+    }
+
     // ---------- CONFIRM ----------
 
     public boolean allowsDiagnosisConfirm(DiagnosisStatus status) {
