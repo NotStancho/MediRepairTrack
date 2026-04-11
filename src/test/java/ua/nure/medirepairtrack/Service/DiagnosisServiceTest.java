@@ -9,6 +9,7 @@ import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.Diagnosis.DiagnosisStatus;
 import ua.nure.medirepairtrack.Entity.Diagnosis.DiagnosisType;
 import ua.nure.medirepairtrack.Entity.Employee.Employee;
+import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Repository.DiagnosisRepository;
 import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
 
@@ -25,6 +26,7 @@ class DiagnosisServiceTest {
     private DiagnosisRepository diagnosisRepository;
     private ClaimService claimService;
     private EmployeeService employeeService;
+    private DiagnosisPredictionRepository diagnosisPredictionRepository;
     private DiagnosisStatusMachine statusMachine;
 
     private DiagnosisService diagnosisService;
@@ -34,12 +36,17 @@ class DiagnosisServiceTest {
         diagnosisRepository = mock(DiagnosisRepository.class);
         claimService = mock(ClaimService.class);
         employeeService = mock(EmployeeService.class);
+        diagnosisPredictionRepository = mock(DiagnosisPredictionRepository.class);
         statusMachine = mock(DiagnosisStatusMachine.class);
+
+        when(diagnosisPredictionRepository.existsByDiagnosisId(any()))
+                .thenReturn(false);
 
         diagnosisService = new DiagnosisService(
                 diagnosisRepository,
                 claimService,
                 employeeService,
+                diagnosisPredictionRepository,
                 null, // eventPublisher не потрібен
                 statusMachine
         );

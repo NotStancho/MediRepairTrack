@@ -9,4 +9,5 @@ public interface DiagnosisPredictionRepository extends JpaRepository<DiagnosisPr
 
     List<DiagnosisPrediction> findByDiagnosisIdOrderByCreatedAtDesc(Integer diagnosisId);
 
+    boolean existsByDiagnosisId(Integer diagnosisId);
 }

@@ -28,4 +28,6 @@ public class DiagnosisResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime confirmedAt;
+
+    private Boolean hasPrediction;
 }

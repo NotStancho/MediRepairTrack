@@ -18,6 +18,7 @@ import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.InvalidStatusTransitionException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
+import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Repository.DiagnosisRepository;
 import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
 import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
@@ -35,6 +36,8 @@ public class DiagnosisService {
     private final DiagnosisRepository diagnosisRepository;
     private final ClaimService claimService;
     private final EmployeeService employeeService;
+
+    private final DiagnosisPredictionRepository diagnosisPredictionRepository;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -262,6 +265,9 @@ public class DiagnosisService {
     }
 
     private DiagnosisResponseDTO map(Diagnosis d) {
+
+        boolean hasPrediction = diagnosisPredictionRepository.existsByDiagnosisId(d.getId());
+
         return DiagnosisResponseDTO.builder()
                 .id(d.getId())
                 .claimId(d.getClaim().getId())
@@ -275,6 +281,7 @@ public class DiagnosisService {
                 .createdAt(d.getCreatedAt())
                 .updatedAt(d.getUpdatedAt())
                 .confirmedAt(d.getConfirmedAt())
+                .hasPrediction(hasPrediction)
                 .build();
     }
 }
