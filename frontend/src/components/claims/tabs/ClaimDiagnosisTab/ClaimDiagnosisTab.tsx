@@ -87,13 +87,10 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                     rejectingId={rejectingId}
                     archivingId={archivingId}
 
-                    onSelect={(id) =>
-                        setSelectedDiagnosisId(prev => {
-                            const next = prev === id ? null : id;
-                            void loadAllowedStatuses(next);
-                            return next;
-                        })
-                    }
+                    onSelect={(id) => {
+                        setSelectedDiagnosisId(id);
+                        void loadAllowedStatuses(id);
+                    }}
 
                     onEdit={(diagnosis) => setEditDiagnosis(diagnosis)}
 

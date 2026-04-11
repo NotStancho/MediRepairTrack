@@ -45,7 +45,7 @@ export default function DiagnosisList({
     };
     const handleSelect = (id: number) => {
         onSelect(id);
-        setOpenPredictionId(null);
+        setOpenPredictionId(prev => (prev === id ? prev : null));
     };
 
     if (!diagnoses.length) {
