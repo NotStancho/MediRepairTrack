@@ -1,13 +1,12 @@
 // components/claims/tabs/ClaimDiagnosisTab/ClaimDiagnosisTab.tsx
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { FiActivity } from 'react-icons/fi';
 
 import { useAuth } from '../../../../context/AuthContext';
 
 import { useDiagnosis } from '../../../../hooks/diagnosis/useDiagnoses';
 import DiagnosisList from './DiagnosisList';
-import PredictionSection from './PredictionSection';
 
 import Button from '../../../../ui/Button';
 import CreateDiagnosisModal from '../ClaimDiagnosisTab/modals/CreateDiagnosisModal';
@@ -40,22 +39,14 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
 
         update,
 
-        allowedStatuses,
-        allowedStatusesLoading,
-        loadAllowedStatuses,
+        allowedStatuses, allowedStatusesLoading, loadAllowedStatuses,
 
         refresh,
     } = useDiagnosis(claimId);
 
     const [selectedDiagnosisId, setSelectedDiagnosisId] = useState<number | null>(null);
-
     const [createOpen, setCreateOpen] = useState(false);
     const [editDiagnosis, setEditDiagnosis] = useState<Diagnosis | null>(null);
-
-    const selectedDiagnosis = useMemo(
-        () => diagnoses.find(d => d.id === selectedDiagnosisId) ?? null,
-        [diagnoses, selectedDiagnosisId]
-    );
 
     if (loading) {
         return (
@@ -131,26 +122,6 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                         );
                     }}
                 />
-            </section>
-
-            <section className="rounded-lg border border-border bg-surface p-4 shadow-sm">
-                <h3 className="font-semibold text-ink mb-3">
-                    Прогнози та результати DSS
-                </h3>
-
-                {!selectedDiagnosis ? (
-                    <div className="text-sm text-ink-muted italic">
-                        Діагностику ще не вибрано
-                    </div>
-                ) : (
-                    <>
-                        <div className="text-sm text-ink-muted mb-2">
-                            Активна діагностика #{selectedDiagnosis.id}
-                        </div>
-
-                        <PredictionSection diagnosisId={selectedDiagnosis.id} />
-                    </>
-                )}
             </section>
 
             {createOpen && (

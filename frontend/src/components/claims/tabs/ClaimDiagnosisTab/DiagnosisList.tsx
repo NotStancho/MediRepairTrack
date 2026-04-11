@@ -1,5 +1,6 @@
 // components/claims/tabs/ClaimDiagnosisTab/DiagnosisList.tsx
 
+import { useState } from 'react';
 import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
 import DiagnosisCard from './DiagnosisCard';
 
@@ -36,6 +37,17 @@ export default function DiagnosisList({
                                           confirmingId, rejectingId, archivingId, deletingId,
                                           onConfirm, onReject, onArchive, onDelete
                                       }: Props) {
+    const [openPredictionId, setOpenPredictionId] = useState<number | null>(null);
+
+    const togglePrediction = (id: number) => {
+        setOpenPredictionId(prev => (prev === id ? null : id));
+        onSelect(id);
+    };
+    const handleSelect = (id: number) => {
+        onSelect(id);
+        setOpenPredictionId(null);
+    };
+
     if (!diagnoses.length) {
         return (
             <div className="text-sm text-ink-muted italic">
@@ -51,7 +63,7 @@ export default function DiagnosisList({
                     key={diagnosis.id}
                     diagnosis={diagnosis}
                     selected={diagnosis.id === selectedDiagnosisId}
-                    onClick={() => onSelect(diagnosis.id)}
+                    onClick={() => handleSelect(diagnosis.id)}
                     onEdit={() => onEdit(diagnosis)}
 
                     allowedStatuses={
@@ -70,6 +82,9 @@ export default function DiagnosisList({
                     onReject={() => onReject(diagnosis)}
                     onArchive={() => onArchive(diagnosis)}
                     onDelete={() => onDelete(diagnosis)}
+
+                    isPredictionOpen={openPredictionId === diagnosis.id}
+                    onTogglePrediction={() => togglePrediction(diagnosis.id)}
                 />
             ))}
         </div>

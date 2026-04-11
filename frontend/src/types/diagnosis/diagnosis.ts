@@ -29,4 +29,6 @@ export interface Diagnosis {
     createdAt: string;
     updatedAt: string | null;
     confirmedAt: string | null;
+
+    hasPrediction: boolean;
 }

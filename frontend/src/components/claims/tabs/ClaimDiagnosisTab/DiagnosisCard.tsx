@@ -3,21 +3,20 @@
 import { useState } from 'react';
 
 import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
-
 import {
     DIAGNOSIS_TYPE_LABELS,
     DIAGNOSIS_TYPE_COLORS,
 } from '../../../../utils/diagnosisLabels';
-
 import { formatDateTime } from '../../../../utils/dateFormat';
 import { formatMoney } from '../../../../utils/moneyFormat';
 
 import DiagnosisStatusActions from './DiagnosisStatusActions';
+import PredictionSection from './PredictionSection';
 
 import ConfirmBox from '../../../../ui/ConfirmBox';
 
-import { FiEdit2 } from 'react-icons/fi';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiChevronDown } from 'react-icons/fi';
+import Button from "../../../../ui/Button.tsx";
 
 interface Props {
     diagnosis: Diagnosis;
@@ -37,6 +36,9 @@ interface Props {
     onReject?: () => Promise<void>;
     onArchive?: () => Promise<void>;
     onDelete?: () => Promise<void> | void;
+
+    isPredictionOpen?: boolean;
+    onTogglePrediction?: () => void;
 }
 
 export default function DiagnosisCard({
@@ -49,6 +51,8 @@ export default function DiagnosisCard({
 
                                           confirming, rejecting, archiving, deleting,
                                           onConfirm, onReject, onArchive, onDelete,
+
+                                          isPredictionOpen, onTogglePrediction,
                                       }: Props) {
 
     const [deleteOpen, setDeleteOpen] = useState(false);
@@ -57,11 +61,13 @@ export default function DiagnosisCard({
         <div
             onClick={onClick}
             className={`
-            relative
-            w-full text-left rounded-lg border p-4 transition-all cursor-pointer
-            ${selected
-                ? 'border-brand bg-brand-soft shadow-sm'
-                : 'border-border bg-surface hover:border-brand/40 hover:bg-brand-soft/40'}
+                relative
+                w-full text-left rounded-lg border p-4 transition-all cursor-pointer
+                transition-all duration-200 ease-in-out
+
+                    ${selected
+                    ? 'border-brand bg-surface shadow-sm'
+                    : 'border-border hover:border-brand/40 hover:bg-brand-soft/40'}
             `}
         >
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -216,6 +222,51 @@ export default function DiagnosisCard({
                     </div>
                 </div>
             </div>
+
+            <div className="mt-4 pt-3 border-t border-border">
+                {diagnosis.hasPrediction ? (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onTogglePrediction?.();
+                        }}
+                        className="
+                            inline-flex items-center gap-1
+                            text-xs text-brand
+                            transition-colors duration-200
+                            hover:text-brand-strong
+                        "
+                    >
+                        <FiChevronDown
+                            size={14}
+                            className={`
+                                transition-transform duration-300 ease-in-out
+                                ${isPredictionOpen ? 'rotate-180' : 'rotate-0'}
+                            `}
+                        />
+
+                        {isPredictionOpen ? 'Згорнути прогноз' : 'Розгорнути прогноз'}
+                    </button>
+                ) : (
+                    <Button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+                        variant="secondary" className="h-8 px-3 text-xs"
+                    >
+                        + Додати прогноз
+                    </Button>
+                )}
+            </div>
+
+            {diagnosis.hasPrediction && isPredictionOpen && (
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-4 pt-4 border-t border-border"
+                >
+                    <PredictionSection diagnosisId={diagnosis.id} />
+                </div>
+            )}
 
             {deleteOpen && (
                 <ConfirmBox
