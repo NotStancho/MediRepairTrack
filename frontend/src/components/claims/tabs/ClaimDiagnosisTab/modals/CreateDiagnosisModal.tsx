@@ -95,7 +95,7 @@ export default function CreateDiagnosisModal({
         <Modal
             title="Створити діагностику"
             onClose={onClose}
-            width="md"
+            width="lg"
             backdrop="dim"
         >
             <div className="flex gap-2">

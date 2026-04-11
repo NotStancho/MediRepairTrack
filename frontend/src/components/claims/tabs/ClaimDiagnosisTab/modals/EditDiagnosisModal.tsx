@@ -47,7 +47,7 @@ export default function EditDiagnosisModal({diagnosis, onClose, onSave, updating
         <Modal
             title={`Редагувати діагностику #${diagnosis.id}`}
             onClose={onClose}
-            width="md"
+            width="lg"
             backdrop="dim"
         >
             <div className="space-y-3">

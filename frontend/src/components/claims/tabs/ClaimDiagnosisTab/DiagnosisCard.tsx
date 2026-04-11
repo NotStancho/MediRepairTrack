@@ -103,16 +103,21 @@ export default function DiagnosisCard({
                     )}
 
                     <div className="space-y-2 text-sm text-ink">
-                        {diagnosis.finalConclusion?.trim() && (
-                            <div>
-                                <div className="text-ink-muted">
-                                    Фінальний висновок
-                                </div>
+                        <div>
+                            <div className="text-ink-muted">
+                                Фінальний висновок
+                            </div>
+
+                            {diagnosis.finalConclusion?.trim() ? (
                                 <div className="whitespace-pre-line font-medium">
                                     {diagnosis.finalConclusion}
                                 </div>
-                            </div>
-                        )}
+                            ) : (
+                                <div className="text-warning italic">
+                                    не заповнено (обовʼязково для підтвердження)
+                                </div>
+                            )}
+                        </div>
 
                         <div>
                             <div className="text-ink-muted">
