@@ -3,6 +3,8 @@
 import { useState } from 'react';
 
 import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
+import type { CreateManualPredictionPayload } from '../../../../types/diagnosis/DSS/diagnosisPredictionPayloads';
+
 import {
     DIAGNOSIS_TYPE_LABELS,
     DIAGNOSIS_TYPE_COLORS,
@@ -12,11 +14,12 @@ import { formatMoney } from '../../../../utils/moneyFormat';
 
 import DiagnosisStatusActions from './DiagnosisStatusActions';
 import PredictionSection from './PredictionSection';
+import CreatePredictionModal from './modals/CreatePredictionModal';
 
 import ConfirmBox from '../../../../ui/ConfirmBox';
+import Button from '../../../../ui/Button';
 
 import { FiEdit2, FiTrash2, FiChevronDown } from 'react-icons/fi';
-import Button from "../../../../ui/Button.tsx";
 
 interface Props {
     diagnosis: Diagnosis;
@@ -37,6 +40,9 @@ interface Props {
     onArchive?: () => Promise<void>;
     onDelete?: () => Promise<void> | void;
 
+    creatingPrediction?: boolean;
+    onCreatePrediction?: (payload: CreateManualPredictionPayload) => Promise<void>;
+
     isPredictionOpen?: boolean;
     onTogglePrediction?: () => void;
 }
@@ -53,8 +59,10 @@ export default function DiagnosisCard({
                                           onConfirm, onReject, onArchive, onDelete,
 
                                           isPredictionOpen, onTogglePrediction,
+                                          creatingPrediction, onCreatePrediction,
                                       }: Props) {
 
+    const [createPredictionOpen, setCreatePredictionOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     return (
@@ -62,10 +70,8 @@ export default function DiagnosisCard({
             onClick={onClick}
             className={`
                 relative
-                w-full text-left rounded-lg border p-4 transition-all cursor-pointer
-                transition-all duration-200 ease-in-out
-
-                    ${selected
+                w-full text-left rounded-lg border p-4 transition-all cursor-pointer duration-200 ease-in-out
+                ${selected
                     ? 'border-brand shadow-sm'
                     : 'border-border hover:border-brand/40'}
             `}
@@ -251,8 +257,10 @@ export default function DiagnosisCard({
                     <Button
                         onClick={(e) => {
                             e.stopPropagation();
+                            setCreatePredictionOpen(true);
                         }}
-                        variant="secondary" className="h-8 px-3 text-xs"
+                        variant="secondary"
+                        className="h-8 px-3 text-xs"
                     >
                         + Додати прогноз
                     </Button>
@@ -266,6 +274,19 @@ export default function DiagnosisCard({
                 >
                     <PredictionSection diagnosisId={diagnosis.id} />
                 </div>
+            )}
+
+            {createPredictionOpen && onCreatePrediction && (
+                <CreatePredictionModal
+                    diagnosisId={diagnosis.id}
+                    onClose={() => setCreatePredictionOpen(false)}
+                    onCreated={() => {
+                        setCreatePredictionOpen(false);
+                        onTogglePrediction?.();
+                    }}
+                    create={onCreatePrediction}
+                    creating={creatingPrediction ?? false}
+                />
             )}
 
             {deleteOpen && (

@@ -53,12 +53,20 @@ public class DiagnosisPredictionService {
 
         ComplexityLevel complexity = complexityLevelService.getEntity(dto.getPredictedComplexityLevelId());
 
+        BigDecimal cost = dto.getPredictedCost() != null
+                ? dto.getPredictedCost()
+                : BigDecimal.ZERO;
+
+        BigDecimal time = dto.getPredictedTimeHours() != null
+                ? dto.getPredictedTimeHours()
+                : BigDecimal.ZERO;
+
         DiagnosisPrediction prediction = DiagnosisPrediction.builder()
                 .diagnosis(diagnosis)
                 .predictedComplexityLevel(complexity)
                 .predictionSource(PredictionSource.MANUAL)
-                .predictedCost(dto.getPredictedCost())
-                .predictedTimeHours(dto.getPredictedTimeHours())
+                .predictedCost(cost)
+                .predictedTimeHours(time)
                 .predictionExplanation(dto.getPredictionExplanation())
                 .predictedWarrantyProbability(BigDecimal.ZERO) // default
                 .confidenceScore(BigDecimal.ZERO) // default

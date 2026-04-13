@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
+import type { CreateManualPredictionPayload} from '../../../../types/diagnosis/DSS/diagnosisPredictionPayloads';
 import DiagnosisCard from './DiagnosisCard';
 
 interface Props {
@@ -23,6 +24,9 @@ interface Props {
     onReject: (diagnosis: Diagnosis) => Promise<void>;
     onArchive: (diagnosis: Diagnosis) => Promise<void>;
     onDelete: (diagnosis: Diagnosis) => void;
+
+    creatingPrediction: boolean;
+    onCreatePrediction: (payload: CreateManualPredictionPayload) => Promise<void>;
 }
 
 export default function DiagnosisList({
@@ -35,7 +39,9 @@ export default function DiagnosisList({
                                           allowedStatuses, allowedStatusesLoading,
 
                                           confirmingId, rejectingId, archivingId, deletingId,
-                                          onConfirm, onReject, onArchive, onDelete
+                                          onConfirm, onReject, onArchive, onDelete,
+
+                                          creatingPrediction, onCreatePrediction,
                                       }: Props) {
     const [openPredictionId, setOpenPredictionId] = useState<number | null>(null);
 
@@ -45,7 +51,9 @@ export default function DiagnosisList({
     };
     const handleSelect = (id: number) => {
         onSelect(id);
-        setOpenPredictionId(prev => (prev === id ? prev : null));
+        if (openPredictionId !== id) {
+            setOpenPredictionId(null);
+        }
     };
 
     if (!diagnoses.length) {
@@ -82,6 +90,9 @@ export default function DiagnosisList({
                     onReject={() => onReject(diagnosis)}
                     onArchive={() => onArchive(diagnosis)}
                     onDelete={() => onDelete(diagnosis)}
+
+                    creatingPrediction={creatingPrediction}
+                    onCreatePrediction={onCreatePrediction}
 
                     isPredictionOpen={openPredictionId === diagnosis.id}
                     onTogglePrediction={() => togglePrediction(diagnosis.id)}

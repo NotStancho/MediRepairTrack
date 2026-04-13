@@ -6,12 +6,16 @@ import { FiActivity } from 'react-icons/fi';
 import { useAuth } from '../../../../context/AuthContext';
 
 import { useDiagnosis } from '../../../../hooks/diagnosis/useDiagnoses';
+import { usePrediction } from '../../../../hooks/diagnosis/useDiagnosisPrediction';
+
 import DiagnosisList from './DiagnosisList';
 
 import Button from '../../../../ui/Button';
 import CreateDiagnosisModal from '../ClaimDiagnosisTab/modals/CreateDiagnosisModal';
 import EditDiagnosisModal from '../ClaimDiagnosisTab/modals/EditDiagnosisModal';
+
 import type { Diagnosis } from "../../../../types/diagnosis/diagnosis";
+import type { CreateManualPredictionPayload } from '../../../../types/diagnosis/DSS/diagnosisPredictionPayloads';
 
 interface Props {
     claimId: number;
@@ -47,6 +51,11 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
     const [selectedDiagnosisId, setSelectedDiagnosisId] = useState<number | null>(null);
     const [createOpen, setCreateOpen] = useState(false);
     const [editDiagnosis, setEditDiagnosis] = useState<Diagnosis | null>(null);
+
+    const {
+        create: createPrediction,
+        creating: creatingPrediction,
+    } = usePrediction(selectedDiagnosisId ?? 0);
 
     if (loading) {
         return (
@@ -117,6 +126,15 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                         setSelectedDiagnosisId(prev =>
                             prev === diagnosis.id ? null : prev
                         );
+                    }}
+
+                    creatingPrediction={creatingPrediction}
+                    onCreatePrediction={async (payload: CreateManualPredictionPayload) => {
+                        await createPrediction(payload);
+                        await refresh();
+
+                        setSelectedDiagnosisId(payload.diagnosisId);
+                        await loadAllowedStatuses(payload.diagnosisId);
                     }}
                 />
             </section>

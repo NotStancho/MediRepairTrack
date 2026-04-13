@@ -3,8 +3,8 @@
 export interface CreateManualPredictionPayload {
     diagnosisId: number;
     predictedComplexityLevelId: number;
-    predictedCost: number;
-    predictedTimeHours: number;
+    predictedCost?: number;
+    predictedTimeHours?: number;
     predictionExplanation: string;
 }
 

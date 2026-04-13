@@ -12,7 +12,6 @@ export default function PredictionSection({ diagnosisId }: Props) {
     const {
         prediction,
         loading,
-        create,
         recalculate
     } = usePrediction(diagnosisId);
 
@@ -26,32 +25,14 @@ export default function PredictionSection({ diagnosisId }: Props) {
 
     if (!prediction) {
         return (
-            <div className="space-y-2">
-                <div className="text-sm text-ink-muted">
-                    Прогноз ще не створено
-                </div>
-
-                <button
-                    onClick={async () => {
-                        await create({
-                            diagnosisId,
-                            predictedComplexityLevelId: 1, // TODO
-                            predictedCost: 1,
-                            predictedTimeHours: 1,
-                            predictionExplanation: 'Manual prediction'
-                        });
-                    }}
-                    className="text-sm text-brand hover:underline"
-                >
-                    + Створити прогноз
-                </button>
+            <div className="text-sm text-ink-muted italic">
+                Прогноз ще не створено
             </div>
         );
     }
 
     return (
         <div className="space-y-4">
-            {/* card */}
             <PredictionCard
                 prediction={prediction}
                 onRecalculate={() => recalculate(prediction.id)}
