@@ -16,8 +16,8 @@ import type {
     UpdatePredictionPayload
 } from '../../types/diagnosis/DSS/diagnosisPredictionPayloads';
 
-export function usePredictions(diagnosisId: number) {
-    const [data, setData] = useState<DiagnosisPrediction[]>([]);
+export function usePrediction(diagnosisId: number) {
+    const [prediction, setPrediction] = useState<DiagnosisPrediction | null>();
     const [loading, setLoading] = useState(true);
 
     const [creating, setCreating] = useState(false);
@@ -28,7 +28,7 @@ export function usePredictions(diagnosisId: number) {
     const load = useCallback(async (cancelled?: () => boolean) => {
         if (!diagnosisId) {
             if (!cancelled?.()) {
-                setData([]);
+                setPrediction(null);
                 setLoading(false);
             }
             return;
@@ -37,7 +37,7 @@ export function usePredictions(diagnosisId: number) {
         setLoading(true);
         try {
             const res = await getPredictionsByDiagnosis(diagnosisId);
-            if (!cancelled?.()) setData(res);
+            if (!cancelled?.()) setPrediction(res[0] ?? null);
         } finally {
             if (!cancelled?.()) setLoading(false);
         }
@@ -57,7 +57,7 @@ export function usePredictions(diagnosisId: number) {
         setCreating(true);
         try {
             const created = await createManualPrediction(payload);
-            setData(prev => [created, ...prev]);
+            setPrediction(created);
             return created;
         } finally {
             setCreating(false);
@@ -68,9 +68,7 @@ export function usePredictions(diagnosisId: number) {
         setUpdating(true);
         try {
             const updated = await updatePrediction(id, payload);
-            setData(prev =>
-                prev.map(p => (p.id === id ? updated : p))
-            );
+            setPrediction(updated);
             return updated;
         } finally {
             setUpdating(false);
@@ -81,7 +79,7 @@ export function usePredictions(diagnosisId: number) {
         setRemoving(true);
         try {
             await deletePrediction(id);
-            setData(prev => prev.filter(p => p.id !== id));
+            setPrediction(null);
         } finally {
             setRemoving(false);
         }
@@ -98,7 +96,7 @@ export function usePredictions(diagnosisId: number) {
     };
 
     return {
-        data,
+        prediction,
         loading,
 
         creating,
