@@ -1,7 +1,7 @@
-// components/claims/tabs/ClaimDiagnosisTab/PredictionCard.tsx
+// components/claims/tabs/ClaimDiagnosisTab/tabs/PredictionGeneralTab.tsx
 
-import type { DiagnosisPrediction } from '../../../../types/diagnosis/DSS/diagnosisPrediction';
-import { formatMoney } from '../../../../utils/moneyFormat';
+import type { DiagnosisPrediction } from '../../../../../types/diagnosis/DSS/diagnosisPrediction';
+import { formatMoney } from '../../../../../utils/moneyFormat';
 
 import { FiEdit2 } from 'react-icons/fi';
 
@@ -11,7 +11,7 @@ interface Props {
     onEdit?: () => void;
 }
 
-export default function PredictionCard({
+export default function PredictionGeneralTab({
                                            prediction,
                                            onRecalculate,
                                            onEdit
@@ -21,7 +21,7 @@ export default function PredictionCard({
         `${(value * 100).toFixed(1)}%`;
 
     return (
-        <div className="relative rounded-lg border border-border bg-surface p-4 shadow-sm space-y-4">
+        <div className="relative space-y-4">
 
             <div className="flex justify-between items-start pr-10">
                 {onEdit && (

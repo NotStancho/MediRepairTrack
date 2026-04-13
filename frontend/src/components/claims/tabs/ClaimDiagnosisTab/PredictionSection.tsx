@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 import { usePrediction } from '../../../../hooks/diagnosis/useDiagnosisPrediction';
-import PredictionCard from './PredictionCard';
 import PredictionTabs from './PredictionTabs';
 import EditPredictionModal from './modals/EditPredictionModal';
 
@@ -36,13 +35,11 @@ export default function PredictionSection({ diagnosisId }: Props) {
 
     return (
         <div className="space-y-4">
-            <PredictionCard
+            <PredictionTabs
                 prediction={prediction}
                 onRecalculate={() => recalculate(prediction.id)}
                 onEdit={() => setEditOpen(true)}
             />
-
-            <PredictionTabs predictionId={prediction.id} />
 
             {editOpen && (
                 <EditPredictionModal
