@@ -239,12 +239,20 @@ public class DiagnosisPredictedPartService {
 
     private PredictedPartResponseDTO map(DiagnosisPredictedPart e) {
         return PredictedPartResponseDTO.builder()
+
                 .predictionId(e.getPrediction().getId())
-                .partId(e.getPart().getId())
+                .part(
+                        PartShortDTO.builder()
+                                .id(e.getPart().getId())
+                                .partCode(e.getPart().getPartCode())
+                                .partName(e.getPart().getPartName())
+                                .price(e.getPart().getPrice())
+                                .unitName(e.getPart().getUnitName())
+                                .build()
+                )
                 .probabilityScore(e.getProbabilityScore())
                 .rankPosition(e.getRankPosition())
                 .createdAt(e.getCreatedAt())
                 .build();
     }
-
 }

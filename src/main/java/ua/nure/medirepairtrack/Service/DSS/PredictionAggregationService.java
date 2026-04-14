@@ -14,7 +14,6 @@ import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.ClaimService;
-import ua.nure.medirepairtrack.Service.PartService;
 import ua.nure.medirepairtrack.Service.PricingConfigService;
 
 import java.math.BigDecimal;
@@ -33,7 +32,6 @@ public class PredictionAggregationService {
     private final PredictionExplanationService explanationService;
 
     private final ClaimService claimService;
-    private final PartService partService;
     private final PricingConfigService pricingConfigService;
     private final ComplexityLevelService complexityLevelService;
 
@@ -112,11 +110,9 @@ public class PredictionAggregationService {
         var predictedParts = predictedPartService.getAllByPredictionId(prediction.getId());
 
         BigDecimal partsCost = predictedParts.stream()
-                .map(p -> {
-                    var part = partService.getPartEntity(p.getPartId());
-
-                    return part.getPrice().multiply(p.getProbabilityScore());
-                })
+                .map(p ->
+                    p.getPart().getPrice().multiply(p.getProbabilityScore())
+                )
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         partsCost = partsCost.multiply(config.getPartsCoefficient());
