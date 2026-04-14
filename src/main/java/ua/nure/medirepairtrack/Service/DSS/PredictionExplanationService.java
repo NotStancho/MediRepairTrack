@@ -95,16 +95,11 @@ public class PredictionExplanationService {
         var operations = predictedOperationService.getAllByPredictionId(prediction.getId());
 
         return operations.stream()
-                .map(o -> {
-
-                    var operation = repairOperationService.getOperationEntity(o.getOperationId());
-
-                    return PredictedOperationContext.builder()
-                            .operationName(operation.getName())
-                            .probability(o.getProbabilityScore())
-                            .estimatedTime(o.getPredictedTimeSpent())
-                            .build();
-                })
+                .map(o -> PredictedOperationContext.builder()
+                        .operationName(o.getOperation().getName())
+                        .probability(o.getProbabilityScore())
+                        .estimatedTime(o.getPredictedTimeSpent())
+                        .build())
                 .toList();
     }
 

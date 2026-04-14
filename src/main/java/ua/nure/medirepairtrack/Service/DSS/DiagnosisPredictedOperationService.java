@@ -274,7 +274,13 @@ public class DiagnosisPredictedOperationService {
     private PredictedOperationResponseDTO map(DiagnosisPredictedOperation e) {
         return PredictedOperationResponseDTO.builder()
                 .predictionId(e.getPrediction().getId())
-                .operationId(e.getOperation().getId())
+                .operation(
+                        RepairOperationShortDTO.builder()
+                        .id(e.getOperation().getId())
+                        .name(e.getOperation().getName())
+                        .complexityLevelName(e.getOperation().getComplexityLevel().getName())
+                        .build()
+                )
                 .probabilityScore(e.getProbabilityScore())
                 .rankPosition(e.getRankPosition())
                 .predictedTimeSpent(e.getPredictedTimeSpent())
