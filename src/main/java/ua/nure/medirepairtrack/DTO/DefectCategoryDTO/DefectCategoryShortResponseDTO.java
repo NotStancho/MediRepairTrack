@@ -12,4 +12,5 @@ public class DefectCategoryShortResponseDTO {
     private Integer id;
     private String name;
     private String typicalSymptoms;
+    private String description;
 }

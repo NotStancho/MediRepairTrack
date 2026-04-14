@@ -91,6 +91,7 @@ public class DefectCategoryService {
                 .id(e.getId())
                 .name(e.getName())
                 .typicalSymptoms(e.getTypicalSymptoms())
+                .description(e.getDescription())
                 .build();
     }
 }
