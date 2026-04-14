@@ -1,5 +1,3 @@
-// components/claims/tabs/ClaimDiagnosisTab/modals/CreatePredictedPartModal.tsx
-
 import { useState } from 'react';
 
 import Modal from '../../../../../ui/Modal/Modal';
@@ -9,39 +7,38 @@ import FormField from '../../../../../ui/FormField';
 import Select from '../../../../../ui/Select';
 import { inputBase } from '../../../../../ui/formStyles';
 
-import {formatMoney} from '../../../../../utils/moneyFormat';
-
-import type { PartShort } from '../../../../../types/part/partShort';
-import type { CreatePredictedPartPayload } from '../../../../../types/diagnosis/DSS/predictedPartPayloads';
+import type { DefectCategoryShort } from '../../../../../types/defectCategory/defectCategoryShort';
+import type { CreatePredictedDefectPayload } from '../../../../../types/diagnosis/DSS/predictedDefectCategoryPayload';
 
 interface Props {
     predictionId: number;
-    available: PartShort[];
+    available: DefectCategoryShort[];
     creating: boolean;
     onClose: () => void;
-    onCreate: (payload: CreatePredictedPartPayload) => Promise<void>;
-    onCreateBatch: (payload: CreatePredictedPartPayload[]) => Promise<void>;
+    onCreate: (payload: CreatePredictedDefectPayload) => Promise<void>;
+    onCreateBatch: (payload: CreatePredictedDefectPayload[]) => Promise<void>;
 }
 
-export default function CreatePredictedPartModal({
-                                                     predictionId,
-                                                     available,
-                                                     creating,
-                                                     onClose,
-                                                     onCreate,
-                                                 }: Props) {
+export default function CreatePredictedDefectModal({
+                                                       predictionId,
+                                                       available,
+                                                       creating,
+                                                       onClose,
+                                                       onCreate,
+                                                   }: Props) {
     const [form, setForm] = useState({
-        partId: null as number | null,
+        defectCategoryId: null as number | null,
         probabilityScore: '',
+        rankPosition: '',
     });
 
     const handleSubmit = async () => {
         await onCreate({
             predictionId,
-            partId: form.partId as number,
+            defectCategoryId: form.defectCategoryId as number,
             probabilityScore: form.probabilityScore
                 ? Number(form.probabilityScore)
-                : undefined as unknown as number,
+                : undefined as unknown as number
         });
 
         onClose();
@@ -49,23 +46,21 @@ export default function CreatePredictedPartModal({
 
     return (
         <Modal
-            title="Додати прогнозовану запчастину"
+            title="Додати прогнозований дефект"
             onClose={onClose}
             width="lg"
         >
             <div className="space-y-3">
-                <FormField label="Запчастина">
+                <FormField label="Категорія дефекту">
                     <Select
-                        value={form.partId}
+                        value={form.defectCategoryId}
                         onChange={(val) =>
-                            setForm({ ...form, partId: val })
+                            setForm({ ...form, defectCategoryId: val })
                         }
                         options={available}
-                        getLabel={(item) =>
-                            `${item.partCode} - ${item.partName} (${formatMoney(item.price)} ₴ / ${item.unitName})`
-                        }
+                        getLabel={(item) => item.name}
                         getValue={(item) => item.id}
-                        placeholder="Оберіть запчастину"
+                        placeholder="Оберіть категорію дефекту"
                         searchable
                     />
                 </FormField>

@@ -1,3 +1,5 @@
+// components/claims/tabs/ClaimDiagnosisTab/modals/CreatePredictedOperationModal.tsx
+
 import { useState } from 'react';
 
 import Modal from '../../../../../ui/Modal/Modal';

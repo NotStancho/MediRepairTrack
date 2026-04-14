@@ -113,7 +113,7 @@ export function usePredictedDefects(predictionId: number) {
 
             setData(prev =>
                 prev.map(d =>
-                    d.defectCategoryId === defectCategoryId ? updated : d
+                    d.defectCategory.id === defectCategoryId ? updated : d
                 )
             );
 
@@ -129,7 +129,7 @@ export function usePredictedDefects(predictionId: number) {
             await deletePredictedDefect(predictionId, defectCategoryId);
 
             setData(prev =>
-                prev.filter(d => d.defectCategoryId !== defectCategoryId)
+                prev.filter(d => d.defectCategory.id !== defectCategoryId)
             );
 
             await loadAvailable(); // sync
