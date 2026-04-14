@@ -107,7 +107,7 @@ export function usePredictedParts(predictionId: number) {
 
             setData(prev =>
                 prev.map(p =>
-                    p.partId === partId ? updated : p
+                    p.part.id === partId ? updated : p
                 )
             );
 
@@ -124,7 +124,7 @@ export function usePredictedParts(predictionId: number) {
             await deletePredictedPart(predictionId, partId);
 
             setData(prev =>
-                prev.filter(p => p.partId !== partId)
+                prev.filter(p => p.part.id !== partId)
             );
 
             await loadAvailable(); // sync
