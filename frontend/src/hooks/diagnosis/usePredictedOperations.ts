@@ -103,7 +103,7 @@ export function usePredictedOperations(predictionId: number) {
 
             setData(prev =>
                 prev.map(op =>
-                    op.operationId === operationId ? updated : op
+                    op.operation.id === operationId ? updated : op
                 )
             );
 
@@ -119,7 +119,7 @@ export function usePredictedOperations(predictionId: number) {
             await deletePredictedOperation(predictionId, operationId);
 
             setData(prev =>
-                prev.filter(op => op.operationId !== operationId)
+                prev.filter(op => op.operation.id !== operationId)
             );
 
             await loadAvailable(); // sync
