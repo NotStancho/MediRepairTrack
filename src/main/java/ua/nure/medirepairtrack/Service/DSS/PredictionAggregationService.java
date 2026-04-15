@@ -138,7 +138,7 @@ public class PredictionAggregationService {
 
             double similarity = result.getSimilarityScore().doubleValue();
 
-            var claim = claimService.getClaim(result.getClaimId());
+            var claim = claimService.getClaim(result.getClaim().getId());
 
             if (claim.getRepairType() == RepairType.WARRANTY_REPAIR) {
                 weightedWarranty += similarity;

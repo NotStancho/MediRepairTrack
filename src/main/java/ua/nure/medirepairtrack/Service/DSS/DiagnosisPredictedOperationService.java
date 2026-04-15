@@ -113,7 +113,7 @@ public class DiagnosisPredictedOperationService {
 
         for (var result : similarityResults) {
 
-            Integer claimId = result.getClaimId();
+            Integer claimId = result.getClaim().getId();
             double similarity = result.getSimilarityScore().doubleValue();
 
             var operations = claimRepairOperationService.getClaimOperations(claimId);

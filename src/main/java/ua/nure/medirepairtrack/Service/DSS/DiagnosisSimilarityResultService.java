@@ -203,7 +203,17 @@ public class DiagnosisSimilarityResultService {
 
         return SimilarityResultResponseDTO.builder()
                 .predictionId(e.getPrediction().getId())
-                .claimId(e.getSimilarClaim().getId())
+                .claim(
+                        ClaimShortDTO.builder()
+                                .id(e.getSimilarClaim().getId())
+                                .equipmentModel(e.getSimilarClaim().getEquipment().getModel().getModelName())
+                                .serialNumber(e.getSimilarClaim().getEquipment().getSerialNumber())
+                                .defectDescription(e.getSimilarClaim().getDefectDescription())
+                                .repairType(e.getSimilarClaim().getRepairType().name())
+                                .status(e.getSimilarClaim().getStatus().name())
+                                .createdAt(e.getSimilarClaim().getCreatedAt())
+                                .build()
+                )
                 .similarityScore(e.getSimilarityScore())
                 .rankPosition(e.getRankPosition())
                 .createdAt(e.getCreatedAt())

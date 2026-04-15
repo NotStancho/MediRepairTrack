@@ -109,7 +109,7 @@ public class DiagnosisPredictionDefectService {
 
         for (var result : similarityResults) {
 
-            Integer claimId = result.getClaimId();
+            Integer claimId = result.getClaim().getId();
             double similarity = result.getSimilarityScore().doubleValue();
 
             var defects = claimDefectCategoryService.getByClaimId(claimId);

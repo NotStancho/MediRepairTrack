@@ -113,7 +113,7 @@ public class DiagnosisPredictedPartService {
 
         for (var result : similarityResults) {
 
-            Integer claimId = result.getClaimId();
+            Integer claimId = result.getClaim().getId();
             double similarity = result.getSimilarityScore().doubleValue();
 
             var usedParts = partService.getUsedPartsByClaim(claimId);

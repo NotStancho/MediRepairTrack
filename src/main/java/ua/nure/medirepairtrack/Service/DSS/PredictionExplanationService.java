@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ua.nure.medirepairtrack.Client.GeminiText.GeminiTextClient;
 import ua.nure.medirepairtrack.DTO.DSS.PredictionExplanation.*;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
-import ua.nure.medirepairtrack.Service.ClaimService;
 
 import java.util.List;
 
@@ -17,8 +16,6 @@ public class PredictionExplanationService {
     private final DiagnosisPredictedPartService predictedPartService;
     private final DiagnosisPredictedOperationService predictedOperationService;
     private final DiagnosisPredictionDefectService predictionDefectService;
-
-    private final ClaimService claimService;
 
     private final GeminiTextClient geminiTextClient;
 
@@ -53,16 +50,13 @@ public class PredictionExplanationService {
 
         return results.stream()
                 .limit(3)
-                .map(r -> {
-
-                    var claim = claimService.getClaim(r.getClaimId());
-
-                    return SimilarCaseContext.builder()
-                            .equipmentModel(claim.getEquipment().getModel().getModelName())
-                            .defectDescription(claim.getDefectDescription())
+                .map(r ->
+                        SimilarCaseContext.builder()
+                            .equipmentModel(r.getClaim().getEquipmentModel())
+                            .defectDescription(r.getClaim().getDefectDescription())
                             .similarityScore(r.getSimilarityScore())
-                            .build();
-                })
+                            .build()
+                )
                 .toList();
     }
 

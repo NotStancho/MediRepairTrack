@@ -2,6 +2,7 @@ package ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity;
 
 import lombok.Builder;
 import lombok.Data;
+import ua.nure.medirepairtrack.DTO.ClaimDTO.ClaimShortDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 public class SimilarityResultResponseDTO {
 
     private Integer predictionId;
-    private Integer claimId;
+    private ClaimShortDTO claim;
 
     private BigDecimal similarityScore;
     private Integer rankPosition;
