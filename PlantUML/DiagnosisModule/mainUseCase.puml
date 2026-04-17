@@ -1,0 +1,100 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Клієнт" as Client
+actor "Менеджер" as Manager
+actor "Сервісний інженер" as Engineer
+actor "Адміністратор" as Admin
+
+rectangle "ІС обліку ремонту медичного обладнання" {
+
+  package "Робота із заявками" {
+    usecase "Переглядати список\nзаявок" as UC1
+    usecase "Переглядати\nзаявку" as UC2
+    usecase "Створити та подати\nзаявку" as UC3
+    usecase "Перевірити та\nвалідувати заявку" as UC4
+    usecase "Опрацювати заявку\nта встановити статус" as UC5
+  }
+
+  package "Діагностика" {
+    usecase "Переглядати результати\nдіагностики" as UC6
+    usecase "Аналізувати опис\nнесправності" as UC7
+    usecase "Формувати діагностичні\nрекомендації" as UC8
+    usecase "Фіксувати результати\nдіагностики" as UC9
+  }
+
+  package "Ремонт" {
+    usecase "Переглядати стан\nремонту" as UC10
+    usecase "Визначати перелік\nремонтних робіт" as UC11
+    usecase "Фіксувати виконані\nремонтні роботи" as UC12
+    usecase "Оновлювати статус\nремонту" as UC13
+  }
+
+  package "Фінансові документи" {
+    usecase "Переглядати рахунок" as UC14
+    usecase "Розраховувати вартість\nробіт та матеріалів" as UC15
+    usecase "Формувати рахунок" as UC16
+    usecase "Затверджувати рахунок" as UC17
+  }
+}
+
+' ---------------- ACTORS ----------------
+
+Client --> UC1
+Client --> UC2
+Client --> UC3
+Client --> UC10
+Client --> UC14
+
+Manager --> UC1
+Manager --> UC2
+Manager --> UC4
+Manager --> UC5
+Manager --> UC14
+Manager --> UC15
+Manager --> UC16
+
+Engineer --> UC1
+Engineer --> UC2
+Engineer --> UC6
+Engineer --> UC7
+Engineer --> UC8
+Engineer --> UC9
+Engineer --> UC10
+Engineer --> UC11
+Engineer --> UC12
+Engineer --> UC13
+
+Admin --> UC14
+Admin --> UC15
+Admin --> UC16
+Admin --> UC17
+
+' ---------------- INCLUDE ----------------
+' mandatory internal subflows
+
+UC8 .> UC7 : <<include>>
+UC16 .> UC15 : <<include>>
+
+' ---------------- EXTEND ----------------
+' actions performed after viewing / selecting an item
+
+UC4 .> UC2 : <<extend>>
+UC5 .> UC2 : <<extend>>
+
+UC7 .> UC6 : <<extend>>
+UC8 .> UC6 : <<extend>>
+UC9 .> UC6 : <<extend>>
+
+UC11 .> UC10 : <<extend>>
+UC12 .> UC10 : <<extend>>
+UC13 .> UC10 : <<extend>>
+
+UC16 .> UC14 : <<extend>>
+UC17 .> UC14 : <<extend>>
+@enduml
+

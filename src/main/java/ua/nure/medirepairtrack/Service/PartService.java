@@ -87,6 +87,12 @@ public class PartService {
         return partRepository.findAll().stream().map(this::mapPart).toList();
     }
 
+    public List<PartShortDTO> getAllPartsShort() {
+        return partRepository.findAll().stream()
+                .map(this::mapPartShort)
+                .toList();
+    }
+
     @Transactional
     public void delete(Integer partId) {
         if (!partRepository.existsById(partId)) {
@@ -288,6 +294,11 @@ public class PartService {
                 .toList();
     }
 
+    public Part getPartEntity(Integer partId) {
+        return partRepository.findById(partId)
+                .orElseThrow(() -> new NotFoundException("Запчастина не знайдена"));
+    }
+
     // -------------------- helpers --------------------
 
     private void validateQuantityByUnitType(Part part, BigDecimal qty) {
@@ -315,6 +326,16 @@ public class PartService {
                 .unitName(p.getUnitName())
                 .unitType(p.getUnitType())
                 .description(p.getDescription())
+                .build();
+    }
+
+    private PartShortDTO mapPartShort(Part p) {
+        return PartShortDTO.builder()
+                .id(p.getId())
+                .partCode(p.getPartCode())
+                .partName(p.getPartName())
+                .price(p.getPrice())
+                .unitName(p.getUnitName())
                 .build();
     }
 

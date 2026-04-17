@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractions } from '@floating-ui/react';
 import Portal from './Portal';
+import * as React from "react";
 
-interface Props {
-    onEdit?: () => void;
-    onDelete?: () => void;
+interface Action {
+    label: string;
+    onClick: () => void | Promise<void>;
+    danger?: boolean;
 }
 
-export default function RowActionsMenu({ onEdit, onDelete }: Props) {
+interface Props {
+    actions: Action[];
+    trigger: React.ReactNode;
+    disabled?: boolean;
+}
+
+export default function RowActionsMenu({ actions, trigger, disabled }: Props) {
     const [open, setOpen] = useState(false);
 
     const { refs, floatingStyles, context } = useFloating({
@@ -19,9 +27,8 @@ export default function RowActionsMenu({ onEdit, onDelete }: Props) {
     });
 
     const dismiss = useDismiss(context); // клік поза + Escape
-    const { getReferenceProps, getFloatingProps } = useInteractions([
-        dismiss,
-    ]);
+    const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
+
     const setReferenceRef = (node: HTMLButtonElement | null) => {
         refs.setReference(node);
     };
@@ -38,7 +45,7 @@ export default function RowActionsMenu({ onEdit, onDelete }: Props) {
         return () => document.removeEventListener('keydown', onKey);
     }, []);
 
-    if (!onEdit && !onDelete) return null;
+    if (!actions.length) return <>{trigger}</>;
 
     return (
         <>
@@ -46,19 +53,13 @@ export default function RowActionsMenu({ onEdit, onDelete }: Props) {
             <button
                 ref={setReferenceRef}
                 {...getReferenceProps()}
-                onClick={() => {
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (disabled) return;
                     setOpen(v => !v);
                 }}
-                className="
-                    px-2 py-1
-                    rounded
-                    text-ink-muted
-                    hover:bg-surface-muted
-                    hover:text-ink
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ring
-                "
             >
-                ⋯
+                {trigger}
             </button>
 
             {open && (
@@ -76,40 +77,24 @@ export default function RowActionsMenu({ onEdit, onDelete }: Props) {
                             shadow-lg shadow-black/10
                         "
                     >
-                        {onEdit && (
-                            <button
-                                onClick={() => {
-                                    onEdit();
-                                    setOpen(false);
-                                }}
-                                className="
-                                    w-full text-left
-                                    px-3 py-2
-                                    text-sm
-                                    hover:bg-surface-muted
-                                "
-                            >
-                                Редагувати
-                            </button>
-                        )}
-
-                        {onDelete && (
-                            <button
-                                onClick={() => {
-                                    onDelete();
-                                    setOpen(false);
-                                }}
-                                className="
-                                    w-full text-left
-                                    px-3 py-2
-                                    text-sm
-                                    text-danger
-                                    hover:bg-surface-muted
-                                "
-                            >
-                                Видалити
-                            </button>
-                        )}
+                        <div className="py-1">
+                            {actions.map((action, i) => (
+                                <button
+                                    key={i}
+                                    onClick={async () => {
+                                        await action.onClick();
+                                        setOpen(false);
+                                    }}
+                                    className={`
+                                        w-full text-left px-3 py-2 text-sm transition
+                                        hover:bg-surface-muted
+                                        ${action.danger ? 'text-danger' : ''}
+                                    `}
+                                >
+                                    {action.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </Portal>
             )}

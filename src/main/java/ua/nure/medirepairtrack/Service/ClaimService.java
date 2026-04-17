@@ -36,6 +36,7 @@ import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -135,12 +136,20 @@ public class ClaimService {
 
         Equipment equipment = equipmentService.getOrCreate(dto.getEquipment());
 
+        boolean descriptionChanged =
+                !Objects.equals(claim.getDefectDescription(), dto.getDefectDescription());
+
         claim.setClient(client);
         claim.setEquipment(equipment);
         claim.setRepairType(dto.getRepairType());
         claim.setDefectDescription(dto.getDefectDescription());
 
         claimRepository.save(claim);
+
+        if (descriptionChanged && claimStatusMachine.allowsEmbeddingGeneration(claim.getStatus())) {
+            publishClaimDescriptionChangedEvent(claim.getId());
+        }
+
         return mapToResponse(claim);
     }
 
@@ -251,6 +260,13 @@ public class ClaimService {
                 .toList();
     }
 
+    public List<ClaimShortDTO> getAllClaimsShort() {
+        return claimRepository.findAll()
+                .stream()
+                .map(this::mapToShortDTO)
+                .toList();
+    }
+
     public void delete(Integer id) {
         if (!claimRepository.existsById(id)) {
             throw new NotFoundException("Заявка не знайдена");
@@ -337,6 +353,18 @@ public class ClaimService {
                 .build();
     }
 
+    private ClaimShortDTO mapToShortDTO(Claim claim) {
+        return new ClaimShortDTO(
+                claim.getId(),
+                claim.getEquipment().getModel().getModelName(),
+                claim.getEquipment().getSerialNumber(),
+                claim.getDefectDescription(),
+                claim.getRepairType().name(),
+                claim.getStatus().name(),
+                claim.getCreatedAt()
+        );
+    }
+
     private void publishClaimCreatedEvent(Claim claim, Integer creatorEmployeeId) {
         eventPublisher.publishEvent(
                 new ClaimCreatedEvent(
@@ -346,6 +374,12 @@ public class ClaimService {
                         claim.getRepairType(),
                         claim.getStatus()
                 )
+        );
+    }
+
+    public void publishClaimDescriptionChangedEvent(Integer claimId) {
+        eventPublisher.publishEvent(
+                new ClaimDescriptionChangedEvent(claimId)
         );
     }
 }

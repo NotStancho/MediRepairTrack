@@ -10,12 +10,13 @@
  */
 
 
-import {useEffect} from "react";
+import { useEffect } from "react";
 import Portal from "./Portal";
 import Spinner from './Spinner';
-import {useSelect} from '../hooks/useSelect';
-import {useFloating, flip, shift, autoUpdate, size} from '@floating-ui/react'
+import { useSelect } from '../hooks/useSelect';
+import { useFloating, flip, shift, autoUpdate, size } from '@floating-ui/react'
 import Input from "./Input";
+import * as React from "react";
 
 interface Props<T, V = number | string> {
     value: V | null;
@@ -24,6 +25,9 @@ interface Props<T, V = number | string> {
     options: T[];
     getLabel: (item: T) => string;
     getValue: (item: T) => V;
+
+    renderOption?: (item: T, meta: { selected: boolean; highlighted: boolean }) => React.ReactNode;
+    renderValue?: (item: T) => React.ReactNode;
 
     placeholder?: string;
     searchable?: boolean;
@@ -45,6 +49,7 @@ const DEFAULT_MAX_VISIBLE_ITEMS = 8;
 export default function Select<T, V extends string | number = number>({
                                                                           value, onChange, options,
                                                                           getLabel, getValue,
+                                                                          renderOption, renderValue,
                                                                           placeholder = 'Оберіть значення', searchable, onSearchChange,
                                                                           maxVisibleItems, itemHeight,
                                                                           invalid, error, loading, loadingText = 'Завантаження…', disabled
@@ -170,7 +175,9 @@ export default function Select<T, V extends string | number = number>({
                             ${isSelected ? 'bg-brand-soft text-brand-strong font-medium' : ''}
                         `}
                     >
-                        {getLabel(opt)}
+                        {renderOption
+                            ? renderOption(opt, { selected: !!isSelected, highlighted: isHighlighted })
+                            : getLabel(opt)}
                     </div>
                 );
             })}
@@ -202,7 +209,9 @@ export default function Select<T, V extends string | number = number>({
                 `}
             >
                 <span className={selected ? '' : 'text-ink-soft'}>
-                    {selected ? getLabel(selected) : placeholder}
+                    {selected
+                        ? (renderValue ? renderValue(selected) : getLabel(selected))
+                        : placeholder}
                 </span>
 
                 <span className="absolute right-3 text-ink-soft">

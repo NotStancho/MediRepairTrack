@@ -124,4 +124,10 @@ public class ClaimStatusMachine {
         );
     }
 
+    public boolean allowsEmbeddingGeneration(Status status) {
+        return status == Status.ACCEPTED
+                || status == Status.ASSIGNED_TO_ENGINEER
+                || status == Status.IN_PROGRESS
+                || status == Status.WAITING_FOR_PARTS;
+    }
 }

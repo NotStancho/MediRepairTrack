@@ -137,8 +137,29 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                 cell: ({ row }) =>
                     row.original.itemType === 'OTHER' ? (
                         <RowActionsMenu
-                            onEdit={() => openEditOther(row.original)}
-                            onDelete={() => setDeleteId(row.original.id)}
+                            actions={[
+                                {
+                                    label: 'Редагувати',
+                                    onClick: () => openEditOther(row.original),
+                                },
+                                {
+                                    label: 'Видалити',
+                                    onClick: () => setDeleteId(row.original.id),
+                                    danger: true,
+                                },
+                            ]}
+                            trigger={
+                                <button
+                                    className="
+                                        px-2 py-1 rounded
+                                        text-ink-muted
+                                        hover:bg-surface-muted
+                                        hover:text-ink
+                                    "
+                                >
+                                    ...
+                                </button>
+                            }
                         />
                     ) : null,
             });

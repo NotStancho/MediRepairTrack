@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+
+actor "Клієнт" as Client
+
+rectangle {
+
+  usecase "Переглядати свої \nзаявки" as UC1
+  usecase "Переглядати конкретну\nзаявку" as UC2
+  usecase "Подати заявку \nна ремонт" as UC3
+  usecase "Переглядати стан\nремонту" as UC4
+  usecase "Переглядати рахунок" as UC5
+}
+
+Client -right-> UC1
+Client -right-> UC3
+
+UC2 .> UC1 : <<extend>>
+UC4 ..> UC2 : <<extend>>
+UC5 .> UC2 : <<extend>>
+
+@enduml
+

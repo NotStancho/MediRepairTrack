@@ -81,4 +81,14 @@ public class GlobalExceptionHandler {
                         "timestamp", LocalDateTime.now().toString()
                 ));
     }
+
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<?> handleExternalService(ExternalServiceException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of(
+                        "status", 503,
+                        "message", ex.getMessage(),
+                        "timestamp", LocalDateTime.now().toString()
+                ));
+    }
 }

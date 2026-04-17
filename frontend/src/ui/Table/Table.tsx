@@ -159,21 +159,21 @@ export default function Table<TData>({
                                          renderToolbar,
                                          renderEmptyState,
                                          onRowClick,
-    rowClassName,
-    density = 'comfortable',
-    striped = false,
-    showPagination = true,
-    className = '',
-    enableColumnResize = true,
-    enableColumnReorder = true,
-    enableColumnPinning = true,
-    virtualization,
-    storageKey,
-    persistState = true,
-    onSortingChange,
-    onColumnFiltersChange,
-    onGlobalFilterChange,
-    onPaginationChange,
+                                         rowClassName,
+                                         density = 'comfortable',
+                                         striped = false,
+                                         showPagination = true,
+                                         className = '',
+                                         enableColumnResize = true,
+                                         enableColumnReorder = true,
+                                         enableColumnPinning = true,
+                                         virtualization,
+                                         storageKey,
+                                         persistState = true,
+                                         onSortingChange,
+                                         onColumnFiltersChange,
+                                         onGlobalFilterChange,
+                                         onPaginationChange,
 }: Props<TData>) {
     const persistedState = useMemo(() => readPersistedTableState(storageKey), [storageKey]);
 
@@ -186,6 +186,7 @@ export default function Table<TData>({
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         persistedState?.columnVisibility ?? initialState?.columnVisibility ?? {},
     );
+    const paginationEnabled = showPagination && !manualPagination;
     const [pagination, setPagination] = useState<PaginationState>(
         initialState?.pagination ?? { pageIndex: 0, pageSize: 10 },
     );
@@ -297,7 +298,9 @@ export default function Table<TData>({
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: manualFiltering ? undefined : getFilteredRowModel(),
         getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
-        getPaginationRowModel: manualPagination ? undefined : getPaginationRowModel(),
+        getPaginationRowModel: paginationEnabled
+            ? getPaginationRowModel()
+            : undefined,
         getRowId,
         autoResetAll: false,
         columnResizeMode: enableColumnResize ? 'onChange' : undefined,
