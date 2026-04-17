@@ -111,7 +111,7 @@ export function useSimilarityResults(predictionId: number) {
 
             setData(prev =>
                 prev.map(s =>
-                    s.claimId === claimId ? updated : s
+                    s.claim.id === claimId ? updated : s
                 )
             );
 
@@ -127,7 +127,7 @@ export function useSimilarityResults(predictionId: number) {
             await deleteSimilarityResult(predictionId, claimId);
 
             setData(prev =>
-                prev.filter(s => s.claimId !== claimId)
+                prev.filter(s => s.claim.id !== claimId)
             );
 
             await loadAvailable(); // sync
