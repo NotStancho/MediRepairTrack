@@ -2,6 +2,7 @@ package ua.nure.medirepairtrack.Service.claim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.ClaimEmployeeId;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Position;
 import ua.nure.medirepairtrack.Repository.claim.ClaimEmployeeRepository;
@@ -30,7 +31,7 @@ public class ClaimAccessService {
         boolean assigned = claimEmployeeRepository.existsById(new ClaimEmployeeId(claimId, employeeId));
 
         if (!assigned) {
-            throw new IllegalStateException("Працівник не призначений до заявки");
+            throw new OperationNotAllowedException("Працівник не призначений до заявки");
         }
     }
 

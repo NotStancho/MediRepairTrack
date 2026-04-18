@@ -10,6 +10,7 @@ import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.ClaimEmployee;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.ClaimEmployeeId;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.RoleInClaim;
+import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.claim.ClaimEmployeeRepository;
 import ua.nure.medirepairtrack.Repository.claim.ClaimHistoryRepository;
 import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
@@ -32,7 +33,7 @@ public class ClaimEmployeeService {
         ClaimEmployeeId id = new ClaimEmployeeId(claim.getId(), employeeId);
 
         if (claimEmployeeRepository.existsByIdClaimIdAndIdEmployeeId(claim.getId(), employeeId)) {
-            throw new IllegalStateException("Працівник вже призначений до заявки");
+            throw new OperationNotAllowedException("Працівник вже призначений до заявки");
         }
 
         ClaimEmployee ce = ClaimEmployee.builder()

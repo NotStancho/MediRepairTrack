@@ -221,7 +221,7 @@ public class ClaimHistoryService {
     // =========================
     private void recalcClaimTotalTime(Integer claimId) {
         Claim claim = claimRepository.findById(claimId)
-                .orElseThrow();
+                .orElseThrow(() -> new NotFoundException("Заявка не знайдена"));
 
         BigDecimal total = claimHistoryRepository.sumWorkLogTime(claimId);
         claim.setTotalTimeSpent(total);
