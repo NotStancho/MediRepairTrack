@@ -6,13 +6,13 @@ import lombok.Data;
 @Data
 public class CreateDefectCategoryDTO {
 
-    @NotBlank
+    @NotBlank(message = "Назва категорії дефекту обов'язкова")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Опис категорії дефекту обов'язковий")
     private String description;
 
-    @NotBlank
+    @NotBlank(message = "Типові симптоми обов'язкові")
     private String typicalSymptoms;
 
 }

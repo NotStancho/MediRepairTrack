@@ -9,23 +9,23 @@ import java.math.BigDecimal;
 @Data
 public class UpdatePartDTO {
 
-    @NotBlank
-    @Size(max = 45)
+    @NotBlank(message = "Назва постачальника обов'язкова")
+    @Size(max = 45, message = "Назва постачальника не може перевищувати 45 символів")
     private String supplierName;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Назва запчастини обов'язкова")
+    @Size(max = 100, message = "Назва запчастини не може перевищувати 100 символів")
     private String partName;
 
-    @NotNull
-    @DecimalMin(value = "0.00", inclusive = false)
+    @NotNull(message = "Ціна запчастини обов'язкова")
+    @DecimalMin(value = "0.00", inclusive = false, message = "Ціна запчастини має бути більшою за 0")
     private BigDecimal price;
 
-    @NotBlank
-    @Size(max = 20)
+    @NotBlank(message = "Одиниця виміру обов'язкова")
+    @Size(max = 20, message = "Одиниця виміру не може перевищувати 20 символів")
     private String unitName;
 
-    @NotNull
+    @NotNull(message = "Тип одиниці виміру обов'язковий")
     private UnitType unitType;
 
     private String description;

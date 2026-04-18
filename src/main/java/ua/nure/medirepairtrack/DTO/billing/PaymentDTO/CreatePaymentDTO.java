@@ -10,14 +10,14 @@ import java.math.BigDecimal;
 @Data
 public class CreatePaymentDTO {
 
-    @NotNull
+    @NotNull(message = "ID рахунку обов'язковий")
     private Integer invoiceId;
 
-    @NotNull
+    @NotNull(message = "Сума оплати обов'язкова")
     @DecimalMin(value = "0.01", message = "Сума оплати має бути більшою за 0")
     private BigDecimal amount;
 
-    @NotNull
+    @NotNull(message = "Спосіб оплати обов'язковий")
     private PaymentMethod method;
 
     private String provider;

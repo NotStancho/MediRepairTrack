@@ -9,22 +9,22 @@ import java.math.BigDecimal;
 @Data
 public class CreatePricingConfigDTO {
 
-    @NotNull
+    @NotNull(message = "Тип ремонту обов'язковий")
     private RepairType repairType;
 
-    @NotNull
-    @DecimalMin("0.00")
+    @NotNull(message = "Погодинна вартість робіт обов'язкова")
+    @DecimalMin(value = "0.00", message = "Погодинна вартість робіт не може бути від'ємною")
     private BigDecimal laborPricePerHour;
 
-    @DecimalMin("0.00")
+    @DecimalMin(value = "0.00", message = "Мінімальна кількість годин робіт не може бути від'ємною")
     private BigDecimal laborMinHours;
 
-    @NotNull
-    @DecimalMin("0.00")
+    @NotNull(message = "Коефіцієнт для запчастин обов'язковий")
+    @DecimalMin(value = "0.00", message = "Коефіцієнт для запчастин не може бути від'ємним")
     private BigDecimal partsCoefficient;
 
-    @NotNull
-    @DecimalMin("0.00")
+    @NotNull(message = "Коефіцієнт для доставки обов'язковий")
+    @DecimalMin(value = "0.00", message = "Коефіцієнт для доставки не може бути від'ємним")
     private BigDecimal deliveryCoefficient;
 
     private String description;

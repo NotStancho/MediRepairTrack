@@ -10,18 +10,18 @@ import java.math.BigDecimal;
 @Data
 public class CreateEngineerDeliveryDTO {
 
-    @NotNull
+    @NotNull(message = "ID заявки обов'язковий")
     private Integer claimId;
 
-    @NotNull
+    @NotNull(message = "Тип доставки обов'язковий")
     private DeliveryType type; // ENGINEER_ON_SITE
 
-    @NotNull
-    @DecimalMin("0.1")
+    @NotNull(message = "Відстань доставки обов'язкова")
+    @DecimalMin(value = "0.1", message = "Відстань доставки має бути більшою за 0")
     private BigDecimal distanceKm;
 
-    @NotNull
-    @DecimalMin("0.0")
+    @NotNull(message = "Вартість доставки за 1 км обов'язкова")
+    @DecimalMin(value = "0.0", message = "Вартість доставки за 1 км не може бути від'ємною")
     private BigDecimal pricePerUnit;
 
     private String description;

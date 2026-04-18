@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class CreateComplexityLevelDTO {
 
-    @NotBlank
+    @NotBlank(message = "Назва рівня складності обов'язкова")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Опис рівня складності обов'язковий")
     private String description;
 
 }

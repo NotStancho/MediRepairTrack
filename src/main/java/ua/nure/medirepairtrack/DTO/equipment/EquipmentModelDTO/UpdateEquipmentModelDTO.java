@@ -8,18 +8,18 @@ import java.time.LocalDate;
 
 @Data
 public class UpdateEquipmentModelDTO {
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Назва моделі обов'язкова")
+    @Size(max = 100, message = "Назва моделі не може перевищувати 100 символів")
     private String modelName;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Виробник обов'язковий")
+    @Size(max = 100, message = "Назва виробника не може перевищувати 100 символів")
     private String manufacturer;
 
-    @NotNull
+    @NotNull(message = "Тип обладнання обов'язковий")
     private EquipmentType type;
 
-    @NotNull
+    @NotNull(message = "Дата випуску обов'язкова")
     private LocalDate releaseDate;
 
     private String description;

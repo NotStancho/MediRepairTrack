@@ -6,6 +6,6 @@ import ua.nure.medirepairtrack.Entity.claim.Claim.Status;
 
 @Data
 public class UpdateClaimStatusDTO {
-    @NotNull
+    @NotNull(message = "Новий статус заявки обов'язковий")
     private Status status;
 }

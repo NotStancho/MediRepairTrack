@@ -10,22 +10,22 @@ import ua.nure.medirepairtrack.Entity.claim.Claim.Status;
 @Data
 public class CreateClaimByEmployeeDTO {
 
-    @NotNull
+    @NotNull(message = "ID працівника обов'язковий")
     private Integer employeeId;
 
-    @NotNull
+    @NotNull(message = "ID клієнта обов'язковий")
     private Integer clientId;
 
-    @NotNull
+    @NotNull(message = "Тип ремонту обов'язковий")
     private RepairType repairType;
 
-    @NotNull
+    @NotNull(message = "Статус заявки обов'язковий")
     private Status status;
 
-    @NotBlank
+    @NotBlank(message = "Опис несправності обов'язковий")
     private String defectDescription;
 
     @Valid
-    @NotNull
+    @NotNull(message = "Дані обладнання обов'язкові")
     private CreateEquipmentDTO equipment;
 }

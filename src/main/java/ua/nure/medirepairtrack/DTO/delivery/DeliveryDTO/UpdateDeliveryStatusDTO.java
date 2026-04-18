@@ -7,7 +7,7 @@ import ua.nure.medirepairtrack.Entity.delivery.Delivery.DeliveryStatus;
 @Data
 public class UpdateDeliveryStatusDTO {
 
-    @NotNull
+    @NotNull(message = "Новий статус доставки обов'язковий")
     private DeliveryStatus status;
 }
 

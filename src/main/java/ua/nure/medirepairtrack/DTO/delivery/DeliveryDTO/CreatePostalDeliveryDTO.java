@@ -11,17 +11,17 @@ import java.math.BigDecimal;
 @Data
 public class CreatePostalDeliveryDTO {
 
-    @NotNull
+    @NotNull(message = "ID заявки обов'язковий")
     private Integer claimId;
 
-    @NotNull
+    @NotNull(message = "Тип доставки обов'язковий")
     private DeliveryType type;
 
-    @NotNull
+    @NotNull(message = "Служба доставки обов'язкова")
     private DeliveryProvider provider;
 
-    @NotNull
-    @DecimalMin("0.0")
+    @NotNull(message = "Вартість доставки обов'язкова")
+    @DecimalMin(value = "0.0", message = "Вартість доставки не може бути від'ємною")
     private BigDecimal price;
 
     private String trackingCode;

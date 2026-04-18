@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 @Data
 public class UpdatePostalDeliveryDTO {
 
-    @NotNull
-    @DecimalMin("0.0")
+    @NotNull(message = "Вартість доставки обов'язкова")
+    @DecimalMin(value = "0.0", message = "Вартість доставки не може бути від'ємною")
     private BigDecimal price;
 
     private String trackingCode;

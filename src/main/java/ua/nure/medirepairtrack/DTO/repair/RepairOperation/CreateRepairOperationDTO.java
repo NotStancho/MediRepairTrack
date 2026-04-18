@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 public class CreateRepairOperationDTO {
 
-    @NotNull
+    @NotNull(message = "ID рівня складності обов'язковий")
     private Integer complexityLevelId;
 
-    @NotBlank
+    @NotBlank(message = "Назва ремонтної операції обов'язкова")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Опис ремонтної операції обов'язковий")
     private String description;
 
 }

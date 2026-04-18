@@ -7,18 +7,18 @@ import java.math.BigDecimal;
 
 @Data
 public class CreateInvoiceOtherItemDTO {
-    @NotBlank
+    @NotBlank(message = "Опис додаткової позиції рахунку обов'язковий")
     private String description;
 
-    @NotNull
-    @DecimalMin("0.01")
+    @NotNull(message = "Кількість обов'язкова")
+    @DecimalMin(value = "0.01", message = "Кількість має бути більшою за 0")
     private BigDecimal quantity;
 
-    @NotBlank
+    @NotBlank(message = "Одиниця виміру обов'язкова")
     private String unitName;
 
-    @NotNull
-    @DecimalMin("0.00")
+    @NotNull(message = "Ціна за одиницю обов'язкова")
+    @DecimalMin(value = "0.00", message = "Ціна за одиницю не може бути від'ємною")
     private BigDecimal pricePerUnit;
 }
 

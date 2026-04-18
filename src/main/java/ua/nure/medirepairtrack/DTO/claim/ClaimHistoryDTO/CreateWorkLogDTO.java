@@ -7,16 +7,16 @@ import java.math.BigDecimal;
 
 @Data
 public class CreateWorkLogDTO {
-    @NotNull
+    @NotNull(message = "ID заявки обов'язковий")
     private Integer claimId;
 
-    @NotNull
+    @NotNull(message = "ID працівника обов'язковий")
     private Integer employeeId;
 
-    @NotNull
-    @DecimalMin("0.1")
+    @NotNull(message = "Кількість годин обов'язкова")
+    @DecimalMin(value = "0.1", message = "Кількість годин має бути більшою за 0")
     private BigDecimal hours;
 
-    @NotBlank
+    @NotBlank(message = "Опис виконаних робіт обов'язковий")
     private String description;
 }

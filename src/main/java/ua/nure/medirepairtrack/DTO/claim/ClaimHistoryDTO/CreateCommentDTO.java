@@ -7,12 +7,12 @@ import lombok.Data;
 @Data
 public class CreateCommentDTO {
 
-    @NotNull
+    @NotNull(message = "ID заявки обов'язковий")
     private Integer claimId;
 
-    @NotNull
+    @NotNull(message = "ID працівника обов'язковий")
     private Integer employeeId;
 
-    @NotBlank
+    @NotBlank(message = "Текст коментаря обов'язковий")
     private String comment;
 }

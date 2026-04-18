@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class UpdateInvoiceDueDateDTO {
-    @NotNull
+    @NotNull(message = "Нова дата оплати рахунку обов'язкова")
     private LocalDateTime dueAt;
 }
 

@@ -13,31 +13,31 @@ import java.time.LocalDate;
 @Data
 public class UpdateClientContractFullDTO {
 
-    @NotBlank
+    @NotBlank(message = "Назва договору обов'язкова")
     private String contractName;
 
-    @NotNull
+    @NotNull(message = "Тип договору обов'язковий")
     private ContractType contractType;
 
-    @NotNull
+    @NotNull(message = "Статус договору обов'язковий")
     private ContractStatus isActive;
 
-    @NotNull
+    @NotNull(message = "Дата початку дії договору обов'язкова")
     private LocalDate validFrom;
 
-    @NotNull
+    @NotNull(message = "Дата завершення дії договору обов'язкова")
     private LocalDate validTo;
 
-    @NotNull
-    @DecimalMin("0.0")
+    @NotNull(message = "Знижка на роботи обов'язкова")
+    @DecimalMin(value = "0.0", message = "Знижка на роботи не може бути меншою за 0%")
     private BigDecimal discountLabor;
 
-    @NotNull
-    @DecimalMin("0.0")
+    @NotNull(message = "Знижка на запчастини обов'язкова")
+    @DecimalMin(value = "0.0", message = "Знижка на запчастини не може бути меншою за 0%")
     private BigDecimal discountParts;
 
-    @NotNull
-    @DecimalMin("0.0")
+    @NotNull(message = "Знижка на доставку обов'язкова")
+    @DecimalMin(value = "0.0", message = "Знижка на доставку не може бути меншою за 0%")
     private BigDecimal discountDelivery;
 
     private String notes;
