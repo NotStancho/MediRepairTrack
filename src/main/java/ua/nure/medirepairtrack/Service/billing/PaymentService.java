@@ -39,21 +39,17 @@ public class PaymentService {
         }
 
         if (dto.getAmount() == null || dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new OperationNotAllowedException("Сума оплати має бути більшою за 0");
+            throw new BadRequestException("Сума оплати має бути більшою за 0");
         }
 
         if (dto.getMethod() != PaymentMethod.CASH) {
 
             if (dto.getExternalRef() == null || dto.getExternalRef().isBlank()) {
-                throw new OperationNotAllowedException(
-                        "Для безготівкової оплати необхідно вказати reference платежу"
-                );
+                throw new BadRequestException("Для безготівкової оплати необхідно вказати reference платежу");
             }
 
             if (dto.getProvider() == null || dto.getProvider().isBlank()) {
-                throw new OperationNotAllowedException(
-                        "Для безготівкової оплати необхідно вказати провайдера"
-                );
+                throw new BadRequestException("Для безготівкової оплати необхідно вказати провайдера");
             }
         }
 
@@ -76,7 +72,13 @@ public class PaymentService {
         Payment payment = getPayment(paymentId);
 
         if (!paymentStatusMachine.canTransition(payment.getStatus(), PaymentStatus.COMPLETED)) {
-            throw new OperationNotAllowedException("Неможливо завершити оплату");
+            throw new InvalidStatusTransitionException(
+                    StatusMessageUtil.invalidTransition(
+                            "оплати",
+                            payment.getStatus(),
+                            PaymentStatus.COMPLETED
+                    )
+            );
         }
 
         payment.setStatus(PaymentStatus.COMPLETED);

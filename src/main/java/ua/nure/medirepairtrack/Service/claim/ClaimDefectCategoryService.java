@@ -10,6 +10,7 @@ import ua.nure.medirepairtrack.Entity.diagnosis.DefectCategory.DefectCategory;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
 import ua.nure.medirepairtrack.Entity.claim.ClaimDefectCategory.ClaimDefectCategory;
 import ua.nure.medirepairtrack.Entity.claim.ClaimDefectCategory.ClaimDefectCategoryId;
+import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Repository.claim.ClaimDefectCategoryRepository;
 import ua.nure.medirepairtrack.Service.diagnosis.DefectCategoryService;
@@ -30,13 +31,18 @@ public class ClaimDefectCategoryService {
 
     @Transactional
     public ClaimDefectCategoryResponseDTO create(CreateClaimDefectCategoryDTO dto) {
+        ClaimDefectCategoryId id = new ClaimDefectCategoryId(dto.getClaimId(), dto.getDefectCategoryId());
+
+        if (repository.existsById(id)) {
+            throw new BadRequestException("Ця категорія дефекту вже додана до заявки");
+        }
 
         Claim claim = claimService.getClaim(dto.getClaimId());
         DefectCategory defect = defectCategoryService.getEntity(dto.getDefectCategoryId());
         Employee employee = employeeService.getEmployeeEntity(dto.getEmployeeId());
 
         ClaimDefectCategory entity = ClaimDefectCategory.builder()
-                .id(new ClaimDefectCategoryId(dto.getClaimId(), dto.getDefectCategoryId()))
+                .id(id)
                 .claim(claim)
                 .defectCategory(defect)
                 .employee(employee)

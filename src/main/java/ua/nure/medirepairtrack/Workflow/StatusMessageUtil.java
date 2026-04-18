@@ -19,5 +19,18 @@ public class StatusMessageUtil {
                         .toList()
         );
     }
+
+    public static <E extends Enum<E>> String invalidTransition(
+            String entity,
+            E from,
+            E to
+    ) {
+        return String.format(
+                "Недопустимий перехід статусу %s: %s → %s",
+                entity,
+                from,
+                to
+        );
+    }
 }
 

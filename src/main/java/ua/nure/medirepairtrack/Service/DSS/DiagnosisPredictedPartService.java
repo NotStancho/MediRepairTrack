@@ -13,8 +13,8 @@ import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedPart.DiagnosisPredic
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.repair.Part.Part;
+import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
-import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictedPartRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.repair.PartService;
@@ -65,7 +65,7 @@ public class DiagnosisPredictedPartService {
         );
 
         if (repository.existsById(id)) {
-            throw new OperationNotAllowedException("Ця запчастина вже додана");
+            throw new BadRequestException("Ця запчастина вже додана");
         }
 
         Integer maxRank = repository

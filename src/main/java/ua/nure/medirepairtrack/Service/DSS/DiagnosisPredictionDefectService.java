@@ -12,8 +12,8 @@ import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPredictio
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictionDefect.*;
 import ua.nure.medirepairtrack.Entity.diagnosis.DefectCategory.DefectCategory;
 import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
+import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
-import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionDefectRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.claim.ClaimDefectCategoryService;
@@ -65,7 +65,7 @@ public class DiagnosisPredictionDefectService {
         );
 
         if (repository.existsById(id)) {
-            throw new OperationNotAllowedException("Ця категорія дефекту вже додана");
+            throw new BadRequestException("Ця категорія дефекту вже додана");
         }
 
         Integer maxRank = repository.findMaxRankByPredictionId(dto.getPredictionId());

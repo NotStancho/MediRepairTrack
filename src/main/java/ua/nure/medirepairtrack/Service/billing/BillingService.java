@@ -12,7 +12,7 @@ import ua.nure.medirepairtrack.DTO.billing.BillingDTO.BillingResultDTO;
 import ua.nure.medirepairtrack.DTO.billing.BillingDTO.BillingSectionResultDTO;
 import ua.nure.medirepairtrack.DTO.billing.PricingConfigDTO.PricingConfigResponseDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.RepairType;
-import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
+import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Service.delivery.DeliveryService;
 import ua.nure.medirepairtrack.Service.repair.PartService;
 import ua.nure.medirepairtrack.Service.claim.ClaimHistoryService;
@@ -275,7 +275,7 @@ public class BillingService {
             return d.getDistanceKm().multiply(d.getPricePerUnit());
         }
 
-        throw new OperationNotAllowedException(
+        throw new BadRequestException(
                 "Некоректні дані доставки: необхідно price або distanceKm + pricePerUnit. deliveryId=" + d.getId()
         );
     }

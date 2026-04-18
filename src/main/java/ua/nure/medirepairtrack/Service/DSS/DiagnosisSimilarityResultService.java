@@ -12,8 +12,8 @@ import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPredictio
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarity.DiagnosisSimilarityResult;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisSimilarity.DiagnosisSimilarityResultId;
 import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
+import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
-import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisSimilarityResultRepository;
 import ua.nure.medirepairtrack.Service.claim.ClaimService;
@@ -53,11 +53,11 @@ public class DiagnosisSimilarityResultService {
         Claim claim = claimService.getClaim(dto.getSimilarClaimId());
 
         if (diagnosis.getClaim().getId().equals(dto.getSimilarClaimId())) {
-            throw new OperationNotAllowedException("Не можна додати поточну заявку як схожу");
+            throw new BadRequestException("Не можна додати поточну заявку як схожу");
         }
 
         if (diagnosisSimilarityResultRepository.existsById(new DiagnosisSimilarityResultId(dto.getPredictionId(), dto.getSimilarClaimId()))) {
-            throw new OperationNotAllowedException("Ця схожа заявка вже додана");
+            throw new BadRequestException("Ця схожа заявка вже додана");
         }
 
         Integer maxRank = diagnosisSimilarityResultRepository

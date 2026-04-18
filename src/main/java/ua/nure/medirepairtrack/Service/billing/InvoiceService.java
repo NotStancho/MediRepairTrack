@@ -47,7 +47,7 @@ public class InvoiceService {
         Claim claim = claimService.getClaim(claimId);
 
         if (invoiceRepository.findByClaimId(claimId).isPresent()) {
-            throw new OperationNotAllowedException("Рахунок для цієї заявки вже існує");
+            throw new BadRequestException("Рахунок для цієї заявки вже існує");
         }
 
         if (!claimStatusMachine.allowsInvoiceCreation(claim.getStatus())) {
@@ -120,26 +120,26 @@ public class InvoiceService {
 
         // 2. null вже перевірений @Valid, але нехай буде
         if (dueAt == null) {
-            throw new OperationNotAllowedException("Термін оплати не заданий");
+            throw new BadRequestException("Термін оплати не заданий");
         }
 
         LocalDateTime now = LocalDateTime.now();
 
         // 3. Заборона минулих дат
         if (dueAt.isBefore(now)) {
-            throw new OperationNotAllowedException("Термін оплати не може бути в минулому");
+            throw new BadRequestException("Термін оплати не може бути в минулому");
         }
 
         // 4. Якщо вже був dueAt — тільки продовження
         if (invoice.getDueAt() != null) {
 
             if (!dueAt.isAfter(invoice.getDueAt())) {
-                throw new OperationNotAllowedException("Новий термін оплати має бути пізніше поточного");
+                throw new BadRequestException("Новий термін оплати має бути пізніше поточного");
             }
 
             // 5. (Опціонально) обмеження на продовження
             if (dueAt.isAfter(invoice.getDueAt().plusDays(30))) {
-                throw new OperationNotAllowedException("Термін оплати можна продовжити не більше ніж на 30 днів");
+                throw new BadRequestException("Термін оплати можна продовжити не більше ніж на 30 днів");
             }
         }
 
@@ -265,7 +265,7 @@ public class InvoiceService {
                 );
 
         if (!detail.getInvoice().getId().equals(invoiceId)) {
-            throw new OperationNotAllowedException("Позиція не належить цьому рахунку");
+            throw new BadRequestException("Позиція не належить цьому рахунку");
         }
 
         detail.setDescription(dto.getDescription());
@@ -299,7 +299,7 @@ public class InvoiceService {
                 );
 
         if (!detail.getInvoice().getId().equals(invoiceId)) {
-            throw new OperationNotAllowedException("Позиція не належить цьому рахунку");
+            throw new BadRequestException("Позиція не належить цьому рахунку");
         }
 
         invoiceDetailRepository.delete(detail);
@@ -324,16 +324,14 @@ public class InvoiceService {
 
         // 2. Захист від некоректної суми
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new OperationNotAllowedException(
-                    "Сума оплати має бути більшою за 0"
-            );
+            throw new BadRequestException("Сума оплати має бути більшою за 0");
         }
 
         // 3. Заборона переплати
         BigDecimal remaining = invoice.getTotalAmount().subtract(invoice.getTotalPaid());
 
         if (amount.compareTo(remaining) > 0) {
-            throw new OperationNotAllowedException("Сума оплати перевищує залишок до сплати");
+            throw new BadRequestException("Сума оплати перевищує залишок до сплати");
         }
 
         // 4. Застосування оплати
