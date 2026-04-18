@@ -8,8 +8,7 @@ import ua.nure.medirepairtrack.Event.Delivery.DeliveryCreatedEvent;
 import ua.nure.medirepairtrack.Event.Delivery.DeliveryDeletedEvent;
 import ua.nure.medirepairtrack.Event.Delivery.DeliveryStatusChangedEvent;
 import ua.nure.medirepairtrack.Event.Delivery.DeliveryUpdatedEvent;
-import ua.nure.medirepairtrack.Event.Delivery.*;
-import ua.nure.medirepairtrack.Service.InvoiceService;
+import ua.nure.medirepairtrack.Service.billing.InvoiceService;
 import ua.nure.medirepairtrack.Workflow.DeliveryStatusMachine;
 
 @Slf4j

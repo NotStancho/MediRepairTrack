@@ -3,10 +3,10 @@ package ua.nure.medirepairtrack.Controller.DSS;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.ClaimDTO.ClaimShortDTO;
-import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.CreateSimilarityResultDTO;
-import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.SimilarityResultResponseDTO;
-import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarity.UpdateSimilarityResultDTO;
+import ua.nure.medirepairtrack.DTO.claim.ClaimDTO.ClaimShortDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarityDTO.CreateSimilarityResultDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarityDTO.SimilarityResultResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarityDTO.UpdateSimilarityResultDTO;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisSimilarityResultService;
 
 import java.util.List;

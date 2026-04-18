@@ -2,15 +2,18 @@ package ua.nure.medirepairtrack.Service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ua.nure.medirepairtrack.DTO.DiagnosisDTO.CreateManualDiagnosisDTO;
-import ua.nure.medirepairtrack.DTO.DiagnosisDTO.UpdateDiagnosisDTO;
-import ua.nure.medirepairtrack.Entity.Claim.Claim;
-import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
-import ua.nure.medirepairtrack.Entity.Diagnosis.DiagnosisStatus;
-import ua.nure.medirepairtrack.Entity.Diagnosis.DiagnosisType;
-import ua.nure.medirepairtrack.Entity.Employee.Employee;
+import ua.nure.medirepairtrack.DTO.diagnosis.DiagnosisDTO.CreateManualDiagnosisDTO;
+import ua.nure.medirepairtrack.DTO.diagnosis.DiagnosisDTO.UpdateDiagnosisDTO;
+import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
+import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
+import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.DiagnosisStatus;
+import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.DiagnosisType;
+import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
-import ua.nure.medirepairtrack.Repository.DiagnosisRepository;
+import ua.nure.medirepairtrack.Repository.diagnosis.DiagnosisRepository;
+import ua.nure.medirepairtrack.Service.claim.ClaimService;
+import ua.nure.medirepairtrack.Service.diagnosis.DiagnosisService;
+import ua.nure.medirepairtrack.Service.employee.EmployeeService;
 import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
 
 import java.math.BigDecimal;

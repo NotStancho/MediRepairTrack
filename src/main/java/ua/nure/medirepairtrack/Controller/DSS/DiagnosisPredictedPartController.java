@@ -3,10 +3,10 @@ package ua.nure.medirepairtrack.Controller.DSS;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.DSS.PredictedPart.CreatePredictedPartDTO;
-import ua.nure.medirepairtrack.DTO.DSS.PredictedPart.PredictedPartResponseDTO;
-import ua.nure.medirepairtrack.DTO.DSS.PredictedPart.UpdatePredictedPartDTO;
-import ua.nure.medirepairtrack.DTO.PartDTO.PartShortDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedPartDTO.CreatePredictedPartDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedPartDTO.PredictedPartResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedPartDTO.UpdatePredictedPartDTO;
+import ua.nure.medirepairtrack.DTO.repair.PartDTO.PartShortDTO;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisPredictedPartService;
 
 import java.util.List;

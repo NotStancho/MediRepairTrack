@@ -1,7 +1,7 @@
 package ua.nure.medirepairtrack.Workflow;
 
 import org.springframework.stereotype.Component;
-import ua.nure.medirepairtrack.Entity.Delivery.DeliveryStatus;
+import ua.nure.medirepairtrack.Entity.delivery.Delivery.DeliveryStatus;
 
 import java.util.Map;
 import java.util.Set;

@@ -3,7 +3,7 @@ package ua.nure.medirepairtrack.Service.DSS;
 import org.springframework.stereotype.Component;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.PredictionSource;
-import ua.nure.medirepairtrack.Entity.Diagnosis.DiagnosisType;
+import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.DiagnosisType;
 
 @Component
 public class PredictionStateService {

@@ -3,9 +3,9 @@ package ua.nure.medirepairtrack.Service.DSS;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ua.nure.medirepairtrack.Entity.Claim.Claim;
+import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
-import ua.nure.medirepairtrack.Repository.ClaimEmbeddingRepository;
+import ua.nure.medirepairtrack.Repository.DSS.ClaimEmbeddingRepository;
 import ua.nure.medirepairtrack.util.EmbeddingConverter;
 
 import java.util.Comparator;

@@ -1,7 +1,7 @@
 package ua.nure.medirepairtrack.Workflow;
 
 import org.springframework.stereotype.Component;
-import ua.nure.medirepairtrack.Entity.Payment.PaymentStatus;
+import ua.nure.medirepairtrack.Entity.billing.Payment.PaymentStatus;
 
 import java.util.Map;
 import java.util.Set;

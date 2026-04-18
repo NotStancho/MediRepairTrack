@@ -2,7 +2,7 @@ package ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
+import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
 
 import java.math.BigDecimal;

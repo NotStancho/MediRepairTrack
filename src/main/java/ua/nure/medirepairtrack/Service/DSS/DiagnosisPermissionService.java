@@ -2,7 +2,7 @@ package ua.nure.medirepairtrack.Service.DSS;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
+import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
 import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;

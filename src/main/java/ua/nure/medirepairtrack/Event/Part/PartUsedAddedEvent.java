@@ -1,6 +1,6 @@
 package ua.nure.medirepairtrack.Event.Part;
 
-import ua.nure.medirepairtrack.Entity.Part.UnitType;
+import ua.nure.medirepairtrack.Entity.repair.Part.UnitType;
 
 import java.math.BigDecimal;
 

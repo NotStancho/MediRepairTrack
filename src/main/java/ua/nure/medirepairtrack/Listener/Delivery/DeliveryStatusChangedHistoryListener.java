@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import ua.nure.medirepairtrack.Entity.ClaimHistory.ActionType;
+import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ActionType;
 import ua.nure.medirepairtrack.Event.Delivery.DeliveryStatusChangedEvent;
-import ua.nure.medirepairtrack.Service.ClaimHistoryService;
+import ua.nure.medirepairtrack.Service.claim.ClaimHistoryService;
 
 @Slf4j
 @Component

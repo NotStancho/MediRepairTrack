@@ -6,8 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import ua.nure.medirepairtrack.Event.Part.PartUsageUpdatedEvent;
 import ua.nure.medirepairtrack.Event.Part.PartUsedAddedEvent;
-import ua.nure.medirepairtrack.Event.Part.*;
-import ua.nure.medirepairtrack.Service.InvoiceService;
+import ua.nure.medirepairtrack.Service.billing.InvoiceService;
 
 @Slf4j
 @Component

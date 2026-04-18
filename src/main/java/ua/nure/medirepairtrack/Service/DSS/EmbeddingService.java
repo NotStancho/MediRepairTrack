@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.Client.GeminiEmbedded.GeminiEmbeddingClient;
-import ua.nure.medirepairtrack.Entity.Claim.Claim;
-import ua.nure.medirepairtrack.Entity.ClaimEmbedding.ClaimEmbedding;
-import ua.nure.medirepairtrack.Repository.ClaimEmbeddingRepository;
+import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
+import ua.nure.medirepairtrack.Entity.DSS.ClaimEmbedding.ClaimEmbedding;
+import ua.nure.medirepairtrack.Repository.DSS.ClaimEmbeddingRepository;
 import ua.nure.medirepairtrack.util.EmbeddingConverter;
 
 import java.time.LocalDateTime;

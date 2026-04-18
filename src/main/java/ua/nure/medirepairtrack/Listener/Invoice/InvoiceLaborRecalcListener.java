@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 import ua.nure.medirepairtrack.Event.ClaimHistory.WorkLogAddedEvent;
 import ua.nure.medirepairtrack.Event.ClaimHistory.WorkLogDeletedEvent;
 import ua.nure.medirepairtrack.Event.ClaimHistory.WorkLogUpdatedEvent;
-import ua.nure.medirepairtrack.Event.ClaimHistory.*;
-import ua.nure.medirepairtrack.Service.InvoiceService;
+import ua.nure.medirepairtrack.Service.billing.InvoiceService;
 
 @Slf4j
 @Component

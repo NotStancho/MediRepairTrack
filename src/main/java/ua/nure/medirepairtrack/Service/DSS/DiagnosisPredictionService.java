@@ -7,13 +7,13 @@ import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateManualPredic
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.DiagnosisPredictionResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.UpdatePredictionDTO;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
-import ua.nure.medirepairtrack.Entity.Diagnosis.Diagnosis;
+import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.PredictionSource;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
-import ua.nure.medirepairtrack.Service.DiagnosisService;
+import ua.nure.medirepairtrack.Service.diagnosis.DiagnosisService;
 import ua.nure.medirepairtrack.Workflow.DiagnosisStatusMachine;
 import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 

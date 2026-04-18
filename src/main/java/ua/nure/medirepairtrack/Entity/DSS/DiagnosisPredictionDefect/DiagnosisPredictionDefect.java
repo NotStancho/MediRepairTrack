@@ -3,7 +3,7 @@ package ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictionDefect;
 import jakarta.persistence.*;
 import lombok.*;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
-import ua.nure.medirepairtrack.Entity.DefectCategory.DefectCategory;
+import ua.nure.medirepairtrack.Entity.diagnosis.DefectCategory.DefectCategory;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

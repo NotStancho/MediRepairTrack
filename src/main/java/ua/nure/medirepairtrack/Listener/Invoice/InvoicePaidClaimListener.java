@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import ua.nure.medirepairtrack.Event.Invoice.InvoicePaidEvent;
-import ua.nure.medirepairtrack.Service.ClaimService;
+import ua.nure.medirepairtrack.Service.claim.ClaimService;
 
 @Component
 @RequiredArgsConstructor
