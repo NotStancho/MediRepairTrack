@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 public class AddStockDTO {
 
-    @NotNull
+    @NotNull(message = "Кількість для поповнення складу обов'язкова")
     @DecimalMin(value = "0.001", inclusive = true)
     private BigDecimal quantity;
 }

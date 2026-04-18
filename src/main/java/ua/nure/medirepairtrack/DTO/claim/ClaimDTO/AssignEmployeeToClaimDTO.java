@@ -7,12 +7,12 @@ import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.RoleInClaim;
 @Data
 public class AssignEmployeeToClaimDTO {
 
-    @NotNull
+    @NotNull(message = "ID менеджера заявки обов'язковий")
     private Integer managerId;
 
-    @NotNull
+    @NotNull(message = "ID працівника обов'язковий")
     private Integer employeeId;
 
-    @NotNull
+    @NotNull(message = "Роль працівника в заявці обов'язкова")
     private RoleInClaim role;
 }

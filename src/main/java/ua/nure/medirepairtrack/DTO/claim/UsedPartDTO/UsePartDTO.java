@@ -8,10 +8,10 @@ import java.math.BigDecimal;
 @Data
 public class UsePartDTO {
 
-    @NotNull
+    @NotNull(message = "ID запчастини обов'язковий")
     private Integer partId;
 
-    @NotNull
+    @NotNull(message = "Кількість запчастини обов'язкова")
     @DecimalMin(value = "0.001", inclusive = true)
     private BigDecimal quantity;
 }
