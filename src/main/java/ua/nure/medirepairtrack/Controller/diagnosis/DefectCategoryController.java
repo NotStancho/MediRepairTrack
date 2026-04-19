@@ -27,8 +27,18 @@ public class DefectCategoryController {
         return service.update(id, dto);
     }
 
+    @GetMapping("/{id}")
+    public DefectCategoryResponseDTO getById(@PathVariable Integer id) {
+        return service.getById(id);
+    }
+
     @GetMapping
     public List<DefectCategoryResponseDTO> getAll() {
         return service.getAll();
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        service.delete(id);
     }
 }

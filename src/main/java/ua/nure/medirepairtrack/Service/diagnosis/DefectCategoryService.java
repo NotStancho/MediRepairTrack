@@ -62,6 +62,10 @@ public class DefectCategoryService {
                 .toList();
     }
 
+    public DefectCategoryResponseDTO getById(Integer id) {
+        return map(getEntity(id));
+    }
+
     public List<DefectCategoryShortResponseDTO> getAllDefectCategoryShort() {
         return repository.findAll()
                 .stream()
@@ -72,6 +76,12 @@ public class DefectCategoryService {
     public DefectCategory getEntity(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Категорію дефекту не знайдено"));
+    }
+
+    @Transactional
+    public void delete(Integer id) {
+        DefectCategory entity = getEntity(id);
+        repository.delete(entity);
     }
 
     private DefectCategoryResponseDTO map(DefectCategory e) {
