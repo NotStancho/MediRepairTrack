@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import type { IconType } from 'react-icons';
-import { FiFileText, FiUsers, FiTool, FiTruck, FiDollarSign, FiCreditCard, FiPackage, FiClipboard, FiUser, FiMenu, FiBriefcase  } from 'react-icons/fi';
+import { FiFileText, FiUsers, FiTool, FiTruck, FiDollarSign, FiCreditCard, FiPackage, FiClipboard, FiUser, FiMenu, FiBriefcase, FiBookOpen } from 'react-icons/fi';
 
 type MenuItem = {
     to: string;
@@ -42,6 +42,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/employee/employees', label: 'Всі працівники', icon: FiUsers },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/employee/parts', label: 'Запчастини', icon: FiPackage },
+            { to: '/employee/directories', label: 'Довідники', icon: FiBookOpen },
             { to: '/employee/deliveries', label: 'Мої доставки', icon: FiTruck },
             { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
@@ -56,6 +57,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/employees', label: 'Всі працівники', icon: FiBriefcase },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/parts', label: 'Запчастини', icon: FiPackage },
+            { to: '/directories', label: 'Довідники', icon: FiBookOpen },
             { to: '/deliveries', label: 'Всі доставки', icon: FiTruck },
             { to: '/invoices', label: 'Всі рахунки', icon: FiDollarSign },
             { to: '/payments', label: 'Всі оплати', icon: FiCreditCard },
