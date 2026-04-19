@@ -18,5 +18,20 @@ public interface ClientContractRepository extends JpaRepository<ClientContract, 
             LocalDate from,
             LocalDate to
     );
+
+    boolean existsByClientIdAndIsActiveAndValidFromLessThanEqualAndValidToGreaterThanEqual(
+            Integer clientId,
+            ContractStatus status,
+            LocalDate newValidTo,
+            LocalDate newValidFrom
+    );
+
+    boolean existsByClientIdAndIsActiveAndIdNotAndValidFromLessThanEqualAndValidToGreaterThanEqual(
+            Integer clientId,
+            ContractStatus status,
+            Integer id,
+            LocalDate validTo,
+            LocalDate validFrom
+    );
 }
 

@@ -31,6 +31,20 @@ public class ClientContractService {
         Client client = clientRepository.findById(dto.getClientId())
                 .orElseThrow(() -> new NotFoundException("Клієнт не знайдений"));
 
+        if (dto.getValidFrom().isAfter(dto.getValidTo())) {
+            throw new BadRequestException("Дата початку не може бути пізніше дати завершення");
+        }
+
+        if (contractRepository.existsByClientIdAndIsActiveAndValidFromLessThanEqualAndValidToGreaterThanEqual(
+                dto.getClientId(),
+                ContractStatus.ACTIVE,
+                dto.getValidTo(),
+                dto.getValidFrom()
+        )) {
+            throw new OperationNotAllowedException("У клієнта вже існує активний контракт, що перетинається з вказаним періодом");
+        }
+
+
         ClientContract contract = ClientContract.builder()
                 .client(client)
                 .contractName(dto.getContractName())
@@ -73,6 +87,23 @@ public class ClientContractService {
         ClientContract c = contractRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Контракт не знайдений"));
 
+        if (dto.getValidFrom().isAfter(dto.getValidTo())) {
+            throw new BadRequestException("Дата початку не може бути пізніше дати завершення");
+        }
+
+        boolean conflict = contractRepository
+                .existsByClientIdAndIsActiveAndIdNotAndValidFromLessThanEqualAndValidToGreaterThanEqual(
+                        c.getClient().getId(),
+                        ContractStatus.ACTIVE,
+                        c.getId(),
+                        dto.getValidTo(),
+                        dto.getValidFrom()
+                );
+
+        if (conflict && dto.getIsActive() == ContractStatus.ACTIVE) {
+            throw new OperationNotAllowedException("У клієнта вже існує активний контракт, що перетинається з вказаним періодом");
+        }
+
         c.setContractName(dto.getContractName());
         c.setContractType(dto.getContractType());
         c.setIsActive(dto.getIsActive());
@@ -86,7 +117,7 @@ public class ClientContractService {
         return map(contractRepository.save(c));
     }
 
-    // --- 🔥 API ДЛЯ BillingService ---
+    // --- API ДЛЯ BillingService ---
     public ContractDiscountDTO getActiveDiscounts(Integer clientId) {
 
         LocalDate today = LocalDate.now();
