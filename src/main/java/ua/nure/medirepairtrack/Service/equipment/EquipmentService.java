@@ -101,8 +101,9 @@ public class EquipmentService {
 
         try {
             equipmentRepository.save(eq);
+            equipmentRepository.flush();
         } catch (DataIntegrityViolationException ex) {
-            throw new BadRequestException("Конфлікт унікальності: serial_number вже існує в межах цієї моделі");
+            throw new BadRequestException("Конфлікт унікальності: серійний номер вже існує в межах цієї моделі");
         }
 
         return map(eq);
