@@ -8,6 +8,7 @@ import ClaimDetailsPage from "../pages/claims/ClaimDetailsPage";
 import ClaimCreatePage from "../pages/claims/ClaimCreatePage";
 import ClaimCreateEmployeePage from "../pages/claims/ClaimCreateEmployeePage";
 
+import ClientManagementPage from "../pages/clients/ClientManagementPage";
 import EquipmentPage from "../pages/equipment/EquipmentPage";
 import PartPage from "../pages/part/PartPage";
 import DirectoriesPage from "../pages/directories/DirectoriesPage";
@@ -42,9 +43,10 @@ export default function AppRouter() {
 
                 {/* SHARED: EMPLOYEE / ADMIN */}
                 <Route path="/employee/claims/new" element={<ClaimCreateEmployeePage />} />
-                <Route path="/directories" element={<DirectoriesPage />} />
+                <Route path="/clients" element={<ClientManagementPage />} />
                 <Route path="/equipment" element={<EquipmentPage />} />
                 <Route path="/parts" element={<PartPage />} />
+                <Route path="/directories" element={<DirectoriesPage />} />
 
                 {/* EMPLOYEE (ENGINEER) */}
                 <Route path="/employee/claims" element={<ClaimListPage />} />
@@ -56,9 +58,7 @@ export default function AppRouter() {
                 {/* ADMIN / MANAGER */}
                 <Route path="/claims" element={<ClaimListPage />} />
                 <Route path="/claims/:id" element={<ClaimDetailsPage />} />
-
-                <Route path="/clients" element={<ComingSoonPage title="Всі клієнти" />} />
-                <Route path="/contracts" element={<ComingSoonPage title="Всі контракти" />} />
+                <Route path="/contracts" element={<ClientManagementPage />} />
                 <Route path="/employees" element={<ComingSoonPage title="Всі працівники" />} />
                 <Route path="/deliveries" element={<ComingSoonPage title="Всі доставки" />} />
                 <Route path="/invoices" element={<ComingSoonPage title="Всі рахунки" />} />

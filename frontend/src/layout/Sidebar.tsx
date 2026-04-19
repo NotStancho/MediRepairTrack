@@ -52,8 +52,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
     if (user.role === 'ADMIN' || (user.role === 'EMPLOYEE' && user.position === 'MANAGER')) {
         menu.push(
             { to: '/claims', label: 'Всі заявки', icon: FiClipboard },
-            { to: '/clients', label: 'Всі клієнти', icon: FiUsers },
-            { to: '/contracts', label: 'Всі контракти', icon: FiFileText },
+            { to: '/clients', label: 'Клієнти', icon: FiUsers },
             { to: '/employees', label: 'Всі працівники', icon: FiBriefcase },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/parts', label: 'Запчастини', icon: FiPackage },
