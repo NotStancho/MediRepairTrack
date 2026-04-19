@@ -12,11 +12,24 @@ import {
     createClientContract,
     deleteClientContract,
     getAllClientContracts,
+    getClientContractsByClientId,
     getClientContractById,
     updateClientContract,
 } from '../api/clientContract';
 
-export function useClientContracts() {
+interface UseClientContractsOptions {
+    scope?: 'all' | 'client';
+    clientId?: number | null;
+}
+
+export function useClientContracts(
+    options: UseClientContractsOptions = {}
+) {
+    const {
+        scope = 'all',
+        clientId = null,
+    } = options;
+
     const [data, setData] = useState<ClientContract[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -28,9 +41,18 @@ export function useClientContracts() {
     const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const load = useCallback(async (cancelled?: () => boolean) => {
+        if (scope === 'client' && !clientId) {
+            setData([]);
+            setLoading(false);
+            return;
+        }
+
         setLoading(true);
         try {
-            const res = await getAllClientContracts();
+            const res = scope === 'client'
+                ? await getClientContractsByClientId(clientId!)
+                : await getAllClientContracts();
+
             if (!cancelled?.()) {
                 setData(res);
             }
@@ -39,7 +61,7 @@ export function useClientContracts() {
                 setLoading(false);
             }
         }
-    }, []);
+    }, [clientId, scope]);
 
     const loadOne = async (id: number | null) => {
         if (!id) {

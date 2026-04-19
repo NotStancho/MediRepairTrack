@@ -13,6 +13,16 @@ export const getAllClientContracts = async (): Promise<ClientContract[]> => {
     return res.data;
 };
 
+export const getClientContractsByClientId = async (
+    clientId: number
+): Promise<ClientContract[]> => {
+    const res = await api.get<ClientContract[]>(
+        // TODO: replace with /api/contracts/my (security)
+        `/api/contracts/client/${clientId}`
+    );
+    return res.data;
+};
+
 export const getClientContractById = async (
     id: number
 ): Promise<ClientContract> => {

@@ -8,6 +8,7 @@ import ClaimDetailsPage from "../pages/claims/ClaimDetailsPage";
 import ClaimCreatePage from "../pages/claims/ClaimCreatePage";
 import ClaimCreateEmployeePage from "../pages/claims/ClaimCreateEmployeePage";
 
+import ClientContractsPage from "../pages/client/ClientContractsPage";
 import ClientManagementPage from "../pages/clients/ClientManagementPage";
 import EquipmentPage from "../pages/equipment/EquipmentPage";
 import PartPage from "../pages/part/PartPage";
@@ -35,7 +36,7 @@ export default function AppRouter() {
                 <Route path="/client/claims/new" element={<ClaimCreatePage />} />
                 <Route path="/client/claims/:id" element={<ClaimDetailsPage />} />
 
-                <Route path="/client/contracts" element={<ComingSoonPage title="Мої контракти" />} />
+                <Route path="/client/contracts" element={<ClientContractsPage />} />
                 <Route path="/client/equipment" element={<ComingSoonPage title="Моє обладнання" />} />
                 <Route path="/client/deliveries" element={<ComingSoonPage title="Мої доставки" />} />
                 <Route path="/client/invoices" element={<ComingSoonPage title="Мої рахунки" />} />
