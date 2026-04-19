@@ -41,7 +41,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/employee/claims', label: 'Призначені заявки', icon: FiClipboard },
             { to: '/employee/employees', label: 'Всі працівники', icon: FiUsers },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
-            { to: '/employee/parts', label: 'Всі деталі', icon: FiPackage },
+            { to: '/employee/parts', label: 'Запчастини', icon: FiPackage },
             { to: '/employee/deliveries', label: 'Мої доставки', icon: FiTruck },
             { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
@@ -55,7 +55,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/contracts', label: 'Всі контракти', icon: FiFileText },
             { to: '/employees', label: 'Всі працівники', icon: FiBriefcase },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
-            { to: '/parts', label: 'Всі деталі', icon: FiPackage },
+            { to: '/parts', label: 'Запчастини', icon: FiPackage },
             { to: '/deliveries', label: 'Всі доставки', icon: FiTruck },
             { to: '/invoices', label: 'Всі рахунки', icon: FiDollarSign },
             { to: '/payments', label: 'Всі оплати', icon: FiCreditCard },

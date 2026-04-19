@@ -1,53 +1,46 @@
+// api/part.ts
+
 import { api } from './api';
-import type { Part } from '../types/part.ts';
+import type { Part } from '../types/part/part';
+import type {
+    AddPartStockPayload,
+    CreatePartPayload,
+    UpdatePartPayload,
+} from '../types/part/partPayloads';
 
-/* =======================
-   PART (catalog / stock)
-   ======================= */
+export const getAllParts = async (): Promise<Part[]> => {
+    const res = await api.get<Part[]>('/api/part');
+    return res.data;
+};
 
-// отримати всі запчастини
-export const getAllParts = async (): Promise<Part[]> =>
-    (await api.get<Part[]>('/api/part')).data;
+export const getPartById = async (partId: number): Promise<Part> => {
+    const res = await api.get<Part>(`/api/part/${partId}`);
+    return res.data;
+};
 
-// отримати запчастину по id
-export const getPartById = async (partId: number): Promise<Part> =>
-    (await api.get<Part>(`/api/part/${partId}`)).data;
+export const createPart = async (
+    payload: CreatePartPayload
+): Promise<Part> => {
+    const res = await api.post<Part>('/api/part', payload);
+    return res.data;
+};
 
-// створити запчастину
-export const createPart = async (payload: {
-    supplierName: string;
-    partCode: string;
-    partName: string;
-    stockQuantity: number;
-    price: number;
-    unitName: string;
-    unitType: 'PIECE' | 'FRACTIONAL';
-    description?: string;
-}): Promise<Part> =>
-    (await api.post<Part>('/api/part', payload)).data;
-
-// оновити запчастину
 export const updatePart = async (
     partId: number,
-    payload: {
-        supplierName: string;
-        partName: string;
-        price: number;
-        unitName: string;
-        unitType: 'PIECE' | 'FRACTIONAL';
-        description?: string;
-    }
-): Promise<Part> =>
-    (await api.put<Part>(`/api/part/${partId}`, payload)).data;
+    payload: UpdatePartPayload
+): Promise<Part> => {
+    const res = await api.put<Part>(`/api/part/${partId}`, payload);
+    return res.data;
+};
 
-// додати на склад
 export const addPartStock = async (
     partId: number,
-    payload: { quantity: number }
-): Promise<Part> =>
-    (await api.patch<Part>(`/api/part/${partId}/add-stock`, payload)).data;
+    payload: AddPartStockPayload
+): Promise<Part> => {
+    const res = await api.patch<Part>(`/api/part/${partId}/add-stock`, payload);
+    return res.data;
+};
 
-// видалити запчастину
 export const deletePart = async (partId: number): Promise<void> => {
     await api.delete(`/api/part/${partId}`);
 };
