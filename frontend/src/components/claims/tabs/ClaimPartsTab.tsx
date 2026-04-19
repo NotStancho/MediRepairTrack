@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getUsedPartsByClaim } from '../../../api/usedPart';
 import type { UsedPart } from '../../../types/usedPart';
-import { formatMoney } from '../../../utils/moneyFormat';
+import { formatMoney } from '../../../utils/formats/moneyFormat';
 import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
 
 interface Props {

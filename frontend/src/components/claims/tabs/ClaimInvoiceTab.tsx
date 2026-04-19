@@ -1,7 +1,7 @@
 import { INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS, INVOICE_ITEM_LABELS } from '../../../utils/invoiceLabels';
 import { useAuth } from '../../../context/AuthContext';
-import { formatDateTime } from '../../../utils/dateFormat';
-import { formatMoney } from '../../../utils/moneyFormat';
+import { formatDateTime } from '../../../utils/formats/dateFormat';
+import { formatMoney } from '../../../utils/formats/moneyFormat';
 import ConfirmBox from '../../../ui/ConfirmBox';
 import { useMemo, useState, useCallback } from 'react';
 import { useInvoice } from '../../../hooks/useInvoice';

@@ -6,7 +6,7 @@ import { getClaimHistory } from '../../../api/claimHistory';
 import { getEmployeeById } from '../../../api/employee';
 
 import { FiClock } from 'react-icons/fi';
-import { formatDateTime } from '../../../utils/dateFormat';
+import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { HISTORY_ICONS } from '../../../utils/claimHistoryLabels';
 import { EMPLOYEE_POSITION_LABELS, EMPLOYEE_POSITION_COLORS } from '../../../utils/employeeLabels';
 import { CLAIM_STATUS_LABELS, STATUS_COLORS } from '../../../utils/claimLabels';

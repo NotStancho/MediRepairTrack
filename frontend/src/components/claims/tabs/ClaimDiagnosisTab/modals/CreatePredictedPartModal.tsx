@@ -9,7 +9,7 @@ import FormField from '../../../../../ui/FormField';
 import Select from '../../../../../ui/Select';
 import { inputBase } from '../../../../../ui/formStyles';
 
-import {formatMoney} from '../../../../../utils/moneyFormat';
+import { formatMoney } from '../../../../../utils/formats/moneyFormat';
 
 import type { PartShort } from '../../../../../types/part/partShort';
 import type { CreatePredictedPartPayload } from '../../../../../types/diagnosis/DSS/predictedPartPayloads';

@@ -1,7 +1,7 @@
 // components/claims/tabs/ClaimDiagnosisTab/tabs/PredictionGeneralTab.tsx
 
 import type { DiagnosisPrediction } from '../../../../../types/diagnosis/DSS/diagnosisPrediction';
-import { formatMoney } from '../../../../../utils/moneyFormat';
+import { formatMoney } from '../../../../../utils/formats/moneyFormat';
 
 import { FiEdit2 } from 'react-icons/fi';
 

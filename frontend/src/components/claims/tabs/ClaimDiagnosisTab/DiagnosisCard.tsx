@@ -9,8 +9,8 @@ import {
     DIAGNOSIS_TYPE_LABELS,
     DIAGNOSIS_TYPE_COLORS,
 } from '../../../../utils/diagnosisLabels';
-import { formatDateTime } from '../../../../utils/dateFormat';
-import { formatMoney } from '../../../../utils/moneyFormat';
+import { formatDateTime } from '../../../../utils/formats/dateFormat';
+import { formatMoney } from '../../../../utils/formats/moneyFormat';
 
 import DiagnosisStatusActions from './DiagnosisStatusActions';
 import PredictionSection from './PredictionSection';

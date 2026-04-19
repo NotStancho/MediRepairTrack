@@ -1,3 +1,5 @@
+// utils/format/moneyFormat.ts
+
 export function formatMoney(value?: number | null): string {
     if (value == null) return '-';
 

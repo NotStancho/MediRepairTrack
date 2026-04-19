@@ -4,7 +4,7 @@ import type {ClientFull} from '../../../types/client/clientFull';
 import type {EquipmentFull} from '../../../types/equipment/equipmentFull';
 import {getClientFullById} from '../../../api/client';
 import {getEquipmentFullById} from '../../../api/equipment';
-import {formatDateTime} from '../../../utils/dateFormat';
+import {formatDateTime} from '../../../utils/formats/dateFormat';
 import {REPAIR_TYPE_LABELS, CLAIM_STATUS_LABELS, STATUS_COLORS, REPAIR_TYPE_COLORS,} from '../../../utils/claimLabels';
 
 interface Props {

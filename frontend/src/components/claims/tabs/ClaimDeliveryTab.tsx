@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { getDeliveriesByClaim } from '../../../api/delivery';
 import type { Delivery } from '../../../types/delivery';
 import { DELIVERY_PROVIDER_LABELS, DELIVERY_STATUS_LABELS, DELIVERY_TYPE_LABELS } from '../../../utils/deliveryLabels';
-import { formatMoney } from '../../../utils/moneyFormat';
+import { formatMoney } from '../../../utils/formats/moneyFormat';
 import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
 
 interface Props {

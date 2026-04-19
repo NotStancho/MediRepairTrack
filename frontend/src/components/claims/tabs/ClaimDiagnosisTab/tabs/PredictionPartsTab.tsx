@@ -13,7 +13,7 @@ import RowActionsMenu from '../../../../../ui/RowActionsMenu';
 import CreatePredictedPartModal from '../modals/CreatePredictedPartModal';
 import EditPredictedPartModal from '../modals/EditPredictedPartModal';
 
-import { formatMoney } from '../../../../../utils/moneyFormat';
+import { formatMoney } from '../../../../../utils/formats/moneyFormat';
 
 interface Props {
     predictionId: number;

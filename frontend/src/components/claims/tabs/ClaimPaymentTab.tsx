@@ -4,8 +4,8 @@ import { PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_COLORS } f
 import { useInvoice } from '../../../hooks/useInvoice';
 import { usePayments } from '../../../hooks/usePayments';
 
-import { formatDateTime } from '../../../utils/dateFormat';
-import { formatMoney } from '../../../utils/moneyFormat';
+import { formatDateTime } from '../../../utils/formats/dateFormat';
+import { formatMoney } from '../../../utils/formats/moneyFormat';
 
 import { inputBase, primaryButton, secondaryButton, selectBase } from "../../../ui/formStyles";
 import Modal from '../../../ui/Modal/Modal';
