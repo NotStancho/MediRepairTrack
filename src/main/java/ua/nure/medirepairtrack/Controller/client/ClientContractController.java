@@ -24,6 +24,16 @@ public class ClientContractController {
         return clientContractService.create(dto);
     }
 
+    @GetMapping
+    public List<ClientContractResponseDTO> getAll() {
+        return clientContractService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public ClientContractResponseDTO getById(@PathVariable Integer id) {
+        return clientContractService.getById(id);
+    }
+
     // --- Усі контракти клієнта ---
     @GetMapping("/client/{clientId}")
     public List<ClientContractResponseDTO> getByClient(@PathVariable Integer clientId) {
@@ -39,6 +49,11 @@ public class ClientContractController {
     @PutMapping("/{id}")
     public ClientContractResponseDTO updateFull(@PathVariable Integer id, @Valid @RequestBody UpdateClientContractFullDTO dto) {
         return clientContractService.updateFull(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        clientContractService.delete(id);
     }
 
 

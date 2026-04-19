@@ -7,6 +7,7 @@ import ua.nure.medirepairtrack.Entity.client.ClientContract.ContractType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -14,6 +15,7 @@ public class ClientContractResponseDTO {
 
     private Integer id;
     private Integer clientId;
+    private String clientOrganizationName;
 
     private String contractName;
     private ContractType contractType;
@@ -25,5 +27,9 @@ public class ClientContractResponseDTO {
     private BigDecimal discountLabor;
     private BigDecimal discountParts;
     private BigDecimal discountDelivery;
+
+    private String notes;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
 

@@ -63,6 +63,17 @@ public class ClientContractService {
         return map(contract);
     }
 
+    public List<ClientContractResponseDTO> getAll() {
+        return contractRepository.findAll()
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    public ClientContractResponseDTO getById(Integer id) {
+        return map(getEntity(id));
+    }
+
     // --- Отримати всі контракти клієнта ---
     public List<ClientContractResponseDTO> getByClient(Integer clientId) {
         return contractRepository.findByClientId(clientId)
@@ -113,8 +124,14 @@ public class ClientContractService {
         c.setDiscountParts(dto.getDiscountParts());
         c.setDiscountDelivery(dto.getDiscountDelivery());
         c.setNotes(dto.getNotes());
+        c.setUpdatedAt(LocalDateTime.now());
 
         return map(contractRepository.save(c));
+    }
+
+    public void delete(Integer id) {
+        ClientContract contract = getEntity(id);
+        contractRepository.delete(contract);
     }
 
     // --- API ДЛЯ BillingService ---
@@ -147,6 +164,7 @@ public class ClientContractService {
         return ClientContractResponseDTO.builder()
                 .id(c.getId())
                 .clientId(c.getClient().getId())
+                .clientOrganizationName(c.getClient().getOrganizationName())
                 .contractName(c.getContractName())
                 .contractType(c.getContractType())
                 .status(c.getIsActive())
@@ -155,7 +173,15 @@ public class ClientContractService {
                 .discountLabor(c.getDiscountLabor())
                 .discountParts(c.getDiscountParts())
                 .discountDelivery(c.getDiscountDelivery())
+                .notes(c.getNotes())
+                .createdAt(c.getCreatedAt())
+                .updatedAt(c.getUpdatedAt())
                 .build();
+    }
+
+    private ClientContract getEntity(Integer id) {
+        return contractRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Контракт не знайдений"));
     }
 }
 
