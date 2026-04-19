@@ -52,10 +52,16 @@ export default function Modal({
 
                 {/* modal */}
                 <div
-                    className={`relative z-10 w-full ${WIDTHS[width]} bg-surface rounded-2xl border border-border shadow-xl shadow-black/10 p-5 space-y-4`}
+                    className={`
+                        relative z-10 w-full ${WIDTHS[width]}
+                        bg-surface rounded-2xl border border-border
+                        shadow-xl shadow-black/10
+                        max-h-[90vh] flex flex-col
+                    `}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <div className="flex justify-between items-center">
+                    {/* HEADER */}
+                    <div className="flex justify-between items-center p-4 border-b border-border">
                         <h2 className="text-lg font-semibold text-ink">{title}</h2>
                         <button
                             onClick={onClose}
@@ -65,7 +71,10 @@ export default function Modal({
                         </button>
                     </div>
 
-                    {children}
+                    {/* BODY (scroll) */}
+                    <div className="overflow-y-auto p-4 space-y-4">
+                        {children}
+                    </div>
                 </div>
             </div>
         </Portal>
