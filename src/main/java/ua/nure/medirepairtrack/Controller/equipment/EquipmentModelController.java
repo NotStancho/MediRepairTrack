@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.CreateEquipmentModelDTO;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.EquipmentModelResponseDTO;
+import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.EquipmentModelShortDTO;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.UpdateEquipmentModelDTO;
 import ua.nure.medirepairtrack.Entity.equipment.EquipmentModel.EquipmentType;
 import ua.nure.medirepairtrack.Service.equipment.EquipmentModelService;
@@ -37,6 +38,11 @@ public class EquipmentModelController {
     @GetMapping
     public List<EquipmentModelResponseDTO> getAll() {
         return equipmentModelService.getAll();
+    }
+
+    @GetMapping("/short")
+    public List<EquipmentModelShortDTO> getAllShort() {
+        return equipmentModelService.getAllShort();
     }
 
     @GetMapping("/search/model-name")

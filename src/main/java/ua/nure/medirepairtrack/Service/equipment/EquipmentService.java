@@ -8,6 +8,7 @@ import ua.nure.medirepairtrack.DTO.equipment.EquipmentDTO.CreateEquipmentDTO;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentDTO.EquipmentFullResponseDTO;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentDTO.EquipmentResponseDTO;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentDTO.UpdateEquipmentDTO;
+import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.EquipmentModelShortDTO;
 import ua.nure.medirepairtrack.Entity.equipment.Equipment.Equipment;
 import ua.nure.medirepairtrack.Entity.equipment.EquipmentModel.EquipmentModel;
 import ua.nure.medirepairtrack.Exception.*;
@@ -143,12 +144,22 @@ public class EquipmentService {
     }
 
     private EquipmentResponseDTO map(Equipment e) {
+        EquipmentModel m = e.getModel();
+
         return EquipmentResponseDTO.builder()
                 .id(e.getId())
+                .model(EquipmentModelShortDTO.builder()
+                        .id(m.getId())
+                        .modelName(m.getModelName())
+                        .manufacturer(m.getManufacturer())
+                        .build()
+                )
                 .serialNumber(e.getSerialNumber())
                 .purchaseDate(e.getPurchaseDate())
                 .price(e.getPrice())
                 .description(e.getDescription())
+                .createdAt(e.getCreatedAt())
+                .updatedAt(e.getUpdatedAt())
                 .build();
     }
 
@@ -162,6 +173,8 @@ public class EquipmentService {
                 .purchaseDate(e.getPurchaseDate())
                 .price(e.getPrice())
                 .description(e.getDescription())
+                .createdAt(e.getCreatedAt())
+                .updatedAt(e.getUpdatedAt())
 
                 // model
                 .modelName(m.getModelName())

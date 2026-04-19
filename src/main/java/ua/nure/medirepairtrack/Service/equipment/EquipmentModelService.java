@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.CreateEquipmentModelDTO;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.EquipmentModelResponseDTO;
+import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.EquipmentModelShortDTO;
 import ua.nure.medirepairtrack.DTO.equipment.EquipmentModelDTO.UpdateEquipmentModelDTO;
 import ua.nure.medirepairtrack.Entity.equipment.EquipmentModel.EquipmentModel;
 import ua.nure.medirepairtrack.Entity.equipment.EquipmentModel.EquipmentType;
@@ -62,6 +63,13 @@ public class EquipmentModelService {
         return equipmentModelRepository.findAll().stream().map(this::map).toList();
     }
 
+    public List<EquipmentModelShortDTO> getAllShort() {
+        return equipmentModelRepository.findAll()
+                .stream()
+                .map(this::mapShort)
+                .toList();
+    }
+
     public List<EquipmentModelResponseDTO> searchByModelName(String modelName) {
         return equipmentModelRepository.findByModelNameContainingIgnoreCase(modelName)
                 .stream().map(this::map).toList();
@@ -94,6 +102,14 @@ public class EquipmentModelService {
                 .description(m.getDescription())
                 .createdAt(m.getCreatedAt())
                 .updatedAt(m.getUpdatedAt())
+                .build();
+    }
+
+    private EquipmentModelShortDTO mapShort(EquipmentModel m) {
+        return EquipmentModelShortDTO.builder()
+                .id(m.getId())
+                .modelName(m.getModelName())
+                .manufacturer(m.getManufacturer())
                 .build();
     }
 }
