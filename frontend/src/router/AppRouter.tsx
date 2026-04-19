@@ -9,7 +9,8 @@ import ClaimCreatePage from "../pages/claims/ClaimCreatePage";
 import ClaimCreateEmployeePage from "../pages/claims/ClaimCreateEmployeePage";
 
 import EquipmentPage from "../pages/equipment/EquipmentPage";
-import PartPage from "../pages/part/PartPage.tsx";
+import PartPage from "../pages/part/PartPage";
+import DirectoriesPage from "../pages/directories/DirectoriesPage";
 
 import ComingSoonPage from "../pages/common/ComingSoonPage";
 
@@ -41,6 +42,7 @@ export default function AppRouter() {
 
                 {/* SHARED: EMPLOYEE / ADMIN */}
                 <Route path="/employee/claims/new" element={<ClaimCreateEmployeePage />} />
+                <Route path="/directories" element={<DirectoriesPage />} />
                 <Route path="/equipment" element={<EquipmentPage />} />
                 <Route path="/parts" element={<PartPage />} />
 
