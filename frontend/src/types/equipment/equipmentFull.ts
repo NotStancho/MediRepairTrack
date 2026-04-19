@@ -1,5 +1,5 @@
 // types/equipment/equipmentFull
-import type { EquipmentType } from './equipmentType';
+import type { EquipmentType } from '../equipmentModel/equipmentType.ts';
 
 export interface EquipmentFull {
     id: number;
@@ -7,6 +7,8 @@ export interface EquipmentFull {
     purchaseDate: string;
     price: number;
     description: string | null;
+    createdAt: string;
+    updatedAt?: string | null;
 
     modelName: string;
     manufacturer: string;

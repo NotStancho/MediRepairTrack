@@ -1,4 +1,4 @@
-// types/equipment/equipmentModel
+// types/equipmentModel/equipmentModel
 import type { EquipmentType } from './equipmentType';
 
 export interface EquipmentModel {
@@ -8,6 +8,6 @@ export interface EquipmentModel {
     type: EquipmentType;
     releaseDate: string;
     description: string | null;
-    createdAt?: string;
+    createdAt: string;
     updatedAt?: string | null;
 }

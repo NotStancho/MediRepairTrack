@@ -48,7 +48,10 @@ export default function ClaimCreateEmployeePage() {
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const { models, loading: modelsLoading } = useEquipmentModels();
+    const {
+        shortData: models,
+        shortLoading: modelsLoading
+    } = useEquipmentModels();
     const { checking, exists, isNew } = useEquipmentResolver(modelId, serialNumber);
 
     if (!user || (user.role !== 'EMPLOYEE' && user.role !== 'ADMIN') || (user.role === 'EMPLOYEE' && !allowedPositions.includes(user.position!))) {
@@ -270,7 +273,7 @@ export default function ClaimCreateEmployeePage() {
                             value={modelId}
                             onChange={setModelId}
                             options={models}
-                            getLabel={m => m.modelName}
+                            getLabel={m => `${m.modelName} (${m.manufacturer})`}
                             getValue={m => m.id}
                             placeholder="Оберіть модель"
                             searchable

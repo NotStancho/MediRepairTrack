@@ -1,4 +1,5 @@
-// types/equipment/equipmentType
+// types/equipmentModel/equipmentType
+
 export type EquipmentType =
     | 'HEMOGLOBINOMETER'
     | 'MICROSCOPE'
