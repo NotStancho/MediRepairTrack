@@ -22,6 +22,7 @@ import ua.nure.medirepairtrack.Workflow.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,8 +47,10 @@ public class InvoiceService {
     public InvoiceResponseDTO createDraft(Integer claimId) {
         Claim claim = claimService.getClaim(claimId);
 
-        if (invoiceRepository.findByClaimId(claimId).isPresent()) {
-            throw new BadRequestException("Рахунок для цієї заявки вже існує");
+        Optional<Invoice> existing = invoiceRepository.findByClaimId(claimId);
+
+        if (existing.isPresent()) {
+            return map(existing.get());
         }
 
         if (!claimStatusMachine.allowsInvoiceCreation(claim.getStatus())) {
@@ -496,24 +499,6 @@ public class InvoiceService {
 
         refreshInvoiceTotals(invoice, billing);
     }
-
-
-    // =========================
-    // UTIL
-    // =========================
-
-    public void assertInvoiceEditable(Integer claimId) {
-
-        invoiceRepository.findByClaimId(claimId)
-                .ifPresent(invoice -> {
-                    if (!invoiceStatusMachine.allowsCostMutation(invoice.getStatus())) {
-                        throw new OperationNotAllowedException(
-                                StatusMessageUtil.denied("змінювати фінансові дані", invoice.getStatus(), invoiceStatusMachine.allowedCostMutationStatuses()));
-                    }
-                });
-    }
-
-
 
     private Invoice getEditableInvoiceByClaim(Integer claimId) {
 
