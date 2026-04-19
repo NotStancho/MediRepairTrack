@@ -20,9 +20,6 @@ public class DiagnosisListener {
             return;
         }
 
-        CreateAutoDiagnosisDTO dto = new CreateAutoDiagnosisDTO();
-        dto.setClaimId(event.claimId());
-
-        diagnosisService.createAutoDiagnosis(dto);
+        diagnosisService.ensureInitialDiagnosisExists(event.claimId());
     }
 }
