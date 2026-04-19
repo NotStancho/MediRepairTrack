@@ -81,7 +81,8 @@ export default function RowActionsMenu({ actions, trigger, disabled }: Props) {
                             {actions.map((action, i) => (
                                 <button
                                     key={i}
-                                    onClick={async () => {
+                                    onClick={async (e) => {
+                                        e.stopPropagation();
                                         await action.onClick();
                                         setOpen(false);
                                     }}
