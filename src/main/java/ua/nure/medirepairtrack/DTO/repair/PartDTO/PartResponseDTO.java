@@ -5,6 +5,7 @@ import lombok.Data;
 import ua.nure.medirepairtrack.Entity.repair.Part.UnitType;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -19,4 +20,7 @@ public class PartResponseDTO {
     private String unitName;
     private UnitType unitType;
     private String description;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

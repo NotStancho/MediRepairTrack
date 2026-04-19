@@ -333,6 +333,8 @@ public class PartService {
                 .unitName(p.getUnitName())
                 .unitType(p.getUnitType())
                 .description(p.getDescription())
+                .createdAt(p.getCreatedAt())
+                .updatedAt(p.getUpdatedAt())
                 .build();
     }
 
