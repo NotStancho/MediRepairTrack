@@ -15,7 +15,7 @@ import { ROLE_IN_CLAIM_LABELS, ROLE_IN_CLAIM_COLORS } from '../../utils/roleInCl
 import Button from '../../ui/Button';
 import { Table, TableToolbar, type TableColumnDef } from '../../ui/Table';
 
-import { formatDateTime } from '../../utils/dateFormat';
+import { formatDateTime } from '../../utils/formats/dateFormat';
 
 export default function ClaimListPage() {
     const { user } = useAuth();
