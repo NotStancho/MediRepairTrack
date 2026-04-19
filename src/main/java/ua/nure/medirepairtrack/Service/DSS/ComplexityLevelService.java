@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.ComplexityLevelResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.CreateComplexityLevelDTO;
+import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.UpdateComplexityLevelDTO;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Repository.DSS.ComplexityLevelRepository;
@@ -28,11 +29,32 @@ public class ComplexityLevelService {
         return map(repository.save(entity));
     }
 
+    @Transactional
+    public ComplexityLevelResponseDTO update(Integer id, UpdateComplexityLevelDTO dto) {
+
+        ComplexityLevel entity = getEntity(id);
+
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+
+        return map(repository.save(entity));
+    }
+
+    public ComplexityLevelResponseDTO getById(Integer id) {
+        return map(getEntity(id));
+    }
+
     public List<ComplexityLevelResponseDTO> getAll() {
         return repository.findAll()
                 .stream()
                 .map(this::map)
                 .toList();
+    }
+
+    @Transactional
+    public void delete(Integer id) {
+        ComplexityLevel entity = getEntity(id);
+        repository.delete(entity);
     }
 
     public ComplexityLevel getEntity(Integer id) {
