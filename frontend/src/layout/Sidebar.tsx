@@ -40,7 +40,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
         menu.push(
             { to: '/employee/claims', label: 'Призначені заявки', icon: FiClipboard },
             { to: '/employee/employees', label: 'Всі працівники', icon: FiUsers },
-            { to: '/employee/equipment', label: 'Всі обладнання', icon: FiTool },
+            { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/employee/parts', label: 'Всі деталі', icon: FiPackage },
             { to: '/employee/deliveries', label: 'Мої доставки', icon: FiTruck },
             { to: '/profile', label: 'Мій профіль', icon: FiUser },
@@ -54,7 +54,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/clients', label: 'Всі клієнти', icon: FiUsers },
             { to: '/contracts', label: 'Всі контракти', icon: FiFileText },
             { to: '/employees', label: 'Всі працівники', icon: FiBriefcase },
-            { to: '/equipment', label: 'Всі обладнання', icon: FiTool },
+            { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/parts', label: 'Всі деталі', icon: FiPackage },
             { to: '/deliveries', label: 'Всі доставки', icon: FiTruck },
             { to: '/invoices', label: 'Всі рахунки', icon: FiDollarSign },
@@ -64,7 +64,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
     }
 
     return (
-        <div className="h-screen bg-gradient-to-b from-brand-strong to-[#082f37] text-white flex flex-col border-r border-white/10">
+        <div className="h-screen bg-linear-to-b from-brand-strong to-[#082f37] text-white flex flex-col border-r border-white/10">
             {/* Logo + toggle */}
             <div
                 className={[
