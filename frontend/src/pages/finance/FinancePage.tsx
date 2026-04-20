@@ -3,6 +3,7 @@
 import Tabs, { type TabItem } from '../../ui/Tabs';
 
 import InvoicesTab from './tabs/InvoicesTab';
+import PaymentsTab from './tabs/PaymentsTab';
 import { useState } from 'react';
 
 const tabs: TabItem[] = [
@@ -36,7 +37,13 @@ export default function FinancePage() {
                 )}
 
                 {active === 'payments' && (
-                    <Placeholder text="Таб оплати буде доданий наступним кроком." />
+                    <PaymentsTab
+                        scope="all"
+                        showClientColumn
+                        storageKey="finance-payments-table"
+                        globalFilterPlaceholder="Пошук за рахунком, клієнтом, методом, статусом або reference"
+                        emptyText="Оплати ще не створені"
+                    />
                 )}
 
                 {active === 'pricing-config' && (

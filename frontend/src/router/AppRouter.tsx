@@ -10,6 +10,7 @@ import ClaimCreateEmployeePage from "../pages/claims/ClaimCreateEmployeePage";
 
 import ClientContractsPage from "../pages/client/ClientContractsPage";
 import ClientInvoicesPage from "../pages/client/ClientInvoicesPage";
+import ClientPaymentsPage from "../pages/client/ClientPaymentsPage";
 import ClientManagementPage from "../pages/clients/ClientManagementPage";
 import EquipmentPage from "../pages/equipment/EquipmentPage";
 import FinancePage from "../pages/finance/FinancePage";
@@ -42,7 +43,7 @@ export default function AppRouter() {
                 <Route path="/client/equipment" element={<ComingSoonPage title="Моє обладнання" />} />
                 <Route path="/client/deliveries" element={<ComingSoonPage title="Мої доставки" />} />
                 <Route path="/client/invoices" element={<ClientInvoicesPage />} />
-                <Route path="/client/payments" element={<ComingSoonPage title="Оплати" />} />
+                <Route path="/client/payments" element={<ClientPaymentsPage />} />
 
                 {/* SHARED: EMPLOYEE / ADMIN */}
                 <Route path="/employee/claims/new" element={<ClaimCreateEmployeePage />} />

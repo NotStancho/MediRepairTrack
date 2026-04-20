@@ -1,5 +1,20 @@
+// api/payment.ts
+
 import { api } from './api';
-import type { Payment, PaymentMethod } from '../types/payment';
+import type { Payment, PaymentMethod, PaymentView } from '../types/payment';
+
+export const getAllPayments = async (): Promise<PaymentView[]> =>
+    (await api.get<PaymentView[]>('/api/payment')).data;
+
+export const getPaymentsByClient = async (
+    clientId: number
+): Promise<PaymentView[]> =>
+    (await api.get<PaymentView[]>(`/api/payment/client/${clientId}`)).data;
+
+export const getPaymentById = async (
+    paymentId: number
+): Promise<PaymentView> =>
+    (await api.get<PaymentView>(`/api/payment/${paymentId}`)).data;
 
 // отримати всі оплати по рахунку
 export const getPaymentsByInvoice = async (

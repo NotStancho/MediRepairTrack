@@ -1,3 +1,5 @@
+import type { InvoiceStatus } from './invoice';
+
 export type PaymentStatus =
     | 'PENDING'
     | 'COMPLETED'
@@ -19,8 +21,17 @@ export interface Payment {
     amount: number;
     method: PaymentMethod;
     status: PaymentStatus;
-    provider?: string;
-    externalRef?: string;
-    paidAt?: string;
+    provider?: string | null;
+    externalRef?: string | null;
+    paidAt?: string | null;
     createdAt: string;
+}
+
+export interface PaymentView extends Payment {
+    claimId: number;
+    clientId: number;
+    clientOrganizationName: string;
+    invoiceNumber: string;
+    invoiceStatus: InvoiceStatus;
+    invoiceTotalAmount: number;
 }
