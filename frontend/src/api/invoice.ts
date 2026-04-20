@@ -1,6 +1,18 @@
 import { api } from './api';
 import type {Invoice, InvoiceDetail, InvoiceFull} from '../types/invoice';
 
+export const getAllInvoices = async () =>
+    (await api.get<Invoice[]>('/api/invoice')).data;
+
+export const getInvoicesByClient = async (clientId: number) =>
+    (await api.get<Invoice[]>(`/api/invoice/client/${clientId}`)).data;
+
+export const getInvoiceById = async (invoiceId: number) =>
+    (await api.get<Invoice>(`/api/invoice/${invoiceId}`)).data;
+
+export const getInvoiceFullById = async (invoiceId: number) =>
+    (await api.get<InvoiceFull>(`/api/invoice/${invoiceId}/full`)).data;
+
 export const getInvoiceByClaim = async (claimId: number) =>
     (await api.get<Invoice>(`/api/invoice/claim/${claimId}`)).data;
 

@@ -545,6 +545,8 @@ public class InvoiceService {
         return InvoiceResponseDTO.builder()
                 .id(invoice.getId())
                 .claimId(invoice.getClaim().getId())
+                .clientId(invoice.getClaim().getClient().getId())
+                .clientOrganizationName(invoice.getClaim().getClient().getOrganizationName())
                 .invoiceNumber(invoice.getInvoiceNumber())
                 .totalBeforeDiscount(invoice.getTotalBeforeDiscount())
                 .discountAmount(invoice.getDiscountAmount())
