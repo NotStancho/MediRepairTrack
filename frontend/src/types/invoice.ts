@@ -9,6 +9,8 @@ export type InvoiceStatus =
 export interface Invoice {
     id: number;
     claimId: number;
+    clientId: number;
+    clientOrganizationName: string;
     invoiceNumber: string;
     totalBeforeDiscount: number | null;
     discountAmount: number | null;
@@ -16,8 +18,9 @@ export interface Invoice {
     totalPaid: number;
     status: InvoiceStatus;
     createdAt: string;
-    issuedAt?: string;
-    closedAt?: string;
+    issuedAt?: string | null;
+    dueAt?: string | null;
+    closedAt?: string | null;
 }
 
 export interface InvoiceDetail {
@@ -31,6 +34,5 @@ export interface InvoiceDetail {
 }
 
 export interface InvoiceFull extends Invoice {
-    dueAt?: string;
     items: InvoiceDetail[];
 }

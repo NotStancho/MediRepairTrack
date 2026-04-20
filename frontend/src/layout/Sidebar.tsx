@@ -29,8 +29,8 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/client/contracts', label: 'Мої контракти', icon: FiFileText },
             { to: '/client/equipment', label: 'Моє обладнання', icon: FiTool },
             { to: '/client/deliveries', label: 'Мої доставки', icon: FiTruck },
-            { to: '/client/invoices', label: 'Мої рахунки', icon: FiDollarSign },
-            { to: '/client/payments', label: 'Мої платежі', icon: FiCreditCard },
+            { to: '/client/invoices', label: 'Рахунки', icon: FiDollarSign },
+            { to: '/client/payments', label: 'Оплати', icon: FiCreditCard },
             { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
     }
@@ -57,9 +57,8 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/parts', label: 'Запчастини', icon: FiPackage },
             { to: '/directories', label: 'Довідники', icon: FiBookOpen },
+            { to: '/finance', label: 'Фінанси', icon: FiDollarSign, },
             { to: '/deliveries', label: 'Всі доставки', icon: FiTruck },
-            { to: '/invoices', label: 'Всі рахунки', icon: FiDollarSign },
-            { to: '/payments', label: 'Всі оплати', icon: FiCreditCard },
             { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
     }

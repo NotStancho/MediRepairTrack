@@ -9,8 +9,10 @@ import ClaimCreatePage from "../pages/claims/ClaimCreatePage";
 import ClaimCreateEmployeePage from "../pages/claims/ClaimCreateEmployeePage";
 
 import ClientContractsPage from "../pages/client/ClientContractsPage";
+import ClientInvoicesPage from "../pages/client/ClientInvoicesPage";
 import ClientManagementPage from "../pages/clients/ClientManagementPage";
 import EquipmentPage from "../pages/equipment/EquipmentPage";
+import FinancePage from "../pages/finance/FinancePage";
 import PartPage from "../pages/part/PartPage";
 import DirectoriesPage from "../pages/directories/DirectoriesPage";
 
@@ -39,8 +41,8 @@ export default function AppRouter() {
                 <Route path="/client/contracts" element={<ClientContractsPage />} />
                 <Route path="/client/equipment" element={<ComingSoonPage title="Моє обладнання" />} />
                 <Route path="/client/deliveries" element={<ComingSoonPage title="Мої доставки" />} />
-                <Route path="/client/invoices" element={<ComingSoonPage title="Мої рахунки" />} />
-                <Route path="/client/payments" element={<ComingSoonPage title="Мої платежі" />} />
+                <Route path="/client/invoices" element={<ClientInvoicesPage />} />
+                <Route path="/client/payments" element={<ComingSoonPage title="Оплати" />} />
 
                 {/* SHARED: EMPLOYEE / ADMIN */}
                 <Route path="/employee/claims/new" element={<ClaimCreateEmployeePage />} />
@@ -60,10 +62,9 @@ export default function AppRouter() {
                 <Route path="/claims" element={<ClaimListPage />} />
                 <Route path="/claims/:id" element={<ClaimDetailsPage />} />
                 <Route path="/contracts" element={<ClientManagementPage />} />
+                <Route path="/finance" element={<FinancePage />} />
                 <Route path="/employees" element={<ComingSoonPage title="Всі працівники" />} />
                 <Route path="/deliveries" element={<ComingSoonPage title="Всі доставки" />} />
-                <Route path="/invoices" element={<ComingSoonPage title="Всі рахунки" />} />
-                <Route path="/payments" element={<ComingSoonPage title="Всі оплати" />} />
 
                 <Route path="/profile" element={<ComingSoonPage title="Мій профіль" />} />
             </Route>
