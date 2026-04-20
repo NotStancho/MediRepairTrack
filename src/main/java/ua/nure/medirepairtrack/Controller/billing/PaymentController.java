@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.nure.medirepairtrack.DTO.billing.PaymentDTO.CreatePaymentDTO;
 import ua.nure.medirepairtrack.DTO.billing.PaymentDTO.PaymentResponseDTO;
+import ua.nure.medirepairtrack.DTO.billing.PaymentDTO.PaymentViewDTO;
 import ua.nure.medirepairtrack.Service.billing.PaymentService;
 
 import java.util.List;
@@ -39,5 +40,20 @@ public class PaymentController {
     @GetMapping("/invoice/{invoiceId}")
     public List<PaymentResponseDTO> getByInvoice(@PathVariable Integer invoiceId) {
         return paymentService.getByInvoice(invoiceId);
+    }
+
+    @GetMapping
+    public List<PaymentViewDTO> getAll() {
+        return paymentService.getAll();
+    }
+
+    @GetMapping("/client/{clientId}")
+    public List<PaymentViewDTO> getByClient(@PathVariable Integer clientId) {
+        return paymentService.getByClient(clientId);
+    }
+
+    @GetMapping("/{paymentId}")
+    public PaymentViewDTO getById(@PathVariable Integer paymentId) {
+        return paymentService.getById(paymentId);
     }
 }

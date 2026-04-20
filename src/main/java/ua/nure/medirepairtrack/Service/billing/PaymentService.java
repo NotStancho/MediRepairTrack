@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.billing.PaymentDTO.CreatePaymentDTO;
 import ua.nure.medirepairtrack.DTO.billing.PaymentDTO.PaymentResponseDTO;
+import ua.nure.medirepairtrack.DTO.billing.PaymentDTO.PaymentViewDTO;
 import ua.nure.medirepairtrack.Entity.billing.Invoice.Invoice;
 import ua.nure.medirepairtrack.Entity.billing.Payment.Payment;
 import ua.nure.medirepairtrack.Entity.billing.Payment.PaymentMethod;
@@ -63,7 +64,7 @@ public class PaymentService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return map(paymentRepository.save(payment));
+        return mapResponse(paymentRepository.save(payment));
     }
 
     @Transactional
@@ -86,14 +87,35 @@ public class PaymentService {
 
         invoiceService.applyPayment(payment.getInvoice().getId(), payment.getAmount());
 
-        return map(paymentRepository.save(payment));
+        return mapResponse(paymentRepository.save(payment));
     }
 
     public List<PaymentResponseDTO> getByInvoice(Integer invoiceId) {
-        return paymentRepository.findByInvoiceId(invoiceId)
+        return paymentRepository.findByInvoiceIdOrderByCreatedAtDesc(invoiceId)
                 .stream()
-                .map(this::map)
+                .map(this::mapResponse)
                 .toList();
+    }
+
+    public List<PaymentViewDTO> getAll() {
+        return paymentRepository.findAllViewData()
+                .stream()
+                .map(this::mapView)
+                .toList();
+    }
+
+    public List<PaymentViewDTO> getByClient(Integer clientId) {
+        return paymentRepository.findAllViewDataByClientId(clientId)
+                .stream()
+                .map(this::mapView)
+                .toList();
+    }
+
+    public PaymentViewDTO getById(Integer paymentId) {
+        Payment payment = paymentRepository.findViewDataById(paymentId)
+                .orElseThrow(() -> new NotFoundException("Оплата не знайдена"));
+
+        return mapView(payment);
     }
 
     private Payment getPayment(Integer id) {
@@ -101,10 +123,30 @@ public class PaymentService {
                 .orElseThrow(() -> new NotFoundException("Оплата не знайдена"));
     }
 
-    private PaymentResponseDTO map(Payment p) {
+    private PaymentResponseDTO mapResponse(Payment p) {
         return PaymentResponseDTO.builder()
                 .id(p.getId())
                 .invoiceId(p.getInvoice().getId())
+                .amount(p.getAmount())
+                .method(p.getMethod())
+                .status(p.getStatus())
+                .provider(p.getProvider())
+                .externalRef(p.getExternalRef())
+                .paidAt(p.getPaidAt())
+                .createdAt(p.getCreatedAt())
+                .build();
+    }
+
+    private PaymentViewDTO mapView(Payment p) {
+        return PaymentViewDTO.builder()
+                .id(p.getId())
+                .invoiceId(p.getInvoice().getId())
+                .claimId(p.getInvoice().getClaim().getId())
+                .clientId(p.getInvoice().getClaim().getClient().getId())
+                .clientOrganizationName(p.getInvoice().getClaim().getClient().getOrganizationName())
+                .invoiceNumber(p.getInvoice().getInvoiceNumber())
+                .invoiceStatus(p.getInvoice().getStatus())
+                .invoiceTotalAmount(p.getInvoice().getTotalAmount())
                 .amount(p.getAmount())
                 .method(p.getMethod())
                 .status(p.getStatus())
