@@ -61,6 +61,11 @@ public class InvoiceController {
         return invoiceService.getAllInvoices();
     }
 
+    @GetMapping("/client/{clientId}")
+    public List<InvoiceResponseDTO> getByClientId(@PathVariable Integer clientId) {
+        return invoiceService.getByClientId(clientId);
+    }
+
     @GetMapping("/{invoiceId}")
     public InvoiceResponseDTO getByInvoiceId(@PathVariable Integer invoiceId) {
         return invoiceService.getByInvoiceId(invoiceId);

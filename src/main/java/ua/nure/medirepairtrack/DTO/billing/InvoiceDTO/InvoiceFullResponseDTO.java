@@ -14,6 +14,8 @@ public class InvoiceFullResponseDTO {
 
     private Integer id;
     private Integer claimId;
+    private Integer clientId;
+    private String clientOrganizationName;
     private String invoiceNumber;
 
     private BigDecimal totalBeforeDiscount;

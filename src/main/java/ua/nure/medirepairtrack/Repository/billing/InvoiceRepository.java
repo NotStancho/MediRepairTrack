@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     List<Invoice> findAllByOrderByCreatedAtDesc();
 
+    List<Invoice> findAllByClaimClientIdOrderByCreatedAtDesc(Integer clientId);
+
     Optional<Invoice> findByClaimId(Integer claimId);
 
     @Query("""

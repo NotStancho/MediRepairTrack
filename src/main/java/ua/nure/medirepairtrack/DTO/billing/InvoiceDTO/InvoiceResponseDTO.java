@@ -13,6 +13,8 @@ public class InvoiceResponseDTO {
 
     private Integer id;
     private Integer claimId;
+    private Integer clientId;
+    private String clientOrganizationName;
     private String invoiceNumber;
 
     private BigDecimal totalBeforeDiscount;
@@ -24,5 +26,6 @@ public class InvoiceResponseDTO {
 
     private LocalDateTime createdAt;
     private LocalDateTime issuedAt;
+    private LocalDateTime dueAt;
     private LocalDateTime closedAt;
 }

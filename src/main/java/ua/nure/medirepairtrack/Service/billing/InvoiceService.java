@@ -372,6 +372,13 @@ public class InvoiceService {
                 .toList();
     }
 
+    public List<InvoiceResponseDTO> getByClientId(Integer clientId) {
+        return invoiceRepository.findAllByClaimClientIdOrderByCreatedAtDesc(clientId)
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
     public InvoiceResponseDTO getByInvoiceId(Integer id) {
         return map(getInvoice(id));
     }
@@ -546,6 +553,7 @@ public class InvoiceService {
                 .status(invoice.getStatus())
                 .createdAt(invoice.getCreatedAt())
                 .issuedAt(invoice.getIssuedAt())
+                .dueAt(invoice.getDueAt())
                 .closedAt(invoice.getClosedAt())
                 .build();
     }
@@ -559,20 +567,18 @@ public class InvoiceService {
         return InvoiceFullResponseDTO.builder()
                 .id(invoice.getId())
                 .claimId(invoice.getClaim().getId())
+                .clientId(invoice.getClaim().getClient().getId())
+                .clientOrganizationName(invoice.getClaim().getClient().getOrganizationName())
                 .invoiceNumber(invoice.getInvoiceNumber())
-
                 .totalBeforeDiscount(invoice.getTotalBeforeDiscount())
                 .discountAmount(invoice.getDiscountAmount())
                 .totalAmount(invoice.getTotalAmount())
                 .totalPaid(invoice.getTotalPaid())
-
                 .status(invoice.getStatus())
-
                 .createdAt(invoice.getCreatedAt())
                 .issuedAt(invoice.getIssuedAt())
                 .dueAt(invoice.getDueAt())
                 .closedAt(invoice.getClosedAt())
-
                 .items(items)
                 .build();
     }
