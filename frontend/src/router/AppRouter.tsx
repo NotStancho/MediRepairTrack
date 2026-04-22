@@ -1,7 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from '../pages/auth/LoginPage';
 import { RequireAuth } from './RequireAuth';
 import AppLayout from '../layout/AppLayout';
+
+import LoginPage from '../pages/auth/LoginPage';
 
 import ClaimListPage from "../pages/claims/ClaimListPage";
 import ClaimDetailsPage from "../pages/claims/ClaimDetailsPage";
@@ -13,11 +14,13 @@ import ClientDeliveriesPage from "../pages/client/ClientDeliveriesPage";
 import ClientInvoicesPage from "../pages/client/ClientInvoicesPage";
 import ClientPaymentsPage from "../pages/client/ClientPaymentsPage";
 import ClientManagementPage from "../pages/clients/ClientManagementPage";
+
+import EmployeesPage from "../pages/employees/EmployeesPage";
 import DeliveriesPage from "../pages/deliveries/DeliveriesPage";
 import EquipmentPage from "../pages/equipment/EquipmentPage";
-import FinancePage from "../pages/finance/FinancePage";
 import PartPage from "../pages/part/PartPage";
 import DirectoriesPage from "../pages/directories/DirectoriesPage";
+import FinancePage from "../pages/finance/FinancePage";
 
 import ComingSoonPage from "../pages/common/ComingSoonPage";
 
@@ -50,6 +53,7 @@ export default function AppRouter() {
                 {/* SHARED: EMPLOYEE / ADMIN */}
                 <Route path="/employee/claims/new" element={<ClaimCreateEmployeePage />} />
                 <Route path="/clients" element={<ClientManagementPage />} />
+                <Route path="/employees" element={<EmployeesPage />} />
                 <Route path="/equipment" element={<EquipmentPage />} />
                 <Route path="/parts" element={<PartPage />} />
                 <Route path="/directories" element={<DirectoriesPage />} />
@@ -59,14 +63,11 @@ export default function AppRouter() {
                 <Route path="/employee/claims" element={<ClaimListPage />} />
                 <Route path="/employee/claims/:id" element={<ClaimDetailsPage />} />
 
-                <Route path="/employee/employees" element={<ComingSoonPage title="Всі працівники" />} />
-
                 {/* ADMIN / MANAGER */}
                 <Route path="/claims" element={<ClaimListPage />} />
                 <Route path="/claims/:id" element={<ClaimDetailsPage />} />
                 <Route path="/contracts" element={<ClientManagementPage />} />
                 <Route path="/finance" element={<FinancePage />} />
-                <Route path="/employees" element={<ComingSoonPage title="Всі працівники" />} />
 
                 <Route path="/profile" element={<ComingSoonPage title="Мій профіль" />} />
             </Route>

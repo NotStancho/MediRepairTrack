@@ -39,7 +39,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
     if (user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER') {
         menu.push(
             { to: '/employee/claims', label: 'Призначені заявки', icon: FiClipboard },
-            { to: '/employee/employees', label: 'Всі працівники', icon: FiUsers },
+            { to: '/employees', label: 'Працівники', icon: FiUsers },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/parts', label: 'Запчастини', icon: FiPackage },
             { to: '/directories', label: 'Довідники', icon: FiBookOpen },
@@ -53,7 +53,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
         menu.push(
             { to: '/claims', label: 'Всі заявки', icon: FiClipboard },
             { to: '/clients', label: 'Клієнти', icon: FiUsers },
-            { to: '/employees', label: 'Всі працівники', icon: FiBriefcase },
+            { to: '/employees', label: 'Працівники', icon: FiBriefcase },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/parts', label: 'Запчастини', icon: FiPackage },
             { to: '/directories', label: 'Довідники', icon: FiBookOpen },
