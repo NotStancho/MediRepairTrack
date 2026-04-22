@@ -109,6 +109,13 @@ public class EmployeeService {
                 .orElseThrow(() -> new NotFoundException("Співробітник не знайдений"));
     }
 
+    public List<EmployeeResponseDTO> getAll() {
+        return employeeRepository.findAll()
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
     public Employee getEmployeeEntity(Integer id) {
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Співробітник не знайдений"));

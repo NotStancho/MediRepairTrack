@@ -38,6 +38,11 @@ public class EmployeeController {
         return employeeService.getById(id);
     }
 
+    @GetMapping
+    public List<EmployeeResponseDTO> getAll() {
+        return employeeService.getAll();
+    }
+
     @GetMapping("/user/{userId}")
     public EmployeeResponseDTO getByUser(@PathVariable Integer userId) {
         return employeeService.getByUserId(userId);
