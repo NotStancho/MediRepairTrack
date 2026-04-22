@@ -223,10 +223,24 @@ public class DeliveryService {
     // =========================
     // READ
     // =========================
-    public DeliveryResponseDTO getById(Integer id) {
+    public DeliveryViewDTO getById(Integer id) {
         return deliveryRepository.findById(id)
-                .map(this::map)
+                .map(this::mapView)
                 .orElseThrow(() -> new NotFoundException("Доставка не знайдена"));
+    }
+
+    public List<DeliveryViewDTO> getAll() {
+        return deliveryRepository.findAllWithClaimAndClient()
+                .stream()
+                .map(this::mapView)
+                .toList();
+    }
+
+    public List<DeliveryViewDTO> getByClient(Integer clientId) {
+        return deliveryRepository.findAllByClientIdWithFetch(clientId)
+                .stream()
+                .map(this::mapView)
+                .toList();
     }
 
     public List<DeliveryResponseDTO> getByClaim(Integer claimId) {
@@ -318,6 +332,26 @@ public class DeliveryService {
                 .pricePerUnit(d.getPricePerUnit())
                 .price(d.getPrice())
                 .description(d.getDescription())
+                .build();
+    }
+
+    private DeliveryViewDTO mapView(Delivery d) {
+        return DeliveryViewDTO.builder()
+                .id(d.getId())
+                .claimId(d.getClaim().getId())
+                .clientId(d.getClaim().getClient().getId())
+                .clientOrganizationName(d.getClaim().getClient().getOrganizationName())
+                .type(d.getType())
+                .provider(d.getProvider())
+                .status(d.getStatus())
+                .trackingCode(d.getTrackingCode())
+                .distanceKm(d.getDistanceKm())
+                .pricePerUnit(d.getPricePerUnit())
+                .price(d.getPrice())
+                .description(d.getDescription())
+                .createdAt(d.getCreatedAt())
+                .performedAt(d.getPerformedAt())
+                .updatedAt(d.getUpdatedAt())
                 .build();
     }
 }

@@ -54,8 +54,18 @@ public class DeliveryController {
 
 
     @GetMapping("/{id}")
-    public DeliveryResponseDTO getById(@PathVariable Integer id) {
+    public DeliveryViewDTO getById(@PathVariable Integer id) {
         return deliveryService.getById(id);
+    }
+
+    @GetMapping
+    public List<DeliveryViewDTO> getAll() {
+        return deliveryService.getAll();
+    }
+
+    @GetMapping("/client/{clientId}")
+    public List<DeliveryViewDTO> getByClient(@PathVariable Integer clientId) {
+        return deliveryService.getByClient(clientId);
     }
 
     @GetMapping("/claim/{claimId}")
