@@ -28,7 +28,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/client/claims', label: 'Мої заявки', icon: FiClipboard },
             { to: '/client/contracts', label: 'Мої контракти', icon: FiFileText },
             { to: '/client/equipment', label: 'Моє обладнання', icon: FiTool },
-            { to: '/client/deliveries', label: 'Мої доставки', icon: FiTruck },
+            { to: '/client/deliveries', label: 'Доставки', icon: FiTruck },
             { to: '/client/invoices', label: 'Рахунки', icon: FiDollarSign },
             { to: '/client/payments', label: 'Оплати', icon: FiCreditCard },
             { to: '/profile', label: 'Мій профіль', icon: FiUser },
@@ -41,9 +41,9 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/employee/claims', label: 'Призначені заявки', icon: FiClipboard },
             { to: '/employee/employees', label: 'Всі працівники', icon: FiUsers },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
-            { to: '/employee/parts', label: 'Запчастини', icon: FiPackage },
-            { to: '/employee/directories', label: 'Довідники', icon: FiBookOpen },
-            { to: '/employee/deliveries', label: 'Мої доставки', icon: FiTruck },
+            { to: '/parts', label: 'Запчастини', icon: FiPackage },
+            { to: '/directories', label: 'Довідники', icon: FiBookOpen },
+            { to: '/deliveries', label: 'Доставки', icon: FiTruck },
             { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
     }
@@ -58,7 +58,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
             { to: '/parts', label: 'Запчастини', icon: FiPackage },
             { to: '/directories', label: 'Довідники', icon: FiBookOpen },
             { to: '/finance', label: 'Фінанси', icon: FiDollarSign, },
-            { to: '/deliveries', label: 'Всі доставки', icon: FiTruck },
+            { to: '/deliveries', label: 'Доставки', icon: FiTruck },
             { to: '/profile', label: 'Мій профіль', icon: FiUser },
         );
     }

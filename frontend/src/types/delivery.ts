@@ -1,3 +1,5 @@
+// types/delivery.ts
+
 export type DeliveryType =
     | 'CLIENT_DROP_OFF'
     | 'CLIENT_PICKUP'
@@ -38,4 +40,12 @@ export interface Delivery {
     price?: number | null;
 
     description?: string | null;
+}
+
+export interface DeliveryView extends Delivery {
+    clientId: number;
+    clientOrganizationName: string;
+    createdAt: string;
+    performedAt?: string | null;
+    updatedAt?: string | null;
 }
