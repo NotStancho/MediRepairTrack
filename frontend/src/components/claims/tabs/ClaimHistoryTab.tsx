@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ClaimHistory } from '../../../types/claim/claimHistory';
-import type { Employee } from '../../../types/employee';
+import type { Employee } from '../../../types/employee/employee';
 
 import { getClaimHistory } from '../../../api/claimHistory';
 import { getEmployeeById } from '../../../api/employee';

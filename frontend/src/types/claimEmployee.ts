@@ -1,6 +1,6 @@
 // types/claimEmployee
 import type { RoleInClaim } from './claim/assignedClaim';
-import type { EmployeePosition} from "./employee";
+import type { EmployeePosition } from "./employee/employee";
 
 export interface ClaimEmployee {
     employeeId: number;
