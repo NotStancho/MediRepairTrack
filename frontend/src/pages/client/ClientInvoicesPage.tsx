@@ -26,13 +26,6 @@ export default function ClientInvoicesPage() {
 
     return (
         <div className="space-y-4">
-            <div className="space-y-1">
-                <h1 className="text-2xl font-bold">Рахунки</h1>
-                <p className="text-sm text-ink-muted">
-                    Перегляд виставлених вам рахунків і деталізації по кожній позиції.
-                </p>
-            </div>
-
             <InvoicesTab
                 scope="client"
                 clientId={user.clientId}

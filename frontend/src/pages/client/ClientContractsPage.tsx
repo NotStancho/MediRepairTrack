@@ -121,13 +121,6 @@ export default function ClientContractsPage() {
 
     return (
         <div className="space-y-4">
-            <div className="space-y-1">
-                <h1 className="text-2xl font-bold">Мої контракти</h1>
-                <p className="text-sm text-ink-muted">
-                    Перегляд умов, статусів і строків дії ваших договорів.
-                </p>
-            </div>
-
             <Table
                 data={data}
                 columns={columns}

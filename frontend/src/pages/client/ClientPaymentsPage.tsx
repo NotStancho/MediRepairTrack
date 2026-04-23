@@ -26,13 +26,6 @@ export default function ClientPaymentsPage() {
 
     return (
         <div className="space-y-4">
-            <div className="space-y-1">
-                <h1 className="text-2xl font-bold">Оплати</h1>
-                <p className="text-sm text-ink-muted">
-                    Перегляд усіх оплат, їх методів, статусів і прив&apos;язки до рахунків.
-                </p>
-            </div>
-
             <PaymentsTab
                 scope="client"
                 clientId={user.clientId}
