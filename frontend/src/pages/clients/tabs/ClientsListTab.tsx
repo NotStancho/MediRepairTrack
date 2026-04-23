@@ -16,6 +16,7 @@ import TableToolbar from '../../../ui/Table/TableToolbar';
 import CreateClientModal from '../modals/CreateClientModal';
 import EditClientModal from '../modals/EditClientModal';
 import ViewClientModal from '../modals/ViewClientModal';
+import { formatPhoneNumber } from '../../../utils/phone';
 
 export default function ClientsListTab() {
     const {
@@ -76,7 +77,7 @@ export default function ClientsListTab() {
             accessorFn: row => row.organizationPhoneNumber,
             cell: ({ row }) => (
                 <span className="font-mono text-sm text-ink-muted">
-                    {row.original.organizationPhoneNumber}
+                    {formatPhoneNumber(row.original.organizationPhoneNumber)}
                 </span>
             ),
         },

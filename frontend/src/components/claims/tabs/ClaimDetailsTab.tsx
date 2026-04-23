@@ -5,6 +5,7 @@ import type {EquipmentFull} from '../../../types/equipment/equipmentFull';
 import {getClientFullById} from '../../../api/client';
 import {getEquipmentFullById} from '../../../api/equipment';
 import {formatDateTime} from '../../../utils/formats/dateFormat';
+import {formatPhoneNumber} from '../../../utils/phone';
 import {REPAIR_TYPE_LABELS, CLAIM_STATUS_LABELS, STATUS_COLORS, REPAIR_TYPE_COLORS,} from '../../../utils/claimLabels';
 
 interface Props {
@@ -74,7 +75,7 @@ export default function ClaimDetailsTab({claim}: Props) {
                         <div>Організація: <b>{client.organizationName}</b></div>
                         <div>Контактна особа: {client.contactPersonName ?? '-'}</div>
                         <div>Email: {client.organizationEmail}</div>
-                        <div>Телефон: {client.organizationPhoneNumber}</div>
+                        <div>Телефон: {formatPhoneNumber(client.organizationPhoneNumber)}</div>
                         <div className="md:col-span-2">
                             Адреса: {client.address}
                         </div>

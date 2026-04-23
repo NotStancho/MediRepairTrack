@@ -5,6 +5,7 @@ export const PHONE_COUNTRY_DIGITS = '380';
 export const PHONE_LOCAL_DIGIT_COUNT = 9;
 
 const PHONE_VALUE_PATTERN = /^\+380\d{9}$/;
+const PHONE_FORMAT_PATTERN = /^(\+380)(\d{2})(\d{3})(\d{2})(\d{2})$/;
 const NON_DIGIT_PATTERN = /\D/g;
 
 export interface PhoneValidationOptions {
@@ -83,6 +84,20 @@ export function isPhoneNumberValid(value: string): boolean {
     const normalizedPhone = normalizePhoneNumber(value);
 
     return PHONE_VALUE_PATTERN.test(normalizedPhone);
+}
+
+export function formatPhoneNumber(value: string | null | undefined): string {
+    if (!value) {
+        return '';
+    }
+
+    const normalizedPhone = normalizePhoneNumber(value);
+
+    if (!PHONE_VALUE_PATTERN.test(normalizedPhone)) {
+        return value;
+    }
+
+    return normalizedPhone.replace(PHONE_FORMAT_PATTERN, '$1 $2 $3 $4 $5');
 }
 
 export function getPhoneValidationError(

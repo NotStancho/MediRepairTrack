@@ -10,6 +10,7 @@ import ModalFooter from '../../../ui/Modal/ModalFooter';
 
 import { formatDateShort } from '../../../utils/formats/dateShortFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
+import { formatPhoneNumber } from '../../../utils/phone';
 import {
     EMPLOYEE_AVAILABILITY_COLORS,
     EMPLOYEE_AVAILABILITY_LABELS,
@@ -88,7 +89,7 @@ export default function ViewEmployeeModal({ employee, onClose }: {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InfoCard label="ID працівника" value={`#${employee.id}`} mono />
                     <InfoCard label="ID користувача" value={`#${employee.userId}`} mono />
-                    <InfoCard label="Телефон" value={employee.phone} mono />
+                    <InfoCard label="Телефон" value={formatPhoneNumber(employee.phone)} mono />
                     <InfoCard label="Роль" value={ROLE_LABELS[employee.role]} />
                     <InfoCard
                         label="Ставка за годину"

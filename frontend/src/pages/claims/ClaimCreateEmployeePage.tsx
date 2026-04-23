@@ -14,6 +14,7 @@ import Select from '../../ui/Select';
 
 import { createClaimByEmployee } from '../../api/claim';
 import { showApiError } from '../../utils/toastError';
+import { formatPhoneNumber } from '../../utils/phone';
 import toast from 'react-hot-toast';
 
 import { CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS } from '../../utils/claimLabels';
@@ -171,7 +172,7 @@ export default function ClaimCreateEmployeePage() {
                             }}
                             options={clients}
                             getLabel={c =>
-                                `${c.organizationName}, ${c.organizationPhoneNumber}, ${c.organizationEmail}, ${c.contactPersonName}`
+                                `${c.organizationName}, ${formatPhoneNumber(c.organizationPhoneNumber)}, ${c.organizationEmail}, ${c.contactPersonName}`
                             }
                             getValue={c => c.id}
                             searchable
@@ -200,7 +201,7 @@ export default function ClaimCreateEmployeePage() {
 
                                 <div>
                                     <span className="text-ink-muted">Телефон:</span><br />
-                                    {selectedClient.organizationPhoneNumber}
+                                    {formatPhoneNumber(selectedClient.organizationPhoneNumber)}
                                 </div>
 
                                 {selectedClient.contactPersonName && (

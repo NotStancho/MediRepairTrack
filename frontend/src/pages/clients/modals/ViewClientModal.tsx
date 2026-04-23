@@ -7,6 +7,7 @@ import type { ClientFull } from '../../../types/client/clientFull';
 import Button from '../../../ui/Button';
 import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
+import { formatPhoneNumber } from '../../../utils/phone';
 
 interface Props {
     client: ClientFull;
@@ -64,7 +65,7 @@ export default function ViewClientModal({ client, onClose }: Props) {
                     <InfoCard label="Email організації" value={client.organizationEmail} />
                     <InfoCard
                         label="Телефон організації"
-                        value={client.organizationPhoneNumber}
+                        value={formatPhoneNumber(client.organizationPhoneNumber)}
                         mono
                     />
                 </div>
@@ -89,7 +90,11 @@ export default function ViewClientModal({ client, onClose }: Props) {
                             <InfoCard label="ID користувача" value={`#${client.userId}`} mono />
                             <InfoCard label="Email користувача" value={client.userEmail ?? '—'} />
                             <InfoCard label="ПІБ" value={fullName || '—'} />
-                            <InfoCard label="Телефон користувача" value={client.userPhone ?? '—'} mono />
+                            <InfoCard
+                                label="Телефон користувача"
+                                value={client.userPhone ? formatPhoneNumber(client.userPhone) : '—'}
+                                mono
+                            />
                         </div>
                     ) : (
                         <div className="mt-2 text-sm text-ink-muted">
