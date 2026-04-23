@@ -69,7 +69,6 @@ export default function TableToolbar<TData>({
                             table.setPageIndex(0);
                         }}
                         placeholder={globalFilterPlaceholder}
-                        className="pr-9"
                     />
 
                     {globalFilter && (
