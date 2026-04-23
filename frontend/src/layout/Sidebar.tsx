@@ -25,8 +25,8 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
     // CLIENT
     if (user.role === 'CLIENT') {
         menu.push(
-            { to: '/client/claims', label: 'Мої заявки', icon: FiClipboard },
-            { to: '/client/contracts', label: 'Мої контракти', icon: FiFileText },
+            { to: '/client/claims', label: 'Заявки', icon: FiClipboard },
+            { to: '/client/contracts', label: 'Контракти', icon: FiFileText },
             { to: '/client/equipment', label: 'Моє обладнання', icon: FiTool },
             { to: '/client/deliveries', label: 'Доставки', icon: FiTruck },
             { to: '/client/invoices', label: 'Рахунки', icon: FiDollarSign },
@@ -38,7 +38,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
     // SERVICE ENGINEER
     if (user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER') {
         menu.push(
-            { to: '/employee/claims', label: 'Призначені заявки', icon: FiClipboard },
+            { to: '/employee/claims', label: 'Заявки', icon: FiClipboard },
             { to: '/employees', label: 'Працівники', icon: FiUsers },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },
             { to: '/parts', label: 'Запчастини', icon: FiPackage },
@@ -51,7 +51,7 @@ export default function Sidebar({ collapsed, onToggle }: Props) {
     // MANAGER / ADMIN
     if (user.role === 'ADMIN' || (user.role === 'EMPLOYEE' && user.position === 'MANAGER')) {
         menu.push(
-            { to: '/claims', label: 'Всі заявки', icon: FiClipboard },
+            { to: '/claims', label: 'Заявки', icon: FiClipboard },
             { to: '/clients', label: 'Клієнти', icon: FiUsers },
             { to: '/employees', label: 'Працівники', icon: FiBriefcase },
             { to: '/equipment', label: 'Обладнання', icon: FiTool },

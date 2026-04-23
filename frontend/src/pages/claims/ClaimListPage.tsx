@@ -234,37 +234,6 @@ export default function ClaimListPage() {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">
-                    {user?.role === 'CLIENT'
-                        ? 'Мої заявки'
-                        : user?.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER'
-                            ? 'Призначені заявки'
-                            : 'Всі заявки'}
-                </h1>
-
-                {user.role === 'CLIENT' && (
-                    <Button
-                        variant="primary"
-                        onClick={() => navigate('/client/claims/new')}
-                    >
-                        + Подати заявку
-                    </Button>
-                )}
-
-                {(user.role === 'ADMIN' ||
-                    (user.role === 'EMPLOYEE' &&
-                        ['MANAGER', 'SERVICE_ENGINEER'].includes(user.position!))
-                ) && (
-                    <Button
-                        variant="primary"
-                        onClick={() => navigate('/employee/claims/new')}
-                    >
-                        + Створити заявку
-                    </Button>
-                )}
-            </div>
-
             {user.role === 'EMPLOYEE' && user.position === 'SERVICE_ENGINEER' ? (
                 <Table
                     data={assignedClaims}
@@ -277,6 +246,25 @@ export default function ClaimListPage() {
                         <TableToolbar
                             table={table}
                             globalFilterPlaceholder="Пошук за номером, статусом чи описом"
+                            rightSlot={
+                                <>
+                                    {user.role === 'CLIENT' ? (
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => navigate('/client/claims/new')}
+                                        >
+                                            + Подати заявку
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="primary"
+                                            onClick={() => navigate('/employee/claims/new')}
+                                        >
+                                            + Створити заявку
+                                        </Button>
+                                    )}
+                                </>
+                            }
                         />
                     )}
                     initialState={{
@@ -295,6 +283,23 @@ export default function ClaimListPage() {
                         <TableToolbar
                             table={table}
                             globalFilterPlaceholder="Пошук за номером або описом"
+                            rightSlot={
+                                user.role === 'CLIENT' ? (
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => navigate('/client/claims/new')}
+                                    >
+                                        + Подати заявку
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => navigate('/employee/claims/new')}
+                                    >
+                                        + Створити заявку
+                                    </Button>
+                                )
+                            }
                         />
                     )}
                     initialState={{
