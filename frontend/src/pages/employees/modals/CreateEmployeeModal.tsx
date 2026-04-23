@@ -1,6 +1,6 @@
 // pages/employees/modals/CreateEmployeeModal.tsx
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import type {
     EmployeePosition,
@@ -14,6 +14,7 @@ import Button from '../../../ui/Button';
 import FormField from '../../../ui/FormField';
 import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
+import PhoneInput from '../../../ui/PhoneInput';
 import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
 
@@ -22,8 +23,7 @@ import {
     EMPLOYEE_POSITION_LABELS,
     EMPLOYEE_POSITION_OPTIONS,
 } from '../../../utils/employeeLabels';
-
-const PHONE_PATTERN = /^\+380\d{9}$/;
+import { isPhoneNumberValid } from '../../../utils/phone';
 
 interface Props {
     creating: boolean;
@@ -49,10 +49,7 @@ export default function CreateEmployeeModal({
     });
 
     const rateNumber = Number(form.ratePerHour);
-    const isPhoneValid = useMemo(
-        () => PHONE_PATTERN.test(form.phone.trim()),
-        [form.phone]
-    );
+    const isPhoneValid = isPhoneNumberValid(form.phone);
     const isRateValid =
         form.ratePerHour.trim() !== '' &&
         !Number.isNaN(rateNumber) &&
@@ -151,13 +148,14 @@ export default function CreateEmployeeModal({
                     </FormField>
 
                     <FormField label="Телефон">
-                        <input
-                            className={inputBase}
-                            placeholder="+380XXXXXXXXX"
+                        <PhoneInput
                             value={form.phone}
-                            onChange={e =>
-                                setForm({ ...form, phone: e.target.value })
+                            onChange={phone =>
+                                setForm({ ...form, phone })
                             }
+                            required
+                            requiredErrorMessage="Телефон обов'язковий"
+                            invalidErrorMessage="Телефон має бути у форматі +380 XX XXX XX XX"
                         />
                     </FormField>
                 </div>

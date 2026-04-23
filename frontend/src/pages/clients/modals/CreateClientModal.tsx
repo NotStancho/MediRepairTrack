@@ -1,6 +1,6 @@
 // pages/clients/modals/CreateClientModal.tsx
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import type { CreateClientPayload } from '../../../types/client/clientPayloads';
 
@@ -8,9 +8,10 @@ import Button from '../../../ui/Button';
 import FormField from '../../../ui/FormField';
 import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
+import PhoneInput from '../../../ui/PhoneInput';
 import { inputBase } from '../../../ui/formStyles';
 
-const PHONE_PATTERN = /^\+380\d{9}$/;
+import { isPhoneNumberValid } from '../../../utils/phone';
 
 interface Props {
     creating: boolean;
@@ -32,10 +33,7 @@ export default function CreateClientModal({
         notes: '',
     });
 
-    const isPhoneValid = useMemo(
-        () => PHONE_PATTERN.test(form.organizationPhoneNumber.trim()),
-        [form.organizationPhoneNumber]
-    );
+    const isPhoneValid = isPhoneNumberValid(form.organizationPhoneNumber);
 
     const canSubmit =
         form.organizationName.trim() &&
@@ -84,13 +82,14 @@ export default function CreateClientModal({
                     </FormField>
 
                     <FormField label="Телефон організації">
-                        <input
-                            className={inputBase}
-                            placeholder="+380XXXXXXXXX"
+                        <PhoneInput
                             value={form.organizationPhoneNumber}
-                            onChange={e =>
-                                setForm({ ...form, organizationPhoneNumber: e.target.value })
+                            onChange={organizationPhoneNumber =>
+                                setForm({ ...form, organizationPhoneNumber })
                             }
+                            required
+                            requiredErrorMessage="Телефон організації обов'язковий"
+                            invalidErrorMessage="Телефон повинен бути у форматі +380 XX XXX XX XX"
                         />
                     </FormField>
                 </div>
