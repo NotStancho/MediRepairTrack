@@ -44,11 +44,6 @@ public class ClaimController {
         return claimService.changeStatus(id, employeeId, dto);
     }
 
-    @PostMapping("/{claimId}/assign-employee")
-    public void assignEmployee(@PathVariable Integer claimId, @Valid @RequestBody AssignEmployeeToClaimDTO dto) {
-        claimService.assignEmployee(claimId, dto.getManagerId(), dto.getEmployeeId(), dto.getRole());
-    }
-
     @GetMapping("/{id}")
     public ClaimResponseDTO getClaimById(@PathVariable Integer id) {
         return claimService.getClaimById(id);

@@ -18,14 +18,12 @@ import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
 import ua.nure.medirepairtrack.Repository.client.ClientRepository;
 import ua.nure.medirepairtrack.Repository.delivery.DeliveryRepository;
 import ua.nure.medirepairtrack.Repository.billing.InvoiceRepository;
-import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.RoleInClaim;
 import ua.nure.medirepairtrack.Entity.client.Client.Client;
 import ua.nure.medirepairtrack.Entity.delivery.Delivery.DeliveryStatus;
 import ua.nure.medirepairtrack.Entity.equipment.Equipment.Equipment;
 import ua.nure.medirepairtrack.Entity.billing.Invoice.Invoice;
 import ua.nure.medirepairtrack.Entity.billing.Invoice.InvoiceStatus;
 import ua.nure.medirepairtrack.Event.Claim.*;
-import ua.nure.medirepairtrack.Event.ClaimEmployee.ClaimEmployeeAssignedEvent;
 import ua.nure.medirepairtrack.Service.equipment.EquipmentService;
 import ua.nure.medirepairtrack.Workflow.ClaimStatusMachine;
 import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
@@ -46,7 +44,6 @@ public class ClaimService {
     private final InvoiceRepository invoiceRepository;
     private final DeliveryRepository deliveryRepository;
 
-    private final ClaimEmployeeService claimEmployeeService;
     private final EquipmentService equipmentService;
 
     private final ApplicationEventPublisher eventPublisher;
@@ -144,7 +141,7 @@ public class ClaimService {
         claimRepository.save(claim);
 
         if (descriptionChanged && claimStatusMachine.allowsEmbeddingGeneration(claim.getStatus())) {
-            publishClaimDescriptionChangedEvent(claim.getId());
+            eventPublisher.publishEvent(new ClaimDescriptionChangedEvent(claim.getId()));
         }
 
         return mapToResponse(claim);
@@ -197,26 +194,6 @@ public class ClaimService {
         );
 
         return mapToResponse(claim);
-    }
-
-    @Transactional
-    public void assignEmployee(Integer claimId, Integer managerId, Integer employeeId, RoleInClaim role) {
-
-        Claim claim = getClaim(claimId);
-
-        // бізнес-валідація
-        if (!claimStatusMachine.allowsAssignment(claim.getStatus())) {
-            throw new OperationNotAllowedException(StatusMessageUtil.denied(
-                    "призначити інженера", claim.getStatus(), claimStatusMachine.allowedClaimEditStatuses()
-            ));
-        }
-
-        claimEmployeeService.assignEmployee(claim, employeeId, role);
-
-        // EVENT
-        eventPublisher.publishEvent(
-                new ClaimEmployeeAssignedEvent(claimId, managerId, employeeId, role)
-        );
     }
 
     public ClaimResponseDTO getClaimById(Integer id) {
@@ -371,12 +348,6 @@ public class ClaimService {
                         claim.getRepairType(),
                         claim.getStatus()
                 )
-        );
-    }
-
-    public void publishClaimDescriptionChangedEvent(Integer claimId) {
-        eventPublisher.publishEvent(
-                new ClaimDescriptionChangedEvent(claimId)
         );
     }
 }
