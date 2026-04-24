@@ -53,7 +53,7 @@ public class ClaimEmployeeController {
     }
 
     @GetMapping("/{claimId}/assignable-employees")
-    public List<EmployeeShortDTO> getAssignableEmployees(@PathVariable Integer claimId, @RequestParam Integer actorEmployeeId) {
-        return claimEmployeeService.getAssignableEmployees(claimId, actorEmployeeId);
+    public List<EmployeeShortDTO> getAssignableEmployees(@PathVariable Integer claimId, @RequestParam Integer performedByEmployeeId) {
+        return claimEmployeeService.getAssignableEmployees(claimId, performedByEmployeeId);
     }
 }

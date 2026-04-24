@@ -334,7 +334,7 @@ public class ClaimEmployeeService {
         return String.format(
                 "%s %s.",
                 e.getUser().getLastName(),
-                e.getUser().getFirstName().charAt(0)
+                e.getUser().getFirstName()
         );
     }
 
