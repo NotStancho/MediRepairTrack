@@ -127,6 +127,13 @@ public class ClaimEmployeeService {
         RoleInClaim currentRole = claimEmployee.getRoleInClaim();
         RoleInClaim nextRole = dto.getRoleInClaim();
 
+        if (dto.getPerformedByEmployeeId().equals(employeeId)
+                && claimEmployee.getRoleInClaim() == RoleInClaim.LEAD
+                && dto.getRoleInClaim() != RoleInClaim.LEAD
+        ) {
+            throw new OperationNotAllowedException("Головний інженер не може змінити власну роль");
+        }
+
         if (nextRole == RoleInClaim.LEAD && currentRole != RoleInClaim.LEAD) {
             boolean leadExists = claimEmployeeRepository.existsByClaimIdAndRoleInClaim(claimId, RoleInClaim.LEAD);
             if (leadExists) {
