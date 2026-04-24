@@ -64,6 +64,20 @@ public class ClaimStatusMachine {
         return !isFinal(status);
     }
 
+    private static final Set<Status> ACTIVE_STATUSES = Set.of(
+            Status.ACCEPTED,
+            Status.ASSIGNED_TO_ENGINEER,
+            Status.IN_PROGRESS,
+            Status.WAITING_FOR_PARTS
+    );
+
+    public boolean isActive(Status status) {
+        return ACTIVE_STATUSES.contains(status);
+    }
+
+    public Set<Status> getActiveStatuses() {
+        return ACTIVE_STATUSES;
+    }
 
     public boolean allowsInvoiceCreation(Status status) {
         return Set.of(
