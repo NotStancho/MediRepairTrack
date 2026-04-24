@@ -43,6 +43,11 @@ public class EmployeeController {
         return employeeService.getAll();
     }
 
+    @GetMapping("/short")
+    public List<EmployeeShortDTO> getAllShort() {
+        return employeeService.getAllShort();
+    }
+
     @GetMapping("/user/{userId}")
     public EmployeeResponseDTO getByUser(@PathVariable Integer userId) {
         return employeeService.getByUserId(userId);

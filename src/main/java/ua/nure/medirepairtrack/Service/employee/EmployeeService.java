@@ -102,6 +102,14 @@ public class EmployeeService {
         return map(emp);
     }
 
+    // --- Видалення ---
+    public void delete(Integer id) {
+        if (!employeeRepository.existsById(id))
+            throw new NotFoundException("Співробітник не знайдений");
+
+        employeeRepository.deleteById(id);
+    }
+
     // --- Отримання по ID ---
     public EmployeeResponseDTO getById(Integer id) {
         return employeeRepository.findById(id)
@@ -113,6 +121,13 @@ public class EmployeeService {
         return employeeRepository.findAll()
                 .stream()
                 .map(this::map)
+                .toList();
+    }
+
+    public List<EmployeeShortDTO> getAllShort() {
+        return employeeRepository.findAll()
+                .stream()
+                .map(this::mapToShort)
                 .toList();
     }
 
@@ -168,14 +183,6 @@ public class EmployeeService {
                 .orElseThrow(() -> new NotFoundException("Співробітник не знайдений"));
     }
 
-    // --- Видалення ---
-    public void delete(Integer id) {
-        if (!employeeRepository.existsById(id))
-            throw new NotFoundException("Співробітник не знайдений");
-
-        employeeRepository.deleteById(id);
-    }
-
     // --- Mapping ---
     private EmployeeResponseDTO map(Employee e) {
         return EmployeeResponseDTO.builder()
@@ -189,6 +196,16 @@ public class EmployeeService {
                 .specialization(e.getSpecialization())
                 .availabilityStatus(e.getAvailabilityStatus())
                 .hireDate(e.getHireDate())
+                .build();
+    }
+
+    private EmployeeShortDTO mapToShort(Employee e) {
+        return EmployeeShortDTO.builder()
+                .id(e.getId())
+                .firstName(e.getUser().getFirstName())
+                .lastName(e.getUser().getLastName())
+                .position(e.getPosition())
+                .availabilityStatus(e.getAvailabilityStatus())
                 .build();
     }
 
