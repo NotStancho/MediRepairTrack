@@ -18,21 +18,14 @@ public class ClaimEmployeeAssignmentListener {
     @EventListener
     public void onEmployeeAssigned(ClaimEmployeeAssignedEvent event) {
 
-        log.info(
-                "[EVENT] EmployeeAssigned | claimId={} | employeeId={} | role={} | managerId={}",
+        log.info("[EVENT] EmployeeAssigned | claimId={} | description={}", event.claimId(), event.description());
+
+        claimHistoryService.addSystemEvent(
                 event.claimId(),
-                event.employeeId(),
-                event.role(),
-                event.managerId()
+                event.performedByEmployeeId(),
+                ActionType.SYSTEM_EVENT,
+                event.description()
         );
-
-        String description = String.format(
-                "Менеджер призначив працівника (ID=%d) з роллю %s",
-                event.employeeId(),
-                event.role()
-        );
-
-        claimHistoryService.addSystemEvent(event.claimId(), event.managerId(), ActionType.SYSTEM_EVENT, description);
     }
 }
 

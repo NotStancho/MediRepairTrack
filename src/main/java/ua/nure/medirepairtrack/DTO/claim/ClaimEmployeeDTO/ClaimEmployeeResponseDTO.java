@@ -16,6 +16,7 @@ public class ClaimEmployeeResponseDTO {
     private String firstName;
     private String lastName;
     private Position position;
+    private Double ratePerHour;
 
     // claim-employee
     private RoleInClaim roleInClaim;

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class AssignedActiveClaimDTO {
+public class AssignedActiveClaimViewDTO {
 
     // Ідентифікація
     private Integer claimId;

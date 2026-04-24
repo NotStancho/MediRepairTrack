@@ -1,23 +1,33 @@
 package ua.nure.medirepairtrack.Service.claim;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.nure.medirepairtrack.DTO.claim.ClaimEmployeeDTO.AssignedActiveClaimDTO;
-import ua.nure.medirepairtrack.DTO.claim.ClaimEmployeeDTO.AssignedClaimDTO;
-import ua.nure.medirepairtrack.DTO.claim.ClaimEmployeeDTO.ClaimEmployeeResponseDTO;
+import ua.nure.medirepairtrack.DTO.claim.ClaimEmployeeDTO.AssignEmployeeToClaimDTO;
+import ua.nure.medirepairtrack.DTO.claim.ClaimEmployeeDTO.*;
+import ua.nure.medirepairtrack.DTO.employee.EmployeeDTO.EmployeeShortDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
+import ua.nure.medirepairtrack.Entity.claim.Claim.Status;
+import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ActionType;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.ClaimEmployee;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.ClaimEmployeeId;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.RoleInClaim;
+import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
+import ua.nure.medirepairtrack.Entity.employee.Employee.Position;
+import ua.nure.medirepairtrack.Event.ClaimEmployee.ClaimEmployeeAssignedEvent;
+import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.claim.ClaimEmployeeRepository;
 import ua.nure.medirepairtrack.Repository.claim.ClaimHistoryRepository;
 import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
 import ua.nure.medirepairtrack.Repository.employee.EmployeeRepository;
+import ua.nure.medirepairtrack.Workflow.ClaimStatusMachine;
+import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,84 +37,258 @@ public class ClaimEmployeeService {
     private final ClaimHistoryRepository claimHistoryRepository;
     private final ClaimRepository claimRepository;
     private final EmployeeRepository employeeRepository;
+    private final ClaimHistoryService claimHistoryService;
+    private final ClaimStatusMachine claimStatusMachine;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void assignEmployee(Claim claim, Integer employeeId, RoleInClaim role) {
-        ClaimEmployeeId id = new ClaimEmployeeId(claim.getId(), employeeId);
+    public ClaimEmployeeResponseDTO assignEmployee(Integer claimId, AssignEmployeeToClaimDTO dto) {
 
-        if (claimEmployeeRepository.existsByIdClaimIdAndIdEmployeeId(claim.getId(), employeeId)) {
+        Claim claim = claimRepository.findById(claimId)
+                .orElseThrow(() -> new NotFoundException("Заявка не знайдена"));
+
+        if (!claimStatusMachine.allowsAssignment(claim.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            "призначити працівника",
+                            claim.getStatus(),
+                            claimStatusMachine.allowedClaimEditStatuses()
+                    )
+            );
+        }
+
+        validateCanManageEmployees(claimId, dto.getPerformedByEmployeeId());
+
+        Employee employee = getEmployee(dto.getEmployeeId());
+        ClaimEmployeeId id = new ClaimEmployeeId(claimId, dto.getEmployeeId());
+
+        if (claimEmployeeRepository.existsByIdClaimIdAndIdEmployeeId(claimId, dto.getEmployeeId())) {
             throw new OperationNotAllowedException("Працівник вже призначений до заявки");
+        }
+
+        if (dto.getRole() == RoleInClaim.LEAD) {
+            boolean leadExists = claimEmployeeRepository
+                    .existsByClaimIdAndRoleInClaim(claimId, RoleInClaim.LEAD);
+
+            if (leadExists) {
+                throw new OperationNotAllowedException("У заявці вже є головний інженер");
+            }
         }
 
         ClaimEmployee ce = ClaimEmployee.builder()
                 .id(id)
                 .claim(claim)
-                .employee(employeeRepository.getReferenceById(employeeId))
-                .roleInClaim(role)
+                .employee(employee)
+                .roleInClaim(dto.getRole())
                 .hoursWorked(BigDecimal.ZERO)
                 .build();
 
         claimEmployeeRepository.save(ce);
+
+        Employee performer = getEmployee(dto.getPerformedByEmployeeId());
+        Employee target = employee;
+
+        String description = String.format(
+                "Працівник %s призначив %s з роллю %s",
+                getShortName(performer),
+                getShortName(target),
+                roleLabel(dto.getRole())
+        );
+
+        eventPublisher.publishEvent(
+                new ClaimEmployeeAssignedEvent(
+                        claimId,
+                        performer.getId(),
+                        description
+                )
+        );
+
+        return mapToResponse(ce);
+    }
+
+    @Transactional
+    public ClaimEmployeeResponseDTO updateClaimEmployee(Integer claimId, Integer employeeId, UpdateClaimEmployeeDTO dto) {
+        validateCanManageEmployees(claimId, dto.getPerformedByEmployeeId());
+
+        ClaimEmployee claimEmployee = getClaimEmployee(claimId, employeeId);
+
+        Claim claim = claimEmployee.getClaim();
+
+        if (!claimStatusMachine.allowsAssignment(claim.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            "змінити роль працівника",
+                            claim.getStatus(),
+                            claimStatusMachine.allowedClaimEditStatuses()
+                    )
+            );
+        }
+
+        RoleInClaim currentRole = claimEmployee.getRoleInClaim();
+        RoleInClaim nextRole = dto.getRoleInClaim();
+
+        if (nextRole == RoleInClaim.LEAD && currentRole != RoleInClaim.LEAD) {
+            boolean leadExists = claimEmployeeRepository.existsByClaimIdAndRoleInClaim(claimId, RoleInClaim.LEAD);
+            if (leadExists) {
+                throw new OperationNotAllowedException("У заявці вже є головний інженер");
+            }
+        }
+
+        if (currentRole == nextRole) {
+            return mapToResponse(claimEmployee);
+        }
+
+        claimEmployee.setRoleInClaim(nextRole);
+        claimEmployeeRepository.save(claimEmployee);
+
+        Employee performer = getEmployee(dto.getPerformedByEmployeeId());
+        Employee target = claimEmployee.getEmployee();
+
+        claimHistoryService.addSystemEvent(
+                claimId,
+                performer.getId(),
+                ActionType.SYSTEM_EVENT,
+                String.format(
+                        "Працівник %s змінив роль %s з %s на %s",
+                        getShortName(performer),
+                        getShortName(target),
+                        roleLabel(currentRole),
+                        roleLabel(nextRole)
+                )
+        );
+
+        return mapToResponse(claimEmployee);
+    }
+
+    @Transactional
+    public void deleteClaimEmployee(Integer claimId, Integer employeeId, Integer performedByEmployeeId) {
+        validateCanManageEmployees(claimId, performedByEmployeeId);
+
+        ClaimEmployee claimEmployee = getClaimEmployee(claimId, employeeId);
+
+        Claim claim = claimEmployee.getClaim();
+
+        if (!claimStatusMachine.allowsAssignment(claim.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            "видалити працівника із заявки",
+                            claim.getStatus(),
+                            claimStatusMachine.allowedClaimEditStatuses()
+                    )
+            );
+        }
+
+        if (performedByEmployeeId.equals(employeeId)) {
+            throw new OperationNotAllowedException("Не можна видалити самого себе зі складу працівників заявки");
+        }
+
+        claimEmployeeRepository.delete(claimEmployee);
+
+        Employee performer = getEmployee(performedByEmployeeId);
+        Employee target = claimEmployee.getEmployee();
+
+        claimHistoryService.addSystemEvent(
+                claimId,
+                performedByEmployeeId,
+                ActionType.SYSTEM_EVENT,
+                String.format(
+                        "Працівник %s видалив %s зі складу заявки",
+                        getShortName(performer),
+                        getShortName(target)
+                )
+        );
     }
 
     public List<AssignedClaimDTO> getAssignedClaims(Integer employeeId) {
-        return claimEmployeeRepository.findByEmployeeId(employeeId)
+        return findAssignedClaims(employeeId, null)
                 .stream()
                 .map(this::mapToAssignedClaimDTO)
                 .toList();
     }
 
-    public List<AssignedActiveClaimDTO> getActiveAssignedClaims(Integer employeeId) {
-        return claimEmployeeRepository
-                .findByEmployeeIdAndClaim_ClosedAtIsNull(employeeId)
+    public List<AssignedActiveClaimViewDTO> getActiveAssignedClaims(Integer employeeId) {
+        return findAssignedClaims(employeeId, claimStatusMachine.getActiveStatuses())
                 .stream()
-                .map(this::mapToAssignedActiveClaimDTO)
+                .map(this::mapToAssignedActiveClaimViewDTO)
                 .toList();
     }
 
-    @Transactional
-    public void recalculateHours(Integer claimId, Integer employeeId) {
+    /**
+     * Повертає призначення працівника до заявок.
+     *
+     * Якщо statuses == null або порожній — повертаються всі призначені заявки.
+     * Якщо statuses задано — повертаються лише заявки з відповідними статусами.
+     *
+     * Це дозволяє використовувати один спільний метод для:
+     * - повного списку призначених заявок;
+     * - активних призначених заявок для робочого списку інженера.
+     */
+    private List<ClaimEmployee> findAssignedClaims(Integer employeeId, Set<Status> statuses) {
+        if (statuses == null || statuses.isEmpty()) {
+            return claimEmployeeRepository.findByEmployeeId(employeeId);
+        }
 
-        BigDecimal totalHours =
-                claimHistoryRepository.sumWorkLogTimeByEmployee(
-                        claimId, employeeId
-                );
-
-        ClaimEmployeeId id = new ClaimEmployeeId(claimId, employeeId);
-
-        ClaimEmployee ce = claimEmployeeRepository.findById(id)
-                .orElseGet(() -> ClaimEmployee.builder()
-                        .id(id)
-                        .claim(claimRepository.getReferenceById(claimId))
-                        .employee(employeeRepository.getReferenceById(employeeId))
-                        .roleInClaim(RoleInClaim.ASSISTANT) // default
-                        .hoursWorked(BigDecimal.ZERO)
-                        .build()
-                );
-
-        ce.setHoursWorked(totalHours != null ? totalHours : BigDecimal.ZERO);
-
-        claimEmployeeRepository.save(ce);
+        return claimEmployeeRepository.findByEmployeeIdAndClaim_StatusIn(employeeId, statuses);
     }
 
-    public List<ClaimEmployeeResponseDTO> getEmployeesByClaim(Integer claimId) {
-        return claimEmployeeRepository.findByClaimId(claimId)
-                .stream()
-                .map(ce -> ClaimEmployeeResponseDTO.builder()
-                        .employeeId(ce.getEmployee().getId())
-                        .firstName(ce.getEmployee().getUser().getFirstName())
-                        .lastName(ce.getEmployee().getUser().getLastName())
-                        .position(ce.getEmployee().getPosition())
-                        .roleInClaim(ce.getRoleInClaim())
-                        .hoursWorked(ce.getHoursWorked())
-                        .notes(ce.getNotes())
+
+    public List<EmployeeShortDTO> getAssignableEmployees(Integer claimId, Integer performedByEmployeeId) {
+        claimRepository.findById(claimId)
+                .orElseThrow(() -> new NotFoundException("Заявка не знайдена"));
+
+        validateCanManageEmployees(claimId, performedByEmployeeId);
+
+        List<Employee> employees = employeeRepository.findAssignableEmployees(claimId, performedByEmployeeId);
+
+        return employees.stream()
+                .map(e -> EmployeeShortDTO.builder()
+                        .id(e.getId())
+                        .firstName(e.getUser().getFirstName())
+                        .lastName(e.getUser().getLastName())
+                        .position(e.getPosition())
+                        .availabilityStatus(e.getAvailabilityStatus())
                         .build()
                 )
                 .toList();
     }
 
+    public List<ClaimEmployeeResponseDTO> getEmployeesByClaim(Integer claimId) {
+        return claimEmployeeRepository.findByClaimId(claimId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     public List<ClaimEmployee> getByClaim(Integer claimId) {
         return claimEmployeeRepository.findByClaimId(claimId);
+    }
+
+    @Transactional
+    public void recalculateHours(Integer claimId, Integer employeeId) {
+
+        BigDecimal totalHours = claimHistoryRepository.sumWorkLogTimeByEmployee(claimId, employeeId);
+
+        ClaimEmployee claimEmployee = getClaimEmployee(claimId, employeeId);
+        claimEmployee.setHoursWorked(totalHours != null ? totalHours : BigDecimal.ZERO);
+
+        claimEmployeeRepository.save(claimEmployee);
+    }
+
+    private void validateCanManageEmployees(Integer claimId, Integer performedByEmployeeId) {
+        Employee performer = getEmployee(performedByEmployeeId);
+
+        // Manager can manage all employees
+        if (performer.getPosition() == Position.MANAGER || performer.getPosition() == Position.SYSTEM) {
+            return;
+        }
+
+        ClaimEmployee ce = claimEmployeeRepository
+                .findByIdClaimIdAndIdEmployeeId(claimId, performedByEmployeeId)
+                .orElseThrow(() -> new OperationNotAllowedException("Ви не призначені до цієї заявки"));
+
+        if (ce.getRoleInClaim() != RoleInClaim.LEAD) {
+            throw new OperationNotAllowedException("Лише менеджер або головний інженер можуть керувати працівниками заявки");
+        }
     }
 
     private AssignedClaimDTO mapToAssignedClaimDTO(ClaimEmployee ce) {
@@ -116,10 +300,10 @@ public class ClaimEmployeeService {
                 .build();
     }
 
-    private AssignedActiveClaimDTO mapToAssignedActiveClaimDTO(ClaimEmployee ce) {
+    private AssignedActiveClaimViewDTO mapToAssignedActiveClaimViewDTO(ClaimEmployee ce) {
         Claim c = ce.getClaim();
 
-        return AssignedActiveClaimDTO.builder()
+        return AssignedActiveClaimViewDTO.builder()
                 .claimId(c.getId())
                 .clientId(c.getClient().getId())
                 .status(c.getStatus())
@@ -131,6 +315,47 @@ public class ClaimEmployeeService {
                 .closedAt(c.getClosedAt())
                 .defectDescription(c.getDefectDescription())
                 .build();
+    }
+
+    private ClaimEmployeeResponseDTO mapToResponse(ClaimEmployee ce) {
+        return ClaimEmployeeResponseDTO.builder()
+                .employeeId(ce.getEmployee().getId())
+                .firstName(ce.getEmployee().getUser().getFirstName())
+                .lastName(ce.getEmployee().getUser().getLastName())
+                .position(ce.getEmployee().getPosition())
+                .ratePerHour(ce.getEmployee().getRatePerHour())
+                .roleInClaim(ce.getRoleInClaim())
+                .hoursWorked(ce.getHoursWorked())
+                .notes(ce.getNotes())
+                .build();
+    }
+
+    private String getShortName(Employee e) {
+        return String.format(
+                "%s %s.",
+                e.getUser().getLastName(),
+                e.getUser().getFirstName().charAt(0)
+        );
+    }
+
+    private String roleLabel(RoleInClaim role) {
+        return switch (role) {
+            case LEAD -> "головного інженера";
+            case ASSISTANT -> "асистента";
+            case DIAGNOSTIC -> "діагноста";
+            case INSTALLER -> "монтажника";
+            case EXPERT -> "експерта";
+        };
+    }
+
+    private ClaimEmployee getClaimEmployee(Integer claimId, Integer employeeId) {
+        return claimEmployeeRepository.findByIdClaimIdAndIdEmployeeId(claimId, employeeId)
+                .orElseThrow(() -> new NotFoundException("Працівник не призначений до заявки"));
+    }
+
+    private Employee getEmployee(Integer employeeId) {
+        return employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new NotFoundException("Працівник не знайдений"));
     }
 }
 
