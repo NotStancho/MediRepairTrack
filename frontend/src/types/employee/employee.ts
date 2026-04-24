@@ -29,6 +29,14 @@ export interface Employee {
     hireDate: string;
 }
 
+export interface EmployeeShort {
+    id: number;
+    firstName: string;
+    lastName: string;
+    position: EmployeePosition;
+    availabilityStatus: EmployeeAvailabilityStatus;
+}
+
 export interface EmployeeFull {
     id: number;
     userId: number;
