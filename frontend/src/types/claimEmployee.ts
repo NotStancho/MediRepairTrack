@@ -1,4 +1,5 @@
 // types/claimEmployee
+
 import type { RoleInClaim } from './claim/assignedClaim';
 import type { EmployeePosition } from "./employee/employee";
 
@@ -10,5 +11,5 @@ export interface ClaimEmployee {
     roleInClaim: RoleInClaim;
     hoursWorked: number;
     ratePerHour: number;
-    notes?: string;
+    notes?: string | null;
 }

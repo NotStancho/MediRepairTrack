@@ -1,4 +1,14 @@
+// utils/roleInClaimLabels
+
 import type { RoleInClaim } from '../types/claim/assignedClaim';
+
+export const ROLE_IN_CLAIM_OPTIONS: RoleInClaim[] = [
+    'LEAD',
+    'ASSISTANT',
+    'DIAGNOSTIC',
+    'INSTALLER',
+    'EXPERT',
+];
 
 /* =========================
    ROLE IN CLAIM LABELS
