@@ -1,3 +1,5 @@
+// components/claims/tabs/ClaimHistoryTab
+
 import { useEffect, useState } from 'react';
 import type { ClaimHistory } from '../../../types/claim/claimHistory';
 import type { Employee } from '../../../types/employee/employee';
@@ -5,7 +7,6 @@ import type { Employee } from '../../../types/employee/employee';
 import { getClaimHistory } from '../../../api/claimHistory';
 import { getEmployeeById } from '../../../api/employee';
 
-import { FiClock } from 'react-icons/fi';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { HISTORY_ICONS } from '../../../utils/claimHistoryLabels';
 import { EMPLOYEE_POSITION_LABELS, EMPLOYEE_POSITION_COLORS } from '../../../utils/employeeLabels';
@@ -126,7 +127,7 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                                             text-xs font-medium
                                             ${EMPLOYEE_POSITION_COLORS[employee.position]}
                                         `}
-                                                                        >
+                                    >
                                         {EMPLOYEE_POSITION_LABELS[employee.position]}
                                     </span>
                                 </div>
@@ -138,14 +139,14 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                                     <span
                                         className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mx-1
                                             ${STATUS_COLORS[statusTransition.from]}`}
-                                                                >
+                                    >
                                         {CLAIM_STATUS_LABELS[statusTransition.from]}
                                     </span>
                                     →
                                     <span
                                         className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ml-1
                                             ${STATUS_COLORS[statusTransition.to]}`}
-                                                                >
+                                    >
                                         {CLAIM_STATUS_LABELS[statusTransition.to]}
                                     </span>
                                 </div>
@@ -154,13 +155,6 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                             {!statusTransition && item.description && (
                                 <div className="text-sm text-ink whitespace-pre-line mt-1">
                                     {item.description}
-                                </div>
-                            )}
-
-                            {item.timeSpent > 0 && (
-                                <div className="text-xs text-ink-muted mt-1 flex items-center gap-1">
-                                    <FiClock className="w-3.5 h-3.5" />
-                                    {item.timeSpent} год
                                 </div>
                             )}
                         </div>

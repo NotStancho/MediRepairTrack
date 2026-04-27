@@ -2,22 +2,22 @@ package ua.nure.medirepairtrack.Service.billing;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ua.nure.medirepairtrack.DTO.claim.ClaimDTO.ClaimResponseDTO;
-import ua.nure.medirepairtrack.DTO.claim.ClaimHistoryDTO.ClaimHistoryResponseDTO;
-import ua.nure.medirepairtrack.DTO.client.ClientContractDTO.ContractDiscountDTO;
-import ua.nure.medirepairtrack.DTO.delivery.DeliveryDTO.DeliveryResponseDTO;
-import ua.nure.medirepairtrack.DTO.claim.UsedPartDTO.UsedPartResponseDTO;
 import ua.nure.medirepairtrack.DTO.billing.BillingDTO.BillingItemDTO;
 import ua.nure.medirepairtrack.DTO.billing.BillingDTO.BillingResultDTO;
 import ua.nure.medirepairtrack.DTO.billing.BillingDTO.BillingSectionResultDTO;
 import ua.nure.medirepairtrack.DTO.billing.PricingConfigDTO.PricingConfigResponseDTO;
+import ua.nure.medirepairtrack.DTO.claim.ClaimDTO.ClaimResponseDTO;
+import ua.nure.medirepairtrack.DTO.claim.UsedPartDTO.UsedPartResponseDTO;
+import ua.nure.medirepairtrack.DTO.client.ClientContractDTO.ContractDiscountDTO;
+import ua.nure.medirepairtrack.DTO.delivery.DeliveryDTO.DeliveryResponseDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.RepairType;
+import ua.nure.medirepairtrack.Entity.claim.ClaimRepairOperation.ClaimRepairOperation;
 import ua.nure.medirepairtrack.Exception.BadRequestException;
-import ua.nure.medirepairtrack.Service.delivery.DeliveryService;
-import ua.nure.medirepairtrack.Service.repair.PartService;
-import ua.nure.medirepairtrack.Service.claim.ClaimHistoryService;
+import ua.nure.medirepairtrack.Service.claim.ClaimRepairOperationService;
 import ua.nure.medirepairtrack.Service.claim.ClaimService;
 import ua.nure.medirepairtrack.Service.client.ClientContractService;
+import ua.nure.medirepairtrack.Service.delivery.DeliveryService;
+import ua.nure.medirepairtrack.Service.repair.PartService;
 import ua.nure.medirepairtrack.Workflow.DeliveryStatusMachine;
 
 import java.math.BigDecimal;
@@ -32,7 +32,7 @@ public class BillingService {
     private static final BigDecimal HUNDRED = new BigDecimal("100");
 
     private final ClaimService claimService;
-    private final ClaimHistoryService claimHistoryService;
+    private final ClaimRepairOperationService claimRepairOperationService;
     private final PartService partService;
     private final DeliveryService deliveryService;
     private final PricingConfigService pricingConfigService;
@@ -42,30 +42,30 @@ public class BillingService {
 
     public BillingSectionResultDTO calculateLabor(Integer claimId) {
         // =========================
-        // LABOR (WORK LOG BASED)
+        // LABOR (CLAIM REPAIR OPERATIONS BASED)
         // =========================
 
         ClaimResponseDTO claim = claimService.getClaimById(claimId);
         PricingConfigResponseDTO pricing = pricingConfigService.getByRepairType(claim.getRepairType());
         ContractDiscountDTO discount = clientContractService.getActiveDiscounts(claim.getClientId());
 
-        List<ClaimHistoryResponseDTO> workLogs = claimHistoryService.getWorkLogs(claimId);
+        List<ClaimRepairOperation> operations = claimRepairOperationService.getClaimOperations(claimId);
 
         List<BillingItemDTO> items = new ArrayList<>();
 
         BigDecimal actualHours = BigDecimal.ZERO;
 
-        for (ClaimHistoryResponseDTO log : workLogs) {
+        for (ClaimRepairOperation operation : operations) {
 
-            actualHours = actualHours.add(log.getTimeSpent());
+            actualHours = actualHours.add(operation.getTimeSpent());
 
             items.add(
                     BillingItemDTO.builder()
-                            .description("Роботи: " + log.getDescription())
-                            .quantity(log.getTimeSpent())
+                            .description(buildLaborDescription(operation))
+                            .quantity(operation.getTimeSpent())
                             .pricePerUnit(pricing.getLaborPricePerHour())
                             .totalPrice(
-                                    log.getTimeSpent()
+                                    operation.getTimeSpent()
                                             .multiply(pricing.getLaborPricePerHour())
                             )
                             .unitName("год")
@@ -278,5 +278,15 @@ public class BillingService {
         throw new BadRequestException(
                 "Некоректні дані доставки: необхідно price або distanceKm + pricePerUnit. deliveryId=" + d.getId()
         );
+    }
+
+    private String buildLaborDescription(ClaimRepairOperation operation) {
+        String base = "Робота: " + operation.getOperation().getName();
+
+        if (operation.getNote() == null || operation.getNote().isBlank()) {
+            return base;
+        }
+
+        return base + ". Примітка: " + operation.getNote();
     }
 }

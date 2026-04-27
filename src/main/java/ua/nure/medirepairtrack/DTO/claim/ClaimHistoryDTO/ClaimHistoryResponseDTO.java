@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ActionType;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,6 +15,5 @@ public class ClaimHistoryResponseDTO {
     private Integer employeeId;
     private ActionType actionType;
     private String description;
-    private BigDecimal timeSpent;
     private LocalDateTime actionDate;
 }

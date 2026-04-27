@@ -12,6 +12,5 @@ export interface ClaimHistory {
     employeeId: number;
     actionType: ClaimHistoryActionType;
     description: string;
-    timeSpent: number;
     actionDate: string;
 }

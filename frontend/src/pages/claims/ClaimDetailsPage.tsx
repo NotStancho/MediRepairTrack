@@ -1,13 +1,13 @@
+﻿import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import type { Claim } from '../../types/claim/claim';
 import ClaimHeader from '../../components/claims/ClaimHeader';
 import ClaimTabs from '../../components/claims/ClaimTabs';
 import ClaimStatusUpdate from '../../components/claims/ClaimStatusUpdate';
 import { getClaimById } from '../../api/claim';
 
-import { getEquipmentFullById } from "../../api/equipment";
-import type { EquipmentFull } from "../../types/equipment/equipmentFull";
+import { getEquipmentFullById } from '../../api/equipment';
+import type { EquipmentFull } from '../../types/equipment/equipmentFull';
 
 export default function ClaimDetailsPage() {
     const { id } = useParams<{ id: string }>();
@@ -18,21 +18,50 @@ export default function ClaimDetailsPage() {
 
     const [equipment, setEquipment] = useState<EquipmentFull | null>(null);
 
+    const refreshClaim = useCallback(async () => {
+        if (!claimId) {
+            return;
+        }
+
+        const nextClaim = await getClaimById(claimId);
+        setClaim(nextClaim);
+    }, [claimId]);
+
     useEffect(() => {
         if (!claimId) return;
 
-        setLoading(true);
+        let cancelled = false;
 
-        getClaimById(claimId)
-            .then((c) => {
-                setClaim(c);
-                return getEquipmentFullById(c.equipmentId);
-            })
-            .then(setEquipment)
-            .finally(() => setLoading(false));
+        const load = async () => {
+            setLoading(true);
+
+            try {
+                const nextClaim = await getClaimById(claimId);
+
+                if (cancelled) {
+                    return;
+                }
+
+                setClaim(nextClaim);
+
+                const nextEquipment = await getEquipmentFullById(nextClaim.equipmentId);
+
+                if (!cancelled) {
+                    setEquipment(nextEquipment);
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        void load();
+
+        return () => {
+            cancelled = true;
+        };
     }, [claimId]);
-
-
 
     if (loading) {
         return <div>Завантаження заявки…</div>;
@@ -48,11 +77,11 @@ export default function ClaimDetailsPage() {
                 claim={claim}
                 equipment={equipment}
                 actions={
-                    <ClaimStatusUpdate claim={claim} onUpdated={setClaim} />
+                    <ClaimStatusUpdate claim={claim} onUpdated={refreshClaim} />
                 }
             />
 
-            <ClaimTabs claim={claim} />
+            <ClaimTabs claim={claim} onClaimUpdated={refreshClaim} />
         </div>
     );
 }

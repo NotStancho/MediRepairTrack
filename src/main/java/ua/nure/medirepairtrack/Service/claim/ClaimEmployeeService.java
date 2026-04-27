@@ -4,22 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.nure.medirepairtrack.DTO.claim.ClaimEmployeeDTO.AssignEmployeeToClaimDTO;
 import ua.nure.medirepairtrack.DTO.claim.ClaimEmployeeDTO.*;
 import ua.nure.medirepairtrack.DTO.employee.EmployeeDTO.EmployeeShortDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Status;
-import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ActionType;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.ClaimEmployee;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.ClaimEmployeeId;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.RoleInClaim;
+import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ActionType;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Position;
 import ua.nure.medirepairtrack.Event.ClaimEmployee.ClaimEmployeeAssignedEvent;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.claim.ClaimEmployeeRepository;
-import ua.nure.medirepairtrack.Repository.claim.ClaimHistoryRepository;
+import ua.nure.medirepairtrack.Repository.claim.ClaimRepairOperationRepository;
 import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
 import ua.nure.medirepairtrack.Repository.employee.EmployeeRepository;
 import ua.nure.medirepairtrack.Workflow.ClaimStatusMachine;
@@ -35,7 +34,7 @@ import java.util.Set;
 public class ClaimEmployeeService {
 
     private final ClaimEmployeeRepository claimEmployeeRepository;
-    private final ClaimHistoryRepository claimHistoryRepository;
+    private final ClaimRepairOperationRepository claimRepairOperationRepository;
     private final ClaimRepository claimRepository;
     private final EmployeeRepository employeeRepository;
     private final ClaimHistoryService claimHistoryService;
@@ -254,7 +253,6 @@ public class ClaimEmployeeService {
         return claimEmployeeRepository.findByEmployeeIdAndClaim_StatusIn(employeeId, statuses);
     }
 
-
     public List<EmployeeShortDTO> getAssignableEmployees(Integer claimId, Integer performedByEmployeeId) {
         claimRepository.findById(claimId)
                 .orElseThrow(() -> new NotFoundException("Заявка не знайдена"));
@@ -289,18 +287,19 @@ public class ClaimEmployeeService {
     @Transactional
     public void recalculateHours(Integer claimId, Integer employeeId) {
 
-        BigDecimal totalHours = claimHistoryRepository.sumWorkLogTimeByEmployee(claimId, employeeId);
+        claimEmployeeRepository.findByIdClaimIdAndIdEmployeeId(claimId, employeeId)
+                .ifPresent(claimEmployee -> {
+                    BigDecimal totalHours = claimRepairOperationRepository
+                            .sumTimeSpentByClaimAndEmployee(claimId, employeeId);
 
-        ClaimEmployee claimEmployee = getClaimEmployee(claimId, employeeId);
-        claimEmployee.setHoursWorked(totalHours != null ? totalHours : BigDecimal.ZERO);
-
-        claimEmployeeRepository.save(claimEmployee);
+                    claimEmployee.setHoursWorked(totalHours != null ? totalHours : BigDecimal.ZERO);
+                    claimEmployeeRepository.save(claimEmployee);
+                });
     }
 
     private void validateCanManageEmployees(Integer claimId, Integer performedByEmployeeId) {
         Employee performer = getEmployee(performedByEmployeeId);
 
-        // Manager can manage all employees
         if (performer.getPosition() == Position.MANAGER || performer.getPosition() == Position.SYSTEM) {
             return;
         }

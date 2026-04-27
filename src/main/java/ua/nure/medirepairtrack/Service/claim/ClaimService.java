@@ -4,26 +4,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import ua.nure.medirepairtrack.DTO.claim.ClaimDTO.*;
+import ua.nure.medirepairtrack.Entity.billing.Invoice.Invoice;
+import ua.nure.medirepairtrack.Entity.billing.Invoice.InvoiceStatus;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.claim.Claim.RepairType;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Status;
-import ua.nure.medirepairtrack.Event.Claim.ClaimCreatedEvent;
-import ua.nure.medirepairtrack.Event.Claim.ClaimStatusChangedEvent;
-import ua.nure.medirepairtrack.Exception.InvalidStatusTransitionException;
-import ua.nure.medirepairtrack.Exception.NotFoundException;
-import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
-import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
-import ua.nure.medirepairtrack.Repository.client.ClientRepository;
-import ua.nure.medirepairtrack.Repository.delivery.DeliveryRepository;
-import ua.nure.medirepairtrack.Repository.billing.InvoiceRepository;
 import ua.nure.medirepairtrack.Entity.client.Client.Client;
 import ua.nure.medirepairtrack.Entity.delivery.Delivery.DeliveryStatus;
 import ua.nure.medirepairtrack.Entity.equipment.Equipment.Equipment;
-import ua.nure.medirepairtrack.Entity.billing.Invoice.Invoice;
-import ua.nure.medirepairtrack.Entity.billing.Invoice.InvoiceStatus;
 import ua.nure.medirepairtrack.Event.Claim.*;
+import ua.nure.medirepairtrack.Exception.InvalidStatusTransitionException;
+import ua.nure.medirepairtrack.Exception.NotFoundException;
+import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
+import ua.nure.medirepairtrack.Repository.billing.InvoiceRepository;
+import ua.nure.medirepairtrack.Repository.claim.ClaimRepairOperationRepository;
+import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
+import ua.nure.medirepairtrack.Repository.client.ClientRepository;
+import ua.nure.medirepairtrack.Repository.delivery.DeliveryRepository;
 import ua.nure.medirepairtrack.Service.equipment.EquipmentService;
 import ua.nure.medirepairtrack.Workflow.ClaimStatusMachine;
 import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
@@ -39,6 +37,7 @@ import java.util.Set;
 public class ClaimService {
 
     private final ClaimRepository claimRepository;
+    private final ClaimRepairOperationRepository claimRepairOperationRepository;
 
     private final ClientRepository clientRepository;
     private final InvoiceRepository invoiceRepository;
@@ -253,6 +252,23 @@ public class ClaimService {
                 .orElseThrow(() -> new NotFoundException("Заявка не знайдена"));
     }
 
+    @Transactional
+    public void recalculateTotalTimeSpent(Integer claimId) {
+
+        Claim claim = getClaim(claimId);
+
+        BigDecimal totalTimeSpent = claimRepairOperationRepository
+                .sumTimeSpentByClaim(claimId);
+
+        BigDecimal newTotal = totalTimeSpent != null
+                ? totalTimeSpent
+                : BigDecimal.ZERO;
+
+        if (!newTotal.equals(claim.getTotalTimeSpent())) {
+            claim.setTotalTimeSpent(newTotal);
+        }
+    }
+
     private boolean canBeCompleted(Integer claimId) {
 
         // =========================
@@ -294,6 +310,7 @@ public class ClaimService {
         // =========================
         return true;
     }
+
     @Transactional
     public void tryCompleteClaim(Integer claimId) {
 

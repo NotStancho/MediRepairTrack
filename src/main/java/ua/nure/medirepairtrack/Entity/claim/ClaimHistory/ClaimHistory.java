@@ -5,7 +5,6 @@ import lombok.*;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -39,7 +38,4 @@ public class ClaimHistory {
 
     @Column(name = "action_description", nullable = false, columnDefinition = "TEXT")
     private String actionDescription;
-
-    @Column(name = "time_spent", nullable = false, precision = 5, scale = 2)
-    private BigDecimal timeSpent;
 }
