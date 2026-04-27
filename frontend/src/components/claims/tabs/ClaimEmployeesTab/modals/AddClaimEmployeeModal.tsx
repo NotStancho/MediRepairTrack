@@ -1,4 +1,4 @@
-﻿// components/claims/tabs/ClaimEmployeesTab/modals/AddClaimEmployeeModal.tsx
+// components/claims/tabs/ClaimEmployeesTab/modals/AddClaimEmployeeModal.tsx
 
 import { useState } from 'react';
 
@@ -13,6 +13,7 @@ import InputField from '../../../../../ui/InputField';
 import Modal from '../../../../../ui/Modal/Modal';
 import ModalFooter from '../../../../../ui/Modal/ModalFooter';
 import Select from '../../../../../ui/Select';
+import TextArea from '../../../../../ui/TextArea';
 
 import {
     EMPLOYEE_AVAILABILITY_COLORS,
@@ -48,9 +49,11 @@ export default function AddClaimEmployeeModal({
 
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
     const [selectedRole, setSelectedRole] = useState<RoleInClaim | null>(null);
+    const [notes, setNotes] = useState('');
     const [submitted, setSubmitted] = useState(false);
 
     const roleOptions = ROLE_IN_CLAIM_OPTIONS;
+    const normalizeNotes = (value: string) => value.trim() || null;
 
     const canSubmit = selectedEmployeeId != null && selectedRole != null;
 
@@ -72,6 +75,7 @@ export default function AddClaimEmployeeModal({
             performedByEmployeeId,
             employeeId: selectedEmployeeId,
             role: selectedRole,
+            notes: normalizeNotes(notes),
         });
 
         onClose();
@@ -176,6 +180,18 @@ export default function AddClaimEmployeeModal({
                         placeholder="Оберіть роль"
                         disabled={creating}
                         invalid={!!roleError}
+                    />
+                </InputField>
+
+                <InputField
+                    label="Примітки"
+                    helperText="Поле не обов'язкове"
+                >
+                    <TextArea
+                        value={notes}
+                        onChange={event => setNotes(event.target.value)}
+                        placeholder="Додайте примітку до призначення працівника"
+                        disabled={creating}
                     />
                 </InputField>
             </div>

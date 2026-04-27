@@ -1,4 +1,4 @@
-﻿// // components/claims/tabs/ClaimEmployeesTab/ClaimEmployeesTab.tsx
+// // components/claims/tabs/ClaimEmployeesTab/ClaimEmployeesTab.tsx
 
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -226,7 +226,7 @@ export default function ClaimEmployeesTab({ claimId }: Props) {
                     onSave={async payload => {
                         const updated = await update(editingItem.employeeId, payload);
                         setEditingItem(updated);
-                        toast.success('Роль працівника оновлено');
+                        toast.success('Дані працівника у заявці оновлено');
                     }}
                 />
             )}

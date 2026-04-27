@@ -12,4 +12,6 @@ public class UpdateClaimEmployeeDTO {
 
     @NotNull(message = "Роль працівника в заявці обов'язкова")
     private RoleInClaim roleInClaim;
+
+    private String notes;
 }

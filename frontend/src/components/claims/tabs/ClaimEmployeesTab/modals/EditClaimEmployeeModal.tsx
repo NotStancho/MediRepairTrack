@@ -1,4 +1,4 @@
-﻿// components/claims/tabs/ClaimEmployeesTab/modals/EditClaimEmployeeModal.tsx
+// components/claims/tabs/ClaimEmployeesTab/modals/EditClaimEmployeeModal.tsx
 
 import { useState } from 'react';
 
@@ -10,6 +10,7 @@ import InputField from '../../../../../ui/InputField';
 import Modal from '../../../../../ui/Modal/Modal';
 import ModalFooter from '../../../../../ui/Modal/ModalFooter';
 import Select from '../../../../../ui/Select';
+import TextArea from '../../../../../ui/TextArea';
 
 import {
     EMPLOYEE_POSITION_COLORS,
@@ -37,9 +38,13 @@ export default function EditClaimEmployeeModal({
     onSave,
 }: Props) {
     const [roleInClaim, setRoleInClaim] = useState(claimEmployee.roleInClaim);
+    const [notes, setNotes] = useState(claimEmployee.notes ?? '');
     const [submitted, setSubmitted] = useState(false);
 
     const roleOptions = ROLE_IN_CLAIM_OPTIONS;
+    const normalizeNotes = (value: string) => value.trim() || null;
+    const initialNotes = normalizeNotes(claimEmployee.notes ?? '');
+    const currentNotes = normalizeNotes(notes);
 
     const roleError = submitted && roleInClaim == null
         ? 'Роль у заявці обовʼязкова'
@@ -55,13 +60,14 @@ export default function EditClaimEmployeeModal({
         await onSave({
             performedByEmployeeId,
             roleInClaim,
+            notes: currentNotes,
         });
 
         onClose();
     };
 
     return (
-        <Modal title="Редагувати роль працівника" onClose={onClose} width="md">
+        <Modal title="Редагувати працівника у заявці" onClose={onClose} width="md">
             <div className="space-y-4">
                 <div className="rounded-xl border border-border bg-surface-muted p-4">
                     <div className="text-sm font-medium text-ink">
@@ -110,6 +116,18 @@ export default function EditClaimEmployeeModal({
                         invalid={!!roleError}
                     />
                 </InputField>
+
+                <InputField
+                    label="Примітки"
+                    helperText="Поле не обов'язкове"
+                >
+                    <TextArea
+                        value={notes}
+                        onChange={event => setNotes(event.target.value)}
+                        placeholder="Додайте або оновіть примітку"
+                        disabled={saving}
+                    />
+                </InputField>
             </div>
 
             <ModalFooter>
@@ -119,7 +137,13 @@ export default function EditClaimEmployeeModal({
                 <Button
                     variant="primary"
                     onClick={handleSubmit}
-                    disabled={saving || roleInClaim === claimEmployee.roleInClaim}
+                    disabled={
+                        saving ||
+                        (
+                            roleInClaim === claimEmployee.roleInClaim &&
+                            currentNotes === initialNotes
+                        )
+                    }
                 >
                     {saving ? 'Збереження…' : 'Зберегти'}
                 </Button>

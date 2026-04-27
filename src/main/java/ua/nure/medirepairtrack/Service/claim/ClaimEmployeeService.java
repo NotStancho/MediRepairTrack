@@ -27,6 +27,7 @@ import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -81,6 +82,7 @@ public class ClaimEmployeeService {
                 .employee(employee)
                 .roleInClaim(dto.getRole())
                 .hoursWorked(BigDecimal.ZERO)
+                .notes(dto.getNotes())
                 .build();
 
         claimEmployeeRepository.save(ce);
@@ -117,7 +119,7 @@ public class ClaimEmployeeService {
         if (!claimStatusMachine.allowsAssignment(claim.getStatus())) {
             throw new OperationNotAllowedException(
                     StatusMessageUtil.denied(
-                            "змінити роль працівника",
+                            "змінити працівника в заявці",
                             claim.getStatus(),
                             claimStatusMachine.allowedClaimEditStatuses()
                     )
@@ -126,6 +128,8 @@ public class ClaimEmployeeService {
 
         RoleInClaim currentRole = claimEmployee.getRoleInClaim();
         RoleInClaim nextRole = dto.getRoleInClaim();
+        String currentNotes = claimEmployee.getNotes();
+        String nextNotes = dto.getNotes();
 
         if (dto.getPerformedByEmployeeId().equals(employeeId)
                 && claimEmployee.getRoleInClaim() == RoleInClaim.LEAD
@@ -141,28 +145,40 @@ public class ClaimEmployeeService {
             }
         }
 
-        if (currentRole == nextRole) {
+        boolean roleChanged = currentRole != nextRole;
+        boolean notesChanged = !Objects.equals(currentNotes, nextNotes);
+
+        if (!roleChanged && !notesChanged) {
             return mapToResponse(claimEmployee);
         }
 
-        claimEmployee.setRoleInClaim(nextRole);
+        if (roleChanged) {
+            claimEmployee.setRoleInClaim(nextRole);
+        }
+
+        if (notesChanged) {
+            claimEmployee.setNotes(nextNotes);
+        }
+
         claimEmployeeRepository.save(claimEmployee);
 
-        Employee performer = getEmployee(dto.getPerformedByEmployeeId());
-        Employee target = claimEmployee.getEmployee();
+        if (roleChanged) {
+            Employee performer = getEmployee(dto.getPerformedByEmployeeId());
+            Employee target = claimEmployee.getEmployee();
 
-        claimHistoryService.addSystemEvent(
-                claimId,
-                performer.getId(),
-                ActionType.SYSTEM_EVENT,
-                String.format(
-                        "Працівник %s змінив роль %s з %s на %s",
-                        getShortName(performer),
-                        getShortName(target),
-                        roleLabel(currentRole),
-                        roleLabel(nextRole)
-                )
-        );
+            claimHistoryService.addSystemEvent(
+                    claimId,
+                    performer.getId(),
+                    ActionType.SYSTEM_EVENT,
+                    String.format(
+                            "Працівник %s змінив роль %s з %s на %s",
+                            getShortName(performer),
+                            getShortName(target),
+                            roleLabel(currentRole),
+                            roleLabel(nextRole)
+                    )
+            );
+        }
 
         return mapToResponse(claimEmployee);
     }
