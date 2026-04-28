@@ -7,12 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.claim.ClaimRepairOperationDTO.ClaimRepairOperationResponseDTO;
 import ua.nure.medirepairtrack.DTO.claim.ClaimRepairOperationDTO.CreateClaimRepairOperationDTO;
 import ua.nure.medirepairtrack.DTO.claim.ClaimRepairOperationDTO.UpdateClaimRepairOperationDTO;
+import ua.nure.medirepairtrack.DTO.claim.ClaimRepairOperationDTO.UpdateClaimRepairOperationNoteDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.claim.ClaimRepairOperation.ClaimRepairOperation;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
 import ua.nure.medirepairtrack.Entity.repair.RepairOperation.RepairOperation;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationCreatedEvent;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationDeletedEvent;
+import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationNoteUpdatedEvent;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationUpdatedEvent;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
@@ -25,6 +27,7 @@ import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,13 +43,18 @@ public class ClaimRepairOperationService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public ClaimRepairOperationResponseDTO create(CreateClaimRepairOperationDTO dto) {
+    public ClaimRepairOperationResponseDTO create(CreateClaimRepairOperationDTO dto, Integer performedByEmployeeId) {
 
         Claim claim = claimService.getClaim(dto.getClaimId());
         RepairOperation operation = repairOperationService.getOperationEntity(dto.getOperationId());
         Employee employee = employeeService.getEmployeeEntity(dto.getEmployeeId());
 
-        validateCanManageOperation(claim, employee.getId(), "додати ремонтну роботу");
+        validateClaimStatusAllowsWork(claim, "додати ремонтну роботу");
+        accessService.validateEmployeeCanWorkOnClaim(claim.getId(), performedByEmployeeId);
+
+        if (!dto.getEmployeeId().equals(performedByEmployeeId)) {
+            throw new OperationNotAllowedException("Можна додавати тільки власну ремонтну роботу");
+        }
 
         ClaimRepairOperation entity = ClaimRepairOperation.builder()
                 .claim(claim)
@@ -73,11 +81,16 @@ public class ClaimRepairOperationService {
     }
 
     @Transactional
-    public ClaimRepairOperationResponseDTO update(Integer id, UpdateClaimRepairOperationDTO dto) {
+    public ClaimRepairOperationResponseDTO update(Integer id, UpdateClaimRepairOperationDTO dto, Integer performedByEmployeeId) {
 
         ClaimRepairOperation entity = getEntity(id);
 
-        validateCanManageOperation(entity.getClaim(), entity.getEmployee().getId(), "змінити ремонтну роботу");
+        validateClaimStatusAllowsWork(entity.getClaim(), "змінити ремонтну роботу");
+        accessService.validateEmployeeCanWorkOnClaim(entity.getClaim().getId(), performedByEmployeeId);
+
+        if (!entity.getEmployee().getId().equals(performedByEmployeeId)) {
+            throw new OperationNotAllowedException("Можна редагувати тільки власні записи ремонтних робіт");
+        }
 
         Integer oldRepairOperationId = entity.getOperation().getId();
         String oldRepairOperationName = entity.getOperation().getName();
@@ -108,20 +121,60 @@ public class ClaimRepairOperationService {
         return map(saved);
     }
 
-    public List<ClaimRepairOperationResponseDTO> getByClaim(Integer claimId) {
-
-        return repository.findByClaimIdOrderByCreatedAt(claimId)
-                .stream()
-                .map(this::map)
-                .toList();
-    }
-
     @Transactional
-    public void delete(Integer id) {
+    public ClaimRepairOperationResponseDTO updateNote(Integer id, UpdateClaimRepairOperationNoteDTO dto, Integer performedByEmployeeId) {
 
         ClaimRepairOperation entity = getEntity(id);
 
-        validateCanManageOperation(entity.getClaim(), entity.getEmployee().getId(), "видалити ремонтну роботу");
+        validateClaimStatusAllowsWork(entity.getClaim(), "змінити примітку ремонтної роботи");
+        accessService.validateEmployeeCanWorkOnClaim(entity.getClaim().getId(), performedByEmployeeId);
+
+        boolean isOwn = entity.getEmployee().getId().equals(performedByEmployeeId);
+        boolean isLead = accessService.isLeadOnClaim(entity.getClaim().getId(), performedByEmployeeId);
+
+        if (!isOwn && !isLead) {
+            throw new OperationNotAllowedException("Можна змінювати тільки власні записи або бути головним інженером");
+        }
+
+        String oldNote = entity.getNote();
+        if (Objects.equals(entity.getNote(), dto.getNote())) {
+            return map(entity);
+        }
+
+        Employee performedByEmployee = employeeService.getEmployeeEntity(performedByEmployeeId);
+
+        entity.setNote(dto.getNote());
+        entity.setUpdatedAt(LocalDateTime.now());
+
+        ClaimRepairOperation saved = repository.save(entity);
+
+        eventPublisher.publishEvent(new ClaimRepairOperationNoteUpdatedEvent(
+                saved.getClaim().getId(),
+                saved.getId(),
+                saved.getEmployee().getId(),
+                getEmployeeDisplayName(saved.getEmployee()),
+                performedByEmployee.getId(),
+                getEmployeeDisplayName(performedByEmployee),
+                saved.getOperation().getId(),
+                saved.getOperation().getName(),
+                oldNote,
+                saved.getNote()
+        ));
+
+        return map(saved);
+    }
+
+    @Transactional
+    public void delete(Integer id, Integer performedByEmployeeId) {
+
+        ClaimRepairOperation entity = getEntity(id);
+
+        validateClaimStatusAllowsWork(entity.getClaim(), "видалити ремонтну роботу");
+        accessService.validateEmployeeCanWorkOnClaim(entity.getClaim().getId(), performedByEmployeeId);
+
+        if (!entity.getEmployee().getId().equals(performedByEmployeeId)) {
+            throw new OperationNotAllowedException("Можна видаляти тільки власні записи ремонтних робіт");
+        }
 
         ClaimRepairOperationDeletedEvent event = new ClaimRepairOperationDeletedEvent(
                 entity.getClaim().getId(),
@@ -137,6 +190,14 @@ public class ClaimRepairOperationService {
         eventPublisher.publishEvent(event);
     }
 
+    public List<ClaimRepairOperationResponseDTO> getByClaim(Integer claimId) {
+
+        return repository.findByClaimIdOrderByCreatedAt(claimId)
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
     public List<ClaimRepairOperation> getClaimOperations(Integer claimId) {
 
         return repository.findByClaimIdOrderByCreatedAt(claimId);
@@ -148,14 +209,12 @@ public class ClaimRepairOperationService {
                 .orElseThrow(() -> new NotFoundException("Запис операції ремонту не знайдено"));
     }
 
-    private void validateCanManageOperation(Claim claim, Integer employeeId, String action) {
-        if (!claimStatusMachine.allowsWorkLog(claim.getStatus())) {
+    private void validateClaimStatusAllowsWork(Claim claim, String action) {
+        if (!claimStatusMachine.allowsWork(claim.getStatus())) {
             throw new OperationNotAllowedException(
-                    StatusMessageUtil.denied(action, claim.getStatus(), claimStatusMachine.allowedWorkLogStatuses())
+                    StatusMessageUtil.denied(action, claim.getStatus(), claimStatusMachine.allowedWorkStatuses())
             );
         }
-
-        accessService.checkEmployeeCanWork(claim.getId(), employeeId);
     }
 
     private ClaimRepairOperationResponseDTO map(ClaimRepairOperation e) {
@@ -174,7 +233,7 @@ public class ClaimRepairOperationService {
 
     private String getEmployeeDisplayName(Employee employee) {
         return String.format(
-                "%s %s.",
+                "%s %s",
                 employee.getUser().getLastName(),
                 employee.getUser().getFirstName()
         );

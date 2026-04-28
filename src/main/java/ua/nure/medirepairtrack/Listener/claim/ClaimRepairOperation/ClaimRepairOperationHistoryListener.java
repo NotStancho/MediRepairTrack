@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ActionType;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationCreatedEvent;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationDeletedEvent;
+import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationNoteUpdatedEvent;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationUpdatedEvent;
 import ua.nure.medirepairtrack.Service.claim.ClaimHistoryService;
 
@@ -63,6 +64,49 @@ public class ClaimRepairOperationHistoryListener {
                         event.oldTimeSpent(),
                         event.newTimeSpent()
                 )
+        );
+    }
+
+    @EventListener
+    public void onNoteUpdated(ClaimRepairOperationNoteUpdatedEvent event) {
+
+        log.info(
+                "[EVENT] ClaimRepairOperationHistory | action=NOTE_UPDATED | claimId={} | operationId={} | performedByEmployeeId={}",
+                event.claimId(),
+                event.claimRepairOperationId(),
+                event.performedByEmployeeId()
+        );
+
+        String description;
+
+        if (event.oldNote() == null && event.newNote() != null) {
+            description = String.format(
+                    "Додано примітку до ремонтної роботи: %s. Виконавець: %s. Додав: %s.",
+                    event.repairOperationName(),
+                    event.workEmployeeDisplayName(),
+                    event.performedByEmployeeDisplayName()
+            );
+        } else if (event.newNote() == null) {
+            description = String.format(
+                    "Видалено примітку до ремонтної роботи: %s. Виконавець: %s. Видалив: %s.",
+                    event.repairOperationName(),
+                    event.workEmployeeDisplayName(),
+                    event.performedByEmployeeDisplayName()
+            );
+        } else {
+            description = String.format(
+                    "Оновлено примітку до ремонтної роботи: %s. Виконавець: %s. Змінив: %s.",
+                    event.repairOperationName(),
+                    event.workEmployeeDisplayName(),
+                    event.performedByEmployeeDisplayName()
+            );
+        }
+
+        claimHistoryService.addSystemEvent(
+                event.claimId(),
+                event.performedByEmployeeId(),
+                ActionType.WORK_LOG,
+                description
         );
     }
 
