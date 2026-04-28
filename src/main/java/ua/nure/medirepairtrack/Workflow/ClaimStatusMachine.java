@@ -101,7 +101,7 @@ public class ClaimStatusMachine {
     public boolean allowsWork(Status status) {
         return status == Status.IN_PROGRESS || status == Status.WAITING_FOR_PARTS;
     }
-    public Set<Status> allowedWorkLogStatuses() {
+    public Set<Status> allowedWorkStatuses() {
         return Set.of(Status.IN_PROGRESS, Status.WAITING_FOR_PARTS);
     }
 
