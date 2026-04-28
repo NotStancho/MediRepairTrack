@@ -3,14 +3,14 @@ import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractio
 import Portal from './Portal';
 import * as React from "react";
 
-interface Action {
+export interface RowAction {
     label: string;
     onClick: () => void | Promise<void>;
     danger?: boolean;
 }
 
 interface Props {
-    actions: Action[];
+    actions: RowAction[];
     trigger: React.ReactNode;
     disabled?: boolean;
 }
