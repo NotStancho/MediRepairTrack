@@ -156,7 +156,7 @@ public class ClaimService {
 
         Claim claim = getClaim(id);
 
-        accessService.checkEmployeeCanWork(id, employeeId);
+        accessService.validateEmployeeCanAccessClaim(id, employeeId);
 
         Status currentStatus = claim.getStatus();
         Status newStatus = dto.getStatus();

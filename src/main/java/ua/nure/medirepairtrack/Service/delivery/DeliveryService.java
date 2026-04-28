@@ -150,10 +150,7 @@ public class DeliveryService {
         Delivery delivery = deliveryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Доставка не знайдена"));
 
-        accessService.checkEmployeeCanWork(
-                delivery.getClaim().getId(),
-                employeeId
-        );
+        accessService.validateEmployeeCanAccessClaim(delivery.getClaim().getId(), employeeId);
 
         DeliveryStatus current = delivery.getStatus();
         DeliveryStatus next = dto.getStatus();
@@ -198,10 +195,7 @@ public class DeliveryService {
         Delivery delivery = deliveryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Доставка не знайдена"));
 
-        accessService.checkEmployeeCanWork(
-                delivery.getClaim().getId(),
-                employeeId
-        );
+        accessService.validateEmployeeCanAccessClaim(delivery.getClaim().getId(), employeeId);
 
         if (!deliveryStatusMachine.allowsDelete(delivery.getStatus())) {
             throw new OperationNotAllowedException(StatusMessageUtil.denied("видалити доставку", delivery.getStatus(), deliveryStatusMachine.allowedDeleteStatuses()));
@@ -268,7 +262,7 @@ public class DeliveryService {
             throw new OperationNotAllowedException(StatusMessageUtil.denied("створити доставку", claim.getStatus(), claimStatusMachine.allowedDeliveryStatuses()));
         }
 
-        accessService.checkEmployeeCanWork(claimId, employeeId);
+        accessService.validateEmployeeCanAccessClaim(claimId, employeeId);
 
         return claim;
     }
@@ -278,7 +272,7 @@ public class DeliveryService {
         Delivery delivery = deliveryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Доставка не знайдена"));
 
-        accessService.checkEmployeeCanWork(delivery.getClaim().getId(), employeeId);
+        accessService.validateEmployeeCanAccessClaim(delivery.getClaim().getId(), employeeId);
 
         if (!deliveryStatusMachine.allowsUpdate(delivery.getStatus())) {
             throw new OperationNotAllowedException(StatusMessageUtil.denied("оновити доставку", delivery.getStatus(), deliveryStatusMachine.allowedUpdateStatuses()));

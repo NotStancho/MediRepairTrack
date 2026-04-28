@@ -147,7 +147,7 @@ public class PartService {
             throw new OperationNotAllowedException(StatusMessageUtil.denied("використати запчастини", claim.getStatus(), claimStatusMachine.allowedPartUsageStatuses()));
         }
 
-        accessService.checkEmployeeCanWork(claimId, employeeId);
+        accessService.validateEmployeeCanAccessClaim(claimId, employeeId);
 
         Part part = partRepository.findById(dto.getPartId())
                 .orElseThrow(() -> new NotFoundException("Запчастина не знайдена"));
@@ -211,7 +211,7 @@ public class PartService {
             throw new OperationNotAllowedException(StatusMessageUtil.denied("корекція запчастин", claim.getStatus(), claimStatusMachine.allowedPartUsageStatuses()));
         }
 
-        accessService.checkEmployeeCanWork(claimId, employeeId);
+        accessService.validateEmployeeCanAccessClaim(claimId, employeeId);
 
         UsedPartId id = new UsedPartId(claimId, dto.getPartId());
 
