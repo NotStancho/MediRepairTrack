@@ -367,20 +367,38 @@ export default function ClaimRepairOperationsTab({
                     noteOnly={editingNoteOnly}
                     onClose={closeEdit}
                     onSave={async payload => {
-                        const isNoteOnlyChange =
-                            payload.operationId === editingItem.operationId &&
-                            Number(payload.timeSpent) === Number(editingItem.timeSpent);
+                        const normalizeNote = (value?: string | null) => value?.trim() || null;
 
-                        if (editingNoteOnly || isNoteOnlyChange) {
-                            await updateNote(editingItem.id, { note: payload.note }, performedByEmployeeId);
+                        const operationChanged = payload.operationId !== editingItem.operationId;
+                        const timeChanged = Number(payload.timeSpent) !== Number(editingItem.timeSpent);
+                        const noteChanged =
+                            normalizeNote(payload.note) !== normalizeNote(editingItem.note);
+
+                        const isNoteOnlyUpdate =
+                            editingNoteOnly || (!operationChanged && !timeChanged && noteChanged);
+
+                        if (!operationChanged && !timeChanged && !noteChanged) {
+                            // нічого не змінилось
+                            closeEdit();
+                            return;
+                        }
+
+                        if (isNoteOnlyUpdate) {
+                            await updateNote(
+                                editingItem.id,
+                                { note: normalizeNote(payload.note) },
+                                performedByEmployeeId
+                            );
                         } else {
                             await update(editingItem.id, payload, performedByEmployeeId);
                         }
 
                         await syncClaimSummary();
-                        toast.success(editingNoteOnly || isNoteOnlyChange
-                            ? 'Примітку оновлено'
-                            : 'Ремонтну роботу оновлено'
+
+                        toast.success(
+                            isNoteOnlyUpdate
+                                ? 'Примітку оновлено'
+                                : 'Ремонтну роботу оновлено'
                         );
                     }}
                 />
