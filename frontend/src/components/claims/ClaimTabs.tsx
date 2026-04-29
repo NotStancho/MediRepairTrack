@@ -11,7 +11,7 @@ import ClaimDetailsTab from './tabs/ClaimDetailsTab';
 import ClaimHistoryTab from './tabs/ClaimHistoryTab';
 import ClaimDiagnosisTab from './tabs/ClaimDiagnosisTab/ClaimDiagnosisTab';
 import ClaimEmployeesTab from './tabs/ClaimEmployeesTab/ClaimEmployeesTab';
-import ClaimRepairOperationsTab from './tabs/ClaimRepairOperationsTab/ClaimRepairOperationsTab';
+import ClaimWorksTab from './tabs/ClaimWorksTab/ClaimWorksTab';
 import ClaimPartsTab from './tabs/ClaimPartsTab';
 import ClaimDeliveryTab from './tabs/ClaimDeliveryTab';
 import ClaimInvoiceTab from './tabs/ClaimInvoiceTab';
@@ -39,7 +39,7 @@ const tabs: TabItem[] = [
     { key: 'history', label: 'Історія', icon: FiClock },
     { key: 'diagnosis', label: 'Діагностика', icon: FiActivity },
     { key: 'employees', label: 'Працівники', icon: FiUsers },
-    { key: 'operations', label: 'Ремонтні роботи', icon: FiTool },
+    { key: 'works', label: 'Ремонтні роботи', icon: FiTool },
     { key: 'parts', label: 'Запчастини', icon: FiPackage },
     { key: 'delivery', label: 'Доставка', icon: FiTruck },
     { key: 'invoice', label: 'Рахунок', icon: FiFileText },
@@ -55,10 +55,10 @@ export default function ClaimTabs({ claim, onClaimUpdated }: Props) {
             {active === 'history' && <ClaimHistoryTab claimId={claim.id} />}
             {active === 'diagnosis' && <ClaimDiagnosisTab claimId={claim.id} />}
             {active === 'employees' && <ClaimEmployeesTab claimId={claim.id} />}
-            {active === 'operations' && (
-                <ClaimRepairOperationsTab
+            {active === 'works' && (
+                <ClaimWorksTab
                     claimId={claim.id}
-                    onOperationsChanged={onClaimUpdated}
+                    onWorksChanged={onClaimUpdated}
                 />
             )}
             {active === 'parts' && <ClaimPartsTab claimId={claim.id} />}

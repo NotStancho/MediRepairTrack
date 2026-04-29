@@ -1,0 +1,45 @@
+package ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedWork;
+
+import jakarta.persistence.*;
+import lombok.*;
+import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
+import ua.nure.medirepairtrack.Entity.repair.RepairWork.RepairWork;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "diagnosis_prediction_work")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class DiagnosisPredictedWork {
+
+    @EmbeddedId
+    private DiagnosisPredictedWorkId id;
+
+    @ManyToOne
+    @MapsId("predictionId")
+    @JoinColumn(name = "fk_prediction")
+    private DiagnosisPrediction prediction;
+
+    @ManyToOne
+    @MapsId("repairWorkId")
+    @JoinColumn(name = "fk_repair_work")
+    private RepairWork repairWork;
+
+    @Column(name = "probability_score", nullable = false)
+    private BigDecimal probabilityScore;
+
+    @Column(name = "rank_position", nullable = false)
+    private Integer rankPosition;
+
+    @Column(name = "predicted_time_spent", nullable = false)
+    private BigDecimal predictedTimeSpent;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+}

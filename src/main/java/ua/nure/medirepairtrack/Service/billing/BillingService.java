@@ -11,10 +11,10 @@ import ua.nure.medirepairtrack.DTO.claim.UsedPartDTO.UsedPartResponseDTO;
 import ua.nure.medirepairtrack.DTO.client.ClientContractDTO.ContractDiscountDTO;
 import ua.nure.medirepairtrack.DTO.delivery.DeliveryDTO.DeliveryResponseDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.RepairType;
-import ua.nure.medirepairtrack.Entity.claim.ClaimRepairOperation.ClaimRepairOperation;
+import ua.nure.medirepairtrack.Entity.claim.ClaimWork.ClaimWork;
 import ua.nure.medirepairtrack.Exception.BadRequestException;
-import ua.nure.medirepairtrack.Service.claim.ClaimRepairOperationService;
 import ua.nure.medirepairtrack.Service.claim.ClaimService;
+import ua.nure.medirepairtrack.Service.claim.ClaimWorkService;
 import ua.nure.medirepairtrack.Service.client.ClientContractService;
 import ua.nure.medirepairtrack.Service.delivery.DeliveryService;
 import ua.nure.medirepairtrack.Service.repair.PartService;
@@ -32,7 +32,7 @@ public class BillingService {
     private static final BigDecimal HUNDRED = new BigDecimal("100");
 
     private final ClaimService claimService;
-    private final ClaimRepairOperationService claimRepairOperationService;
+    private final ClaimWorkService claimWorkService;
     private final PartService partService;
     private final DeliveryService deliveryService;
     private final PricingConfigService pricingConfigService;
@@ -42,30 +42,30 @@ public class BillingService {
 
     public BillingSectionResultDTO calculateLabor(Integer claimId) {
         // =========================
-        // LABOR (CLAIM REPAIR OPERATIONS BASED)
+        // LABOR (CLAIM WORK BASED)
         // =========================
 
         ClaimResponseDTO claim = claimService.getClaimById(claimId);
         PricingConfigResponseDTO pricing = pricingConfigService.getByRepairType(claim.getRepairType());
         ContractDiscountDTO discount = clientContractService.getActiveDiscounts(claim.getClientId());
 
-        List<ClaimRepairOperation> operations = claimRepairOperationService.getClaimOperations(claimId);
+        List<ClaimWork> works = claimWorkService.getClaimWorks(claimId);
 
         List<BillingItemDTO> items = new ArrayList<>();
 
         BigDecimal actualHours = BigDecimal.ZERO;
 
-        for (ClaimRepairOperation operation : operations) {
+        for (ClaimWork work : works) {
 
-            actualHours = actualHours.add(operation.getTimeSpent());
+            actualHours = actualHours.add(work.getTimeSpent());
 
             items.add(
                     BillingItemDTO.builder()
-                            .description(buildLaborDescription(operation))
-                            .quantity(operation.getTimeSpent())
+                            .description(buildLaborDescription(work))
+                            .quantity(work.getTimeSpent())
                             .pricePerUnit(pricing.getLaborPricePerHour())
                             .totalPrice(
-                                    operation.getTimeSpent()
+                                    work.getTimeSpent()
                                             .multiply(pricing.getLaborPricePerHour())
                             )
                             .unitName("год")
@@ -280,13 +280,13 @@ public class BillingService {
         );
     }
 
-    private String buildLaborDescription(ClaimRepairOperation operation) {
-        String base = "Робота: " + operation.getRepairWork().getName();
+    private String buildLaborDescription(ClaimWork work) {
+        String base = "Робота: " + work.getRepairWork().getName();
 
-        if (operation.getNote() == null || operation.getNote().isBlank()) {
+        if (work.getNote() == null || work.getNote().isBlank()) {
             return base;
         }
 
-        return base + ". Примітка: " + operation.getNote();
+        return base + ". Примітка: " + work.getNote();
     }
 }

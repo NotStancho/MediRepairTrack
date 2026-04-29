@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisSimilarityDTO.SimilarityResultResponseDTO;
-import ua.nure.medirepairtrack.DTO.DSS.PredictedOperationDTO.PredictedOperationResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.PredictedWorkDTO.PredictedWorkResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.PredictionExplanation.PredictionContext;
 import ua.nure.medirepairtrack.DTO.billing.PricingConfigDTO.PricingConfigResponseDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.RepairType;
@@ -27,7 +27,7 @@ public class PredictionAggregationService {
 
     private final DiagnosisSimilarityResultService similarityResultService;
     private final DiagnosisPredictedPartService predictedPartService;
-    private final DiagnosisPredictedOperationService predictedOperationService;
+    private final DiagnosisPredictedWorkService predictedWorkService;
     private final DiagnosisPredictionDefectService predictedDefectService;
     private final PredictionExplanationService explanationService;
 
@@ -46,7 +46,7 @@ public class PredictionAggregationService {
 
         // 2. predicted entities
         predictedPartService.generatePredictedParts(prediction);
-        predictedOperationService.generatePredictedOperations(prediction);
+        predictedWorkService.generatePredictedWorks(prediction);
         predictedDefectService.generatePredictedDefects(prediction);
 
         // 3. aggregated metrics
@@ -72,15 +72,15 @@ public class PredictionAggregationService {
     @Transactional
     public void calculatePredictedTimeHours(DiagnosisPrediction prediction) {
 
-        var operations = predictedOperationService.getAllByPredictionId(prediction.getId());
+        var works = predictedWorkService.getAllByPredictionId(prediction.getId());
 
-        if (operations.isEmpty()) {
+        if (works.isEmpty()) {
             prediction.setPredictedTimeHours(BigDecimal.ZERO);
             return;
         }
 
-        BigDecimal totalTime = operations.stream()
-                .map(PredictedOperationResponseDTO::getPredictedTimeSpent)
+        BigDecimal totalTime = works.stream()
+                .map(PredictedWorkResponseDTO::getPredictedTimeSpent)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         prediction.setPredictedTimeHours(
@@ -194,7 +194,7 @@ public class PredictionAggregationService {
                 .ofNullable(prediction.getConfidenceScore())
                 .orElse(BigDecimal.ZERO);
 
-        int operationsCount = predictedOperationService.getAllByPredictionId(prediction.getId()).size();
+        int worksCount = predictedWorkService.getAllByPredictionId(prediction.getId()).size();
         int partsCount = predictedPartService.getAllByPredictionId(prediction.getId()).size();
 
         if (predictedHours.compareTo(BigDecimal.valueOf(6)) >= 0) {
@@ -205,9 +205,9 @@ public class PredictionAggregationService {
             complexityScore += 1;
         }
 
-        if (operationsCount >= 5) {
+        if (worksCount >= 5) {
             complexityScore += 2;
-        } else if (operationsCount >= 3) {
+        } else if (worksCount >= 3) {
             complexityScore += 1;
         }
 

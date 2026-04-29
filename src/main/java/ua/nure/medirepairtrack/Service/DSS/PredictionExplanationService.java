@@ -14,7 +14,7 @@ public class PredictionExplanationService {
 
     private final DiagnosisSimilarityResultService diagnosisSimilarityResultService;
     private final DiagnosisPredictedPartService predictedPartService;
-    private final DiagnosisPredictedOperationService predictedOperationService;
+    private final DiagnosisPredictedWorkService predictedWorkService;
     private final DiagnosisPredictionDefectService predictionDefectService;
 
     private final GeminiTextClient geminiTextClient;
@@ -35,7 +35,7 @@ public class PredictionExplanationService {
                 .claimDescription(claim.getDefectDescription())
                 .similarCases(buildSimilarCases(prediction))
                 .predictedDefects(buildDefects(prediction))
-                .predictedOperations(buildOperations(prediction))
+                .predictedWorks(buildWorks(prediction))
                 .predictedParts(buildParts(prediction))
                 .predictedTimeHours(prediction.getPredictedTimeHours())
                 .predictedCost(prediction.getPredictedCost())
@@ -75,15 +75,15 @@ public class PredictionExplanationService {
                 .toList();
     }
 
-    private List<PredictedOperationContext> buildOperations(DiagnosisPrediction prediction) {
+    private List<PredictedWorkContext> buildWorks(DiagnosisPrediction prediction) {
 
-        var operations = predictedOperationService.getAllByPredictionId(prediction.getId());
+        var works = predictedWorkService.getAllByPredictionId(prediction.getId());
 
-        return operations.stream()
-                .map(o -> PredictedOperationContext.builder()
-                        .repairWorkName(o.getRepairWork().getName())
-                        .probability(o.getProbabilityScore())
-                        .estimatedTime(o.getPredictedTimeSpent())
+        return works.stream()
+                .map(work -> PredictedWorkContext.builder()
+                        .repairWorkName(work.getRepairWork().getName())
+                        .probability(work.getProbabilityScore())
+                        .estimatedTime(work.getPredictedTimeSpent())
                         .build())
                 .toList();
     }
@@ -139,14 +139,14 @@ public class PredictionExplanationService {
 
         sb.append("\nПрогнозовані ремонтні роботи:\n");
 
-        for (var o : ctx.getPredictedOperations()) {
+        for (var work : ctx.getPredictedWorks()) {
 
             sb.append("- ")
-                    .append(o.getRepairWorkName())
+                    .append(work.getRepairWorkName())
                     .append(" (ймовірність ")
-                    .append(o.getProbability())
+                    .append(work.getProbability())
                     .append(", час ")
-                    .append(o.getEstimatedTime())
+                    .append(work.getEstimatedTime())
                     .append(" год)\n");
         }
 

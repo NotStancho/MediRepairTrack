@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationCreatedEvent;
-import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationDeletedEvent;
-import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationUpdatedEvent;
+import ua.nure.medirepairtrack.Event.ClaimWork.ClaimWorkCreatedEvent;
+import ua.nure.medirepairtrack.Event.ClaimWork.ClaimWorkDeletedEvent;
+import ua.nure.medirepairtrack.Event.ClaimWork.ClaimWorkUpdatedEvent;
 import ua.nure.medirepairtrack.Service.billing.InvoiceService;
 
 @Slf4j
@@ -17,24 +17,24 @@ public class InvoiceLaborRecalcListener {
     private final InvoiceService invoiceService;
 
     @EventListener
-    public void onCreated(ClaimRepairOperationCreatedEvent event) {
+    public void onCreated(ClaimWorkCreatedEvent event) {
 
         log.info(
-                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_CREATED | claimId={} | claimRepairOperationId={}",
+                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_WORK_CREATED | claimId={} | claimWorkId={}",
                 event.claimId(),
-                event.claimRepairOperationId()
+                event.claimWorkId()
         );
 
         invoiceService.recalculateLabor(event.claimId());
     }
 
     @EventListener
-    public void onUpdated(ClaimRepairOperationUpdatedEvent event) {
+    public void onUpdated(ClaimWorkUpdatedEvent event) {
 
         log.info(
-                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_UPDATED | claimId={} | claimRepairOperationId={} | {} -> {}",
+                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_WORK_UPDATED | claimId={} | claimWorkId={} | {} -> {}",
                 event.claimId(),
-                event.claimRepairOperationId(),
+                event.claimWorkId(),
                 event.oldTimeSpent(),
                 event.newTimeSpent()
         );
@@ -43,12 +43,12 @@ public class InvoiceLaborRecalcListener {
     }
 
     @EventListener
-    public void onDeleted(ClaimRepairOperationDeletedEvent event) {
+    public void onDeleted(ClaimWorkDeletedEvent event) {
 
         log.info(
-                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_DELETED | claimId={} | claimRepairOperationId={} | timeSpent={}",
+                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_WORK_DELETED | claimId={} | claimWorkId={} | timeSpent={}",
                 event.claimId(),
-                event.claimRepairOperationId(),
+                event.claimWorkId(),
                 event.timeSpent()
         );
 

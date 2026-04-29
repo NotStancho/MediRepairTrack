@@ -8,14 +8,14 @@ import type { TabItem } from '../../../../ui/Tabs';
 import type {DiagnosisPrediction} from "../../../../types/diagnosis/DSS/diagnosisPrediction";
 
 import PredictionGeneralTab from './tabs/PredictionGeneralTab';
-import PredictionOperationsTab from './tabs/PredictionOperationsTab';
+import PredictionWorksTab from './tabs/PredictionWorksTab';
 import PredictionPartsTab from './tabs/PredictionPartsTab';
 import PredictionDefectsTab from './tabs/PredictionDefectsTab';
 import PredictionSimilarityTab from './tabs/PredictionSimilarityTab';
 
 const tabs: TabItem[] = [
     { key: 'general', label: 'Загальний' },
-    { key: 'operations', label: 'Роботи' },
+    { key: 'works', label: 'Роботи' },
     { key: 'parts', label: 'Запчастини' },
     { key: 'defects', label: 'Дефекти' },
     { key: 'similar', label: 'Схожі заявки' },
@@ -43,8 +43,8 @@ export default function PredictionTabs({ prediction,
                 />
             )}
 
-            {active === 'operations' && (
-                <PredictionOperationsTab predictionId={prediction.id} />
+            {active === 'works' && (
+                <PredictionWorksTab predictionId={prediction.id} />
             )}
 
             {active === 'parts' && (

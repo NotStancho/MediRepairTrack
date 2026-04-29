@@ -1,0 +1,26 @@
+package ua.nure.medirepairtrack.DTO.claim.ClaimWorkDTO;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+public class ClaimWorkResponseDTO {
+
+    private Integer id;
+
+    private Integer claimId;
+    private Integer repairWorkId;
+    private Integer employeeId;
+
+    private BigDecimal timeSpent;
+
+    private String note;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+}

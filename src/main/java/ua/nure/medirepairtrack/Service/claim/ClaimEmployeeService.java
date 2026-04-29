@@ -18,7 +18,7 @@ import ua.nure.medirepairtrack.Event.ClaimEmployee.ClaimEmployeeAssignedEvent;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.claim.ClaimEmployeeRepository;
-import ua.nure.medirepairtrack.Repository.claim.ClaimRepairOperationRepository;
+import ua.nure.medirepairtrack.Repository.claim.ClaimWorkRepository;
 import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
 import ua.nure.medirepairtrack.Repository.employee.EmployeeRepository;
 import ua.nure.medirepairtrack.Workflow.ClaimStatusMachine;
@@ -34,7 +34,7 @@ import java.util.Set;
 public class ClaimEmployeeService {
 
     private final ClaimEmployeeRepository claimEmployeeRepository;
-    private final ClaimRepairOperationRepository claimRepairOperationRepository;
+    private final ClaimWorkRepository claimWorkRepository;
     private final ClaimRepository claimRepository;
     private final EmployeeRepository employeeRepository;
     private final ClaimHistoryService claimHistoryService;
@@ -289,7 +289,7 @@ public class ClaimEmployeeService {
 
         claimEmployeeRepository.findByIdClaimIdAndIdEmployeeId(claimId, employeeId)
                 .ifPresent(claimEmployee -> {
-                    BigDecimal totalHours = claimRepairOperationRepository
+                    BigDecimal totalHours = claimWorkRepository
                             .sumTimeSpentByClaimAndEmployee(claimId, employeeId);
 
                     claimEmployee.setHoursWorked(totalHours != null ? totalHours : BigDecimal.ZERO);

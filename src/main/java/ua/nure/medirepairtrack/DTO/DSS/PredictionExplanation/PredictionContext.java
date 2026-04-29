@@ -18,7 +18,7 @@ public class PredictionContext {
 
     private List<PredictedDefectContext> predictedDefects;
 
-    private List<PredictedOperationContext> predictedOperations;
+    private List<PredictedWorkContext> predictedWorks;
 
     private List<PredictedPartContext> predictedParts;
 

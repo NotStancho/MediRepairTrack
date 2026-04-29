@@ -250,13 +250,13 @@ dss.predicted-parts.top-k
 dss.predicted-parts.min-probability
 ```
 
-## DiagnosisPredictedOperation
+## DiagnosisPredictedWork
 
-Прогнозовані ремонтні роботи зберігаються у таблиці: diagnosis_prediction_operation.
+Прогнозовані ремонтні роботи зберігаються у таблиці: diagnosis_prediction_work.
 
 Алгоритм прогнозування ремонтних робіт
 1. отримати similarity results
-2. знайти ремонтні роботи у схожих заявках (claim_repair_operation)
+2. знайти ремонтні роботи у схожих заявках (claim_work)
 3. обчислити score для кожної роботи
 4. агрегувати score
 5. обчислити ймовірність
@@ -266,8 +266,8 @@ dss.predicted-parts.min-probability
 
 Конфігурація:
 ```
-dss.predicted-operations.top-k
-dss.predicted-operations.min-probability
+dss.predicted-works.top-k
+dss.predicted-works.min-probability
 ```
 
 ---
@@ -288,7 +288,7 @@ D --> E[SimilaritySearchService]
 E --> F[Find Similar Claims]
 
 F --> G1[Predicted Parts]
-F --> G2[Predicted Operations]
+F --> G2[Predicted Works]
 F --> G3[Predicted Defects]
 
 G1 --> H[Engineer Review]
@@ -394,7 +394,7 @@ DSS використовує:
 # Prediction Aggregation
 
 similar claims:
-- operations frequency
+- work frequency
 - parts frequency
 - time estimation
 - cost estimation
@@ -402,12 +402,12 @@ similar claims:
 ```mermaid
 graph TD
 
-SimilarClaims --> OperationFrequency
+SimilarClaims --> WorkFrequency
 SimilarClaims --> PartFrequency
 SimilarClaims --> TimeEstimation
 SimilarClaims --> CostEstimation
 
-OperationFrequency --> Prediction
+WorkFrequency --> Prediction
 PartFrequency --> Prediction
 TimeEstimation --> Prediction
 CostEstimation --> Prediction

@@ -40,7 +40,7 @@
 - Claim
 - ClaimHistory
 - ClaimEmployee
-- ClaimRepairOperation
+- ClaimWork
 - UsedPart
 
 ### Repair

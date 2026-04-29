@@ -18,7 +18,7 @@ import ua.nure.medirepairtrack.Exception.InvalidStatusTransitionException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.billing.InvoiceRepository;
-import ua.nure.medirepairtrack.Repository.claim.ClaimRepairOperationRepository;
+import ua.nure.medirepairtrack.Repository.claim.ClaimWorkRepository;
 import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
 import ua.nure.medirepairtrack.Repository.client.ClientRepository;
 import ua.nure.medirepairtrack.Repository.delivery.DeliveryRepository;
@@ -37,7 +37,7 @@ import java.util.Set;
 public class ClaimService {
 
     private final ClaimRepository claimRepository;
-    private final ClaimRepairOperationRepository claimRepairOperationRepository;
+    private final ClaimWorkRepository claimWorkRepository;
 
     private final ClientRepository clientRepository;
     private final InvoiceRepository invoiceRepository;
@@ -257,7 +257,7 @@ public class ClaimService {
 
         Claim claim = getClaim(claimId);
 
-        BigDecimal totalTimeSpent = claimRepairOperationRepository
+        BigDecimal totalTimeSpent = claimWorkRepository
                 .sumTimeSpentByClaim(claimId);
 
         BigDecimal newTotal = totalTimeSpent != null
