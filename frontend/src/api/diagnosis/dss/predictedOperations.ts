@@ -6,7 +6,7 @@ import type {
     CreatePredictedOperationPayload,
     UpdatePredictedOperationPayload
 } from '../../../types/diagnosis/DSS/predictedOperationPayloads';
-import type { RepairOperationShort } from '../../../types/repairOperation/repairOperationShort';
+import type { RepairWorkShort } from '../../../types/repairWork/repairWorkShort';
 
 import { mapPredictedOperation } from '../../../utils/mappers/dss/predictedOperationMapper';
 
@@ -28,21 +28,21 @@ export const createPredictedOperationsBatch = async (
 
 export const getPredictedOperationById = async (
     predictionId: number,
-    operationId: number
+    repairWorkId: number
 ): Promise<PredictedOperation> => {
     const res = await api.get<Raw>(
-        `/api/dss/predicted-operations/prediction/${predictionId}/operation/${operationId}`
+        `/api/dss/predicted-operations/prediction/${predictionId}/repair-work/${repairWorkId}`
     );
     return mapPredictedOperation(res.data);
 };
 
 export const updatePredictedOperation = async (
     predictionId: number,
-    operationId: number,
+    repairWorkId: number,
     payload: UpdatePredictedOperationPayload
 ): Promise<PredictedOperation> => {
     const res = await api.put<Raw>(
-        `/api/dss/predicted-operations/${predictionId}/${operationId}`,
+        `/api/dss/predicted-operations/${predictionId}/${repairWorkId}`,
         payload
     );
     return mapPredictedOperation(res.data);
@@ -50,9 +50,9 @@ export const updatePredictedOperation = async (
 
 export const deletePredictedOperation = async (
     predictionId: number,
-    operationId: number
+    repairWorkId: number
 ): Promise<void> => {
-    await api.delete(`/api/dss/predicted-operations/${predictionId}/${operationId}`);
+    await api.delete(`/api/dss/predicted-operations/${predictionId}/${repairWorkId}`);
 };
 
 export const getPredictedOperations = async (
@@ -64,8 +64,8 @@ export const getPredictedOperations = async (
 
 export const getAvailableOperations = async (
     predictionId: number
-): Promise<RepairOperationShort[]> => {
-    const res = await api.get<RepairOperationShort[]>(
+): Promise<RepairWorkShort[]> => {
+    const res = await api.get<RepairWorkShort[]>(
         `/api/dss/predicted-operations/available/${predictionId}`
     );
     return res.data;

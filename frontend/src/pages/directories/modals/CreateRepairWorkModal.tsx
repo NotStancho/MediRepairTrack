@@ -1,9 +1,9 @@
-// pages/directories/modals/CreateRepairOperationModal.tsx
+// pages/directories/modals/CreateRepairWorkModal.tsx
 
 import { useMemo, useState } from 'react';
 
 import type { ComplexityLevel } from '../../../types/diagnosis/DSS/complexityLevel';
-import type { CreateRepairOperationPayload } from '../../../types/repairOperation/repairOperationPayloads';
+import type { CreateRepairWorkPayload } from '../../../types/repairWork/repairWorkPayloads';
 
 import Button from '../../../ui/Button';
 import FormField from '../../../ui/FormField';
@@ -17,10 +17,10 @@ interface Props {
     complexityLoading: boolean;
     creating: boolean;
     onClose: () => void;
-    onCreate: (payload: CreateRepairOperationPayload) => Promise<void>;
+    onCreate: (payload: CreateRepairWorkPayload) => Promise<void>;
 }
 
-export default function CreateRepairOperationModal({
+export default function CreateRepairWorkModal({
     complexityLevels,
     complexityLoading,
     creating,
@@ -54,7 +54,7 @@ export default function CreateRepairOperationModal({
     };
 
     return (
-        <Modal title="Додати ремонтну операцію" onClose={onClose} width="lg">
+        <Modal title="Додати ремонтну роботу" onClose={onClose} width="lg">
             <div className="space-y-3">
                 <FormField label="Рівень складності">
                     <Select

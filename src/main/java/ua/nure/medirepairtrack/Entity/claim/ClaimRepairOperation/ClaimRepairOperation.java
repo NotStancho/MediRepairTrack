@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
-import ua.nure.medirepairtrack.Entity.repair.RepairOperation.RepairOperation;
+import ua.nure.medirepairtrack.Entity.repair.RepairWork.RepairWork;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,8 +28,8 @@ public class ClaimRepairOperation {
     private Claim claim;
 
     @ManyToOne
-    @JoinColumn(name = "fk_repair_operation", nullable = false)
-    private RepairOperation operation;
+    @JoinColumn(name = "fk_repair_work", nullable = false)
+    private RepairWork repairWork;
 
     @ManyToOne
     @JoinColumn(name = "fk_employee", nullable = false)

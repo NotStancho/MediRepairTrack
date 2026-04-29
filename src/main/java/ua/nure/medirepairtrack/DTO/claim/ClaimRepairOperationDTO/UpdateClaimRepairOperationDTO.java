@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 @Data
 public class UpdateClaimRepairOperationDTO {
 
-    @NotNull(message = "ID ремонтної операції є обов'язковим")
-    private Integer operationId;
+    @NotNull(message = "ID ремонтної роботи є обов'язковим")
+    private Integer repairWorkId;
 
-    @NotNull(message = "Час виконання операції є обов'язковим")
-    @DecimalMin(value = "0.01", message = "Час виконання операції має бути більше 0")
+    @NotNull(message = "Час виконання роботи є обов'язковим")
+    @DecimalMin(value = "0.01", message = "Час виконання роботи має бути більше 0")
     private BigDecimal timeSpent;
 
     private String note;

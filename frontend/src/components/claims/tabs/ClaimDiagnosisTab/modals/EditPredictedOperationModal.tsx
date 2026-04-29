@@ -43,15 +43,11 @@ export default function EditPredictedOperationModal({
 
     return (
         <Modal
-            title={`Редагувати операцію "${operation.operation.name}"`}
+            title={`Редагувати роботу "${operation.repairWork.name}"`}
             onClose={onClose}
             width="md"
         >
             <div className="space-y-3">
-                {/*<div className="text-sm text-ink-muted">*/}
-                {/*    {operation.operationDescription}*/}
-                {/*</div>*/}
-
                 <div className="grid grid-cols-2 gap-2">
                     <FormField label="Ймовірність">
                         <input

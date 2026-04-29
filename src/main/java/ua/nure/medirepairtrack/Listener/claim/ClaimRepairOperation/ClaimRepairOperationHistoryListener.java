@@ -22,7 +22,7 @@ public class ClaimRepairOperationHistoryListener {
     public void onCreated(ClaimRepairOperationCreatedEvent event) {
 
         log.info(
-                "[EVENT] ClaimRepairOperationHistory | action=CREATED | claimId={} | operationId={}",
+                "[EVENT] ClaimRepairOperationHistory | action=CREATED | claimId={} | claimRepairOperationId={}",
                 event.claimId(),
                 event.claimRepairOperationId()
         );
@@ -33,7 +33,7 @@ public class ClaimRepairOperationHistoryListener {
                 ActionType.WORK_LOG,
                 String.format(
                         "Зафіксовано ремонтну роботу: %s. Виконавець: %s. Час: %s год.",
-                        event.repairOperationName(),
+                        event.repairWorkName(),
                         event.employeeDisplayName(),
                         event.timeSpent()
                 )
@@ -44,14 +44,14 @@ public class ClaimRepairOperationHistoryListener {
     public void onUpdated(ClaimRepairOperationUpdatedEvent event) {
 
         log.info(
-                "[EVENT] ClaimRepairOperationHistory | action=UPDATED | claimId={} | operationId={}",
+                "[EVENT] ClaimRepairOperationHistory | action=UPDATED | claimId={} | claimRepairOperationId={}",
                 event.claimId(),
                 event.claimRepairOperationId()
         );
 
-        String operationChange = event.oldRepairOperationName().equals(event.newRepairOperationName())
-                ? event.newRepairOperationName()
-                : event.oldRepairOperationName() + " → " + event.newRepairOperationName();
+        String repairWorkChange = event.oldRepairWorkName().equals(event.newRepairWorkName())
+                ? event.newRepairWorkName()
+                : event.oldRepairWorkName() + " → " + event.newRepairWorkName();
 
         claimHistoryService.addSystemEvent(
                 event.claimId(),
@@ -59,7 +59,7 @@ public class ClaimRepairOperationHistoryListener {
                 ActionType.WORK_LOG,
                 String.format(
                         "Оновлено ремонтну роботу: %s. Виконавець: %s. Час: %s → %s год.",
-                        operationChange,
+                        repairWorkChange,
                         event.employeeDisplayName(),
                         event.oldTimeSpent(),
                         event.newTimeSpent()
@@ -71,7 +71,7 @@ public class ClaimRepairOperationHistoryListener {
     public void onNoteUpdated(ClaimRepairOperationNoteUpdatedEvent event) {
 
         log.info(
-                "[EVENT] ClaimRepairOperationHistory | action=NOTE_UPDATED | claimId={} | operationId={} | performedByEmployeeId={}",
+                "[EVENT] ClaimRepairOperationHistory | action=NOTE_UPDATED | claimId={} | claimRepairOperationId={} | performedByEmployeeId={}",
                 event.claimId(),
                 event.claimRepairOperationId(),
                 event.performedByEmployeeId()
@@ -82,21 +82,21 @@ public class ClaimRepairOperationHistoryListener {
         if (event.oldNote() == null && event.newNote() != null) {
             description = String.format(
                     "Додано примітку до ремонтної роботи: %s. Виконавець: %s. Додав: %s.",
-                    event.repairOperationName(),
+                    event.repairWorkName(),
                     event.workEmployeeDisplayName(),
                     event.performedByEmployeeDisplayName()
             );
         } else if (event.newNote() == null) {
             description = String.format(
                     "Видалено примітку до ремонтної роботи: %s. Виконавець: %s. Видалив: %s.",
-                    event.repairOperationName(),
+                    event.repairWorkName(),
                     event.workEmployeeDisplayName(),
                     event.performedByEmployeeDisplayName()
             );
         } else {
             description = String.format(
                     "Оновлено примітку до ремонтної роботи: %s. Виконавець: %s. Змінив: %s.",
-                    event.repairOperationName(),
+                    event.repairWorkName(),
                     event.workEmployeeDisplayName(),
                     event.performedByEmployeeDisplayName()
             );
@@ -114,7 +114,7 @@ public class ClaimRepairOperationHistoryListener {
     public void onDeleted(ClaimRepairOperationDeletedEvent event) {
 
         log.info(
-                "[EVENT] ClaimRepairOperationHistory | action=DELETED | claimId={} | operationId={}",
+                "[EVENT] ClaimRepairOperationHistory | action=DELETED | claimId={} | claimRepairOperationId={}",
                 event.claimId(),
                 event.claimRepairOperationId()
         );
@@ -125,7 +125,7 @@ public class ClaimRepairOperationHistoryListener {
                 ActionType.WORK_LOG,
                 String.format(
                         "Видалено ремонтну роботу: %s. Виконавець: %s. Час: %s год.",
-                        event.repairOperationName(),
+                        event.repairWorkName(),
                         event.employeeDisplayName(),
                         event.timeSpent()
                 )

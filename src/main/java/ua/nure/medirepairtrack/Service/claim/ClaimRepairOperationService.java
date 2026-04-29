@@ -11,7 +11,7 @@ import ua.nure.medirepairtrack.DTO.claim.ClaimRepairOperationDTO.UpdateClaimRepa
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.claim.ClaimRepairOperation.ClaimRepairOperation;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
-import ua.nure.medirepairtrack.Entity.repair.RepairOperation.RepairOperation;
+import ua.nure.medirepairtrack.Entity.repair.RepairWork.RepairWork;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationCreatedEvent;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationDeletedEvent;
 import ua.nure.medirepairtrack.Event.ClaimRepairOperation.ClaimRepairOperationNoteUpdatedEvent;
@@ -20,7 +20,7 @@ import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
 import ua.nure.medirepairtrack.Repository.claim.ClaimRepairOperationRepository;
 import ua.nure.medirepairtrack.Service.employee.EmployeeService;
-import ua.nure.medirepairtrack.Service.repair.RepairOperationService;
+import ua.nure.medirepairtrack.Service.repair.RepairWorkService;
 import ua.nure.medirepairtrack.Workflow.ClaimStatusMachine;
 import ua.nure.medirepairtrack.Workflow.StatusMessageUtil;
 
@@ -36,7 +36,7 @@ public class ClaimRepairOperationService {
     private final ClaimRepairOperationRepository repository;
 
     private final ClaimService claimService;
-    private final RepairOperationService repairOperationService;
+    private final RepairWorkService repairWorkService;
     private final EmployeeService employeeService;
     private final ClaimStatusMachine claimStatusMachine;
     private final ClaimAccessService accessService;
@@ -46,7 +46,7 @@ public class ClaimRepairOperationService {
     public ClaimRepairOperationResponseDTO create(CreateClaimRepairOperationDTO dto, Integer performedByEmployeeId) {
 
         Claim claim = claimService.getClaim(dto.getClaimId());
-        RepairOperation operation = repairOperationService.getOperationEntity(dto.getOperationId());
+        RepairWork repairWork = repairWorkService.getEntity(dto.getRepairWorkId());
         Employee employee = employeeService.getEmployeeEntity(dto.getEmployeeId());
 
         validateClaimStatusAllowsWork(claim, "додати ремонтну роботу");
@@ -58,7 +58,7 @@ public class ClaimRepairOperationService {
 
         ClaimRepairOperation entity = ClaimRepairOperation.builder()
                 .claim(claim)
-                .operation(operation)
+                .repairWork(repairWork)
                 .employee(employee)
                 .timeSpent(dto.getTimeSpent())
                 .note(dto.getNote())
@@ -72,8 +72,8 @@ public class ClaimRepairOperationService {
                 saved.getId(),
                 saved.getEmployee().getId(),
                 getEmployeeDisplayName(saved.getEmployee()),
-                saved.getOperation().getId(),
-                saved.getOperation().getName(),
+                saved.getRepairWork().getId(),
+                saved.getRepairWork().getName(),
                 saved.getTimeSpent()
         ));
 
@@ -92,13 +92,13 @@ public class ClaimRepairOperationService {
             throw new OperationNotAllowedException("Можна редагувати тільки власні записи ремонтних робіт");
         }
 
-        Integer oldRepairOperationId = entity.getOperation().getId();
-        String oldRepairOperationName = entity.getOperation().getName();
+        Integer oldRepairWorkId = entity.getRepairWork().getId();
+        String oldRepairWorkName = entity.getRepairWork().getName();
         BigDecimal oldTimeSpent = entity.getTimeSpent();
 
-        RepairOperation operation = repairOperationService.getOperationEntity(dto.getOperationId());
+        RepairWork repairWork = repairWorkService.getEntity(dto.getRepairWorkId());
 
-        entity.setOperation(operation);
+        entity.setRepairWork(repairWork);
         entity.setTimeSpent(dto.getTimeSpent());
         entity.setNote(dto.getNote());
         entity.setUpdatedAt(LocalDateTime.now());
@@ -110,10 +110,10 @@ public class ClaimRepairOperationService {
                 saved.getId(),
                 saved.getEmployee().getId(),
                 getEmployeeDisplayName(saved.getEmployee()),
-                oldRepairOperationId,
-                oldRepairOperationName,
-                saved.getOperation().getId(),
-                saved.getOperation().getName(),
+                oldRepairWorkId,
+                oldRepairWorkName,
+                saved.getRepairWork().getId(),
+                saved.getRepairWork().getName(),
                 oldTimeSpent,
                 saved.getTimeSpent()
         ));
@@ -155,8 +155,8 @@ public class ClaimRepairOperationService {
                 getEmployeeDisplayName(saved.getEmployee()),
                 performedByEmployee.getId(),
                 getEmployeeDisplayName(performedByEmployee),
-                saved.getOperation().getId(),
-                saved.getOperation().getName(),
+                saved.getRepairWork().getId(),
+                saved.getRepairWork().getName(),
                 oldNote,
                 saved.getNote()
         ));
@@ -181,8 +181,8 @@ public class ClaimRepairOperationService {
                 entity.getId(),
                 entity.getEmployee().getId(),
                 getEmployeeDisplayName(entity.getEmployee()),
-                entity.getOperation().getId(),
-                entity.getOperation().getName(),
+                entity.getRepairWork().getId(),
+                entity.getRepairWork().getName(),
                 entity.getTimeSpent()
         );
 
@@ -206,7 +206,7 @@ public class ClaimRepairOperationService {
     public ClaimRepairOperation getEntity(Integer id) {
 
         return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Запис операції ремонту не знайдено"));
+                .orElseThrow(() -> new NotFoundException("Запис ремонтної роботи не знайдено"));
     }
 
     private void validateClaimStatusAllowsWork(Claim claim, String action) {
@@ -222,7 +222,7 @@ public class ClaimRepairOperationService {
         return ClaimRepairOperationResponseDTO.builder()
                 .id(e.getId())
                 .claimId(e.getClaim().getId())
-                .operationId(e.getOperation().getId())
+                .repairWorkId(e.getRepairWork().getId())
                 .employeeId(e.getEmployee().getId())
                 .timeSpent(e.getTimeSpent())
                 .note(e.getNote())

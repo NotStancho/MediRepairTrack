@@ -81,7 +81,7 @@ public class PredictionExplanationService {
 
         return operations.stream()
                 .map(o -> PredictedOperationContext.builder()
-                        .operationName(o.getOperation().getName())
+                        .repairWorkName(o.getRepairWork().getName())
                         .probability(o.getProbabilityScore())
                         .estimatedTime(o.getPredictedTimeSpent())
                         .build())
@@ -137,12 +137,12 @@ public class PredictionExplanationService {
                     .append(")\n");
         }
 
-        sb.append("\nПрогнозовані ремонтні операції:\n");
+        sb.append("\nПрогнозовані ремонтні роботи:\n");
 
         for (var o : ctx.getPredictedOperations()) {
 
             sb.append("- ")
-                    .append(o.getOperationName())
+                    .append(o.getRepairWorkName())
                     .append(" (ймовірність ")
                     .append(o.getProbability())
                     .append(", час ")

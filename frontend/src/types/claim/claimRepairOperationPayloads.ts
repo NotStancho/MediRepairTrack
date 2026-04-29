@@ -2,14 +2,14 @@
 
 export interface CreateClaimRepairOperationPayload {
     claimId: number;
-    operationId: number;
+    repairWorkId: number;
     employeeId: number;
     timeSpent: number;
     note?: string | null;
 }
 
 export interface UpdateClaimRepairOperationPayload {
-    operationId: number;
+    repairWorkId: number;
     timeSpent: number;
     note?: string | null;
 }

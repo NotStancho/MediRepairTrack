@@ -2,7 +2,7 @@ package ua.nure.medirepairtrack.DTO.DSS.PredictedOperationDTO;
 
 import lombok.Builder;
 import lombok.Data;
-import ua.nure.medirepairtrack.DTO.repair.RepairOperation.RepairOperationShortDTO;
+import ua.nure.medirepairtrack.DTO.repair.RepairWork.RepairWorkShortDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class PredictedOperationResponseDTO {
 
     private Integer predictionId;
-    private RepairOperationShortDTO operation;
+    private RepairWorkShortDTO repairWork;
 
     private BigDecimal probabilityScore;
     private Integer rankPosition;

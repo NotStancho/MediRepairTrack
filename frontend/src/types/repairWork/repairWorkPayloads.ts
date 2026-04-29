@@ -1,12 +1,12 @@
-// types/repairOperation/repairOperationPayloads.ts
+// types/repairWork/repairWorkPayloads.ts
 
-export interface CreateRepairOperationPayload {
+export interface CreateRepairWorkPayload {
     complexityLevelId: number;
     name: string;
     description: string;
 }
 
-export interface UpdateRepairOperationPayload {
+export interface UpdateRepairWorkPayload {
     complexityLevelId: number;
     name: string;
     description: string;

@@ -40,30 +40,22 @@ export default function PredictionOperationsTab({ predictionId }: Props) {
     const columns = useMemo<TableColumnDef<PredictedOperation>[]>(() => [
         {
             id: 'name',
-            header: 'Операція',
-            accessorFn: row => row.operation.name,
+            header: 'Робота',
+            accessorFn: row => row.repairWork.name,
             cell: ({ row }) => (
                 <div className="min-w-0">
                     <div className="font-medium text-ink">
-                        {row.original.operation.name}
+                        {row.original.repairWork.name}
                     </div>
 
-                    {/*{row.original.operationDescription && (*/}
-                    {/*    <div*/}
-                    {/*        className="text-xs text-ink-muted truncate max-w-[320px]"*/}
-                    {/*        title={row.original.operationDescription}*/}
-                    {/*    >*/}
-                    {/*        {row.original.operationDescription}*/}
-                    {/*    </div>*/}
-                    {/*)}*/}
                 </div>
             ),
         },
         {
             id: 'complexity',
             header: 'Складність',
-            accessorFn: row => row.operation.complexityLevelName ?? '',
-            cell: ({ row }) => row.original.operation.complexityLevelName ?? '—',
+            accessorFn: row => row.repairWork.complexityLevelName ?? '',
+            cell: ({ row }) => row.original.repairWork.complexityLevelName ?? '—',
         },
         {
             id: 'probability',
@@ -141,7 +133,7 @@ export default function PredictionOperationsTab({ predictionId }: Props) {
             <div className="flex items-center justify-between gap-3">
                 <div>
                     <div className="font-medium text-ink">
-                        Прогнозовані операції
+                        Прогнозовані ремонтні роботи
                     </div>
                     <div className="text-sm text-ink-muted">
                         Елементів: {data.length}
@@ -153,7 +145,7 @@ export default function PredictionOperationsTab({ predictionId }: Props) {
                     className="h-8 px-3 text-xs"
                     onClick={() => setCreateOpen(true)}
                 >
-                    + Додати операцію
+                    + Додати роботу
                 </Button>
             </div>
 
@@ -164,7 +156,7 @@ export default function PredictionOperationsTab({ predictionId }: Props) {
                 density="compact"
                 striped
                 showPagination={false}
-                storageKey="prediction-operations-tab"
+                storageKey="prediction-repair-works-tab"
                 renderToolbar={(table) => (
                     <TableToolbar
                         table={table}
@@ -173,7 +165,7 @@ export default function PredictionOperationsTab({ predictionId }: Props) {
                 )}
                 renderEmptyState={
                     <div className="text-sm text-ink-muted italic">
-                        Операції ще не додано
+                        Роботи ще не додано
                     </div>
                 }
             />
@@ -201,7 +193,7 @@ export default function PredictionOperationsTab({ predictionId }: Props) {
                     updating={updating}
                     onClose={() => setEditingItem(null)}
                     onSave={async (payload) => {
-                        await update(editingItem.operation.id, payload);
+                        await update(editingItem.repairWork.id, payload);
                         setEditingItem(null);
                     }}
                 />
@@ -209,12 +201,12 @@ export default function PredictionOperationsTab({ predictionId }: Props) {
 
             {deleteItem && (
                 <ConfirmBox
-                    title="Видалити операцію?"
-                    description={`Операція "${deleteItem.operation.name}" буде видалена з прогнозу.`}
+                    title="Видалити роботу?"
+                    description={`Робота "${deleteItem.repairWork.name}" буде видалена з прогнозу.`}
                     confirmText={removing ? 'Видалення...' : 'Так, видалити'}
                     confirmVariant="danger"
                     onConfirm={async () => {
-                        await remove(deleteItem.operation.id);
+                        await remove(deleteItem.repairWork.id);
                         setDeleteItem(null);
                     }}
                     onCancel={() => setDeleteItem(null)}

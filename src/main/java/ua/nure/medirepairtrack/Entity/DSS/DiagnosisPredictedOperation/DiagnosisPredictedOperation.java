@@ -3,7 +3,7 @@ package ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedOperation;
 import jakarta.persistence.*;
 import lombok.*;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
-import ua.nure.medirepairtrack.Entity.repair.RepairOperation.RepairOperation;
+import ua.nure.medirepairtrack.Entity.repair.RepairWork.RepairWork;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,9 +26,9 @@ public class DiagnosisPredictedOperation {
     private DiagnosisPrediction prediction;
 
     @ManyToOne
-    @MapsId("operationId")
-    @JoinColumn(name = "fk_operation")
-    private RepairOperation operation;
+    @MapsId("repairWorkId")
+    @JoinColumn(name = "fk_repair_work")
+    private RepairWork repairWork;
 
     @Column(name = "probability_score", nullable = false)
     private BigDecimal probabilityScore;

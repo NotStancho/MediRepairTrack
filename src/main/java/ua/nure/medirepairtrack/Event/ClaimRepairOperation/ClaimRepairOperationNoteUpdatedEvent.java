@@ -7,8 +7,8 @@ public record ClaimRepairOperationNoteUpdatedEvent(
         String workEmployeeDisplayName,
         Integer performedByEmployeeId,
         String performedByEmployeeDisplayName,
-        Integer repairOperationId,
-        String repairOperationName,
+        Integer repairWorkId,
+        String repairWorkName,
         String oldNote,
         String newNote
 ) {

@@ -7,18 +7,18 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.PredictedOperationDTO.CreatePredictedOperationDTO;
 import ua.nure.medirepairtrack.DTO.DSS.PredictedOperationDTO.PredictedOperationResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.PredictedOperationDTO.UpdatePredictedOperationDTO;
-import ua.nure.medirepairtrack.DTO.repair.RepairOperation.RepairOperationShortDTO;
+import ua.nure.medirepairtrack.DTO.repair.RepairWork.RepairWorkShortDTO;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedOperation.DiagnosisPredictedOperation;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPredictedOperation.DiagnosisPredictedOperationId;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
-import ua.nure.medirepairtrack.Entity.repair.RepairOperation.RepairOperation;
+import ua.nure.medirepairtrack.Entity.repair.RepairWork.RepairWork;
 import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictedOperationRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
 import ua.nure.medirepairtrack.Service.claim.ClaimRepairOperationService;
-import ua.nure.medirepairtrack.Service.repair.RepairOperationService;
+import ua.nure.medirepairtrack.Service.repair.RepairWorkService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,7 +43,7 @@ public class DiagnosisPredictedOperationService {
 
     private final DiagnosisSimilarityResultService similarityResultService;
     private final ClaimRepairOperationService claimRepairOperationService;
-    private final RepairOperationService repairOperationService;
+    private final RepairWorkService repairWorkService;
 
     private final PredictionStateService predictionStateService;
     private final DiagnosisPermissionService permissionService;
@@ -56,17 +56,17 @@ public class DiagnosisPredictedOperationService {
 
         Diagnosis diagnosis = prediction.getDiagnosis();
 
-        permissionService.validateEditable(diagnosis, "додавати прогнозовані операції");
+        permissionService.validateEditable(diagnosis, "додавати прогнозовані роботи");
 
-        RepairOperation operation = repairOperationService.getOperationEntity(dto.getOperationId());
+        RepairWork repairWork = repairWorkService.getEntity(dto.getRepairWorkId());
 
         DiagnosisPredictedOperationId id = new DiagnosisPredictedOperationId(
                 dto.getPredictionId(),
-                dto.getOperationId()
+                dto.getRepairWorkId()
         );
 
         if (repository.existsById(id)) {
-            throw new BadRequestException("Ця операція вже додана");
+            throw new BadRequestException("Ця ремонтна робота вже додана");
         }
 
         Integer maxRank = repository.findMaxRankByPredictionId(dto.getPredictionId());
@@ -75,7 +75,7 @@ public class DiagnosisPredictedOperationService {
         DiagnosisPredictedOperation entity = DiagnosisPredictedOperation.builder()
                 .id(id)
                 .prediction(prediction)
-                .operation(operation)
+                .repairWork(repairWork)
                 .probabilityScore(dto.getProbabilityScore())
                 .rankPosition(newRank)
                 .predictedTimeSpent(dto.getPredictedTimeSpent())
@@ -107,43 +107,43 @@ public class DiagnosisPredictedOperationService {
             return;
         }
 
-        Map<Integer, Double> operationScores = new HashMap<>();
-        Map<Integer, Double> operationWeightedTimeSums = new HashMap<>();
-        Map<Integer, Double> operationSimilaritySums = new HashMap<>();
+        Map<Integer, Double> repairWorkScores = new HashMap<>();
+        Map<Integer, Double> repairWorkWeightedTimeSums = new HashMap<>();
+        Map<Integer, Double> repairWorkSimilaritySums = new HashMap<>();
 
         for (var result : similarityResults) {
 
             Integer claimId = result.getClaim().getId();
             double similarity = result.getSimilarityScore().doubleValue();
 
-            var operations = claimRepairOperationService.getClaimOperations(claimId);
+            var repairWorks = claimRepairOperationService.getClaimOperations(claimId);
 
-            Map<Integer, Double> operationTimesInClaim = new HashMap<>();
+            Map<Integer, Double> repairWorkTimesInClaim = new HashMap<>();
 
-            for (var op : operations) {
+            for (var op : repairWorks) {
 
-                Integer operationId = op.getOperation().getId();
+                Integer repairWorkId = op.getRepairWork().getId();
                 double timeSpent = op.getTimeSpent().doubleValue();
 
-                operationTimesInClaim.merge(operationId, timeSpent, Double::sum);
+                repairWorkTimesInClaim.merge(repairWorkId, timeSpent, Double::sum);
             }
 
-            for (var entry : operationTimesInClaim.entrySet()) {
+            for (var entry : repairWorkTimesInClaim.entrySet()) {
 
-                Integer operationId = entry.getKey();
+                Integer repairWorkId = entry.getKey();
                 double totalTimeInClaim = entry.getValue();
 
-                operationScores.merge(operationId, similarity, Double::sum);
-                operationWeightedTimeSums.merge(operationId, similarity * totalTimeInClaim, Double::sum);
-                operationSimilaritySums.merge(operationId, similarity, Double::sum);
+                repairWorkScores.merge(repairWorkId, similarity, Double::sum);
+                repairWorkWeightedTimeSums.merge(repairWorkId, similarity * totalTimeInClaim, Double::sum);
+                repairWorkSimilaritySums.merge(repairWorkId, similarity, Double::sum);
             }
         }
 
-        if (operationScores.isEmpty()) {
+        if (repairWorkScores.isEmpty()) {
             return;
         }
 
-        double totalScore = operationScores.values()
+        double totalScore = repairWorkScores.values()
                 .stream()
                 .mapToDouble(Double::doubleValue)
                 .sum();
@@ -152,7 +152,7 @@ public class DiagnosisPredictedOperationService {
             return;
         }
 
-        List<Map.Entry<Integer, Double>> ranked = operationScores.entrySet()
+        List<Map.Entry<Integer, Double>> ranked = repairWorkScores.entrySet()
                 .stream()
                 .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
                 .limit(topK)
@@ -162,7 +162,7 @@ public class DiagnosisPredictedOperationService {
 
         for (var entry : ranked) {
 
-            Integer operationId = entry.getKey();
+            Integer repairWorkId = entry.getKey();
             double score = entry.getValue();
 
             BigDecimal probability = BigDecimal.valueOf(score)
@@ -172,8 +172,8 @@ public class DiagnosisPredictedOperationService {
                 continue;
             }
 
-            double weightedTimeSum = operationWeightedTimeSums.get(operationId);
-            double similaritySum = operationSimilaritySums.get(operationId);
+            double weightedTimeSum = repairWorkWeightedTimeSums.get(repairWorkId);
+            double similaritySum = repairWorkSimilaritySums.get(repairWorkId);
 
             if (similaritySum == 0) {
                 continue;
@@ -182,9 +182,9 @@ public class DiagnosisPredictedOperationService {
             double predictedTime = weightedTimeSum / similaritySum;
 
             DiagnosisPredictedOperation entity = DiagnosisPredictedOperation.builder()
-                    .id(new DiagnosisPredictedOperationId(predictionId, operationId))
+                    .id(new DiagnosisPredictedOperationId(predictionId, repairWorkId))
                     .prediction(prediction)
-                    .operation(repairOperationService.getOperationEntity(operationId))
+                    .repairWork(repairWorkService.getEntity(repairWorkId))
                     .probabilityScore(probability)
                     .rankPosition(rank++)
                     .predictedTimeSpent(
@@ -198,17 +198,17 @@ public class DiagnosisPredictedOperationService {
     }
 
     @Transactional
-    public PredictedOperationResponseDTO update(Integer predictionId, Integer operationId, UpdatePredictedOperationDTO dto) {
+    public PredictedOperationResponseDTO update(Integer predictionId, Integer repairWorkId, UpdatePredictedOperationDTO dto) {
 
         DiagnosisPredictedOperationId id =
-                new DiagnosisPredictedOperationId(predictionId, operationId);
+                new DiagnosisPredictedOperationId(predictionId, repairWorkId);
 
         DiagnosisPredictedOperation entity = repository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Прогнозовану операцію не знайдено"));
+                .orElseThrow(() -> new NotFoundException("Прогнозовану ремонтну роботу не знайдено"));
 
         DiagnosisPrediction prediction = entity.getPrediction();
 
-        permissionService.validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану операцію");
+        permissionService.validateEditable(prediction.getDiagnosis(), "редагувати прогнозовану ремонтну роботу");
 
         if (dto.getProbabilityScore() != null) {
             entity.setProbabilityScore(dto.getProbabilityScore());
@@ -226,14 +226,14 @@ public class DiagnosisPredictedOperationService {
     }
 
     @Transactional
-    public void delete(Integer predictionId, Integer operationId) {
+    public void delete(Integer predictionId, Integer repairWorkId) {
 
         DiagnosisPrediction prediction = predictionRepository.findById(predictionId)
                 .orElseThrow(() -> new NotFoundException("Прогноз діагностики не знайдено"));
 
-        permissionService.validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану операцію");
+        permissionService.validateEditable(prediction.getDiagnosis(), "видаляти прогнозовану ремонтну роботу");
 
-        repository.deleteById(new DiagnosisPredictedOperationId(predictionId, operationId));
+        repository.deleteById(new DiagnosisPredictedOperationId(predictionId, repairWorkId));
 
         predictionStateService.markAsHybridIfNeeded(prediction);
     }
@@ -245,28 +245,28 @@ public class DiagnosisPredictedOperationService {
                 .toList();
     }
 
-    public PredictedOperationResponseDTO getById(Integer predictionId, Integer operationId) {
+    public PredictedOperationResponseDTO getById(Integer predictionId, Integer repairWorkId) {
 
         DiagnosisPredictedOperationId id =
-                new DiagnosisPredictedOperationId(predictionId, operationId);
+                new DiagnosisPredictedOperationId(predictionId, repairWorkId);
 
         return repository.findById(id)
                 .map(this::map)
-                .orElseThrow(() -> new NotFoundException("Прогнозовану операцію не знайдено"));
+                .orElseThrow(() -> new NotFoundException("Прогнозовану ремонтну роботу не знайдено"));
     }
 
-    public List<RepairOperationShortDTO> getAvailableOperations(Integer predictionId) {
+    public List<RepairWorkShortDTO> getAvailableOperations(Integer predictionId) {
 
         predictionRepository.findById(predictionId)
                 .orElseThrow(() -> new NotFoundException("Прогноз не знайдений"));
 
-        var usedOperationIds = repository.findByPredictionIdOrderByRankPosition(predictionId)
+        var usedRepairWorkIds = repository.findByPredictionIdOrderByRankPosition(predictionId)
                 .stream()
-                .map(e -> e.getOperation().getId())
+                .map(e -> e.getRepairWork().getId())
                 .collect(Collectors.toSet());
 
-        return repairOperationService.getAllOperationsShort().stream()
-                .filter(op -> !usedOperationIds.contains(op.getId()))
+        return repairWorkService.getAllShort().stream()
+                .filter(repairWork -> !usedRepairWorkIds.contains(repairWork.getId()))
                 .toList();
     }
 
@@ -274,11 +274,11 @@ public class DiagnosisPredictedOperationService {
     private PredictedOperationResponseDTO map(DiagnosisPredictedOperation e) {
         return PredictedOperationResponseDTO.builder()
                 .predictionId(e.getPrediction().getId())
-                .operation(
-                        RepairOperationShortDTO.builder()
-                        .id(e.getOperation().getId())
-                        .name(e.getOperation().getName())
-                        .complexityLevelName(e.getOperation().getComplexityLevel().getName())
+                .repairWork(
+                        RepairWorkShortDTO.builder()
+                        .id(e.getRepairWork().getId())
+                        .name(e.getRepairWork().getName())
+                        .complexityLevelName(e.getRepairWork().getComplexityLevel().getName())
                         .build()
                 )
                 .probabilityScore(e.getProbabilityScore())

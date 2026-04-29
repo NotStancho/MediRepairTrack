@@ -13,7 +13,7 @@ public class ClaimRepairOperationResponseDTO {
     private Integer id;
 
     private Integer claimId;
-    private Integer operationId;
+    private Integer repairWorkId;
     private Integer employeeId;
 
     private BigDecimal timeSpent;

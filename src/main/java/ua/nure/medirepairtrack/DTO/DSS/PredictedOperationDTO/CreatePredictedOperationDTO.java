@@ -13,8 +13,8 @@ public class CreatePredictedOperationDTO {
     @NotNull(message = "Прогноз обовʼязковий")
     private Integer predictionId;
 
-    @NotNull(message = "Операція обовʼязкова")
-    private Integer operationId;
+    @NotNull(message = "Ремонтна робота обовʼязкова")
+    private Integer repairWorkId;
 
     @NotNull(message = "Ймовірність обовʼязкова")
     @DecimalMin(value = "0.0", message = "Ймовірність не може бути менше 0")

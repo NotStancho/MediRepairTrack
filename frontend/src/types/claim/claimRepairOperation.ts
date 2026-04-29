@@ -3,7 +3,7 @@
 export interface ClaimRepairOperation {
     id: number;
     claimId: number;
-    operationId: number;
+    repairWorkId: number;
     employeeId: number;
     timeSpent: number;
     note?: string | null;

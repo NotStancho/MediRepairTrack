@@ -1,10 +1,10 @@
-// pages/directories/modals/EditRepairOperationModal.tsx
+// pages/directories/modals/EditRepairWorkModal.tsx
 
 import { useMemo, useState } from 'react';
 
 import type { ComplexityLevel } from '../../../types/diagnosis/DSS/complexityLevel';
-import type { RepairOperation } from '../../../types/repairOperation/repairOperation';
-import type { UpdateRepairOperationPayload } from '../../../types/repairOperation/repairOperationPayloads';
+import type { RepairWork } from '../../../types/repairWork/repairWork';
+import type { UpdateRepairWorkPayload } from '../../../types/repairWork/repairWorkPayloads';
 
 import Button from '../../../ui/Button';
 import FormField from '../../../ui/FormField';
@@ -14,16 +14,16 @@ import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
 
 interface Props {
-    operation: RepairOperation;
+    repairWork: RepairWork;
     complexityLevels: ComplexityLevel[];
     complexityLoading: boolean;
     updating: boolean;
     onClose: () => void;
-    onSave: (payload: UpdateRepairOperationPayload) => Promise<void>;
+    onSave: (payload: UpdateRepairWorkPayload) => Promise<void>;
 }
 
-export default function EditRepairOperationModal({
-    operation,
+export default function EditRepairWorkModal({
+    repairWork,
     complexityLevels,
     complexityLoading,
     updating,
@@ -31,9 +31,9 @@ export default function EditRepairOperationModal({
     onSave,
 }: Props) {
     const [form, setForm] = useState({
-        complexityLevelId: operation.complexityLevelId,
-        name: operation.name,
-        description: operation.description,
+        complexityLevelId: repairWork.complexityLevelId,
+        name: repairWork.name,
+        description: repairWork.description,
     });
 
     const canSubmit = useMemo(
@@ -57,7 +57,7 @@ export default function EditRepairOperationModal({
     };
 
     return (
-        <Modal title="Редагувати ремонтну операцію" onClose={onClose} width="lg">
+        <Modal title="Редагувати ремонтну роботу" onClose={onClose} width="lg">
             <div className="space-y-3">
                 <FormField label="Рівень складності">
                     <Select

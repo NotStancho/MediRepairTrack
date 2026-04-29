@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../../../context/AuthContext';
 import { useClaimEmployees } from '../../../../hooks/useClaimEmployees';
 import { useClaimRepairOperations } from '../../../../hooks/useClaimRepairOperations';
-import { useRepairOperations } from '../../../../hooks/useRepairOperations';
+import { useRepairWorks } from '../../../../hooks/useRepairWorks';
 
 import type { ClaimEmployee } from '../../../../types/claimEmployee';
 import type { ClaimRepairOperation } from '../../../../types/claim/claimRepairOperation';
@@ -64,9 +64,9 @@ export default function ClaimRepairOperationsTab({
     } = useClaimEmployees(claimId);
 
     const {
-        data: repairOperations,
-        loading: repairOperationsLoading,
-    } = useRepairOperations();
+        data: RepairWorks,
+        loading: RepairWorksLoading,
+    } = useRepairWorks();
 
     const [createOpen, setCreateOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<ClaimRepairOperation | null>(null);
@@ -80,9 +80,9 @@ export default function ClaimRepairOperationsTab({
         () => new Map(claimEmployees.map(employee => [employee.employeeId, employee])),
         [claimEmployees],
     );
-    const repairOperationById = useMemo(
-        () => new Map(repairOperations.map(operation => [operation.id, operation])),
-        [repairOperations],
+    const repairWorkById = useMemo(
+        () => new Map(RepairWorks.map(repairWork => [repairWork.id, repairWork])),
+        [RepairWorks],
     );
 
     const currentClaimEmployee = performedByEmployeeId != null
@@ -150,15 +150,15 @@ export default function ClaimRepairOperationsTab({
                 id: 'operation',
                 header: 'Робота',
                 accessorFn: row => {
-                    const operation = repairOperationById.get(row.operationId);
+                    const repairWork = repairWorkById.get(row.repairWorkId);
 
                     return [
-                        operation?.name ?? `Робота #${row.operationId}`,
-                        operation?.description ?? '',
+                        repairWork?.name ?? `Робота #${row.repairWorkId}`,
+                        repairWork?.description ?? '',
                     ].join(' ');
                 },
                 cell: ({ row }) => {
-                    const operation = repairOperationById.get(row.original.operationId);
+                    const repairWork = repairWorkById.get(row.original.repairWorkId);
                     const note = row.original.note?.trim() ?? '';
                     const notePreview = note.length > 100
                         ? note.slice(0, 100) + '…'
@@ -167,7 +167,7 @@ export default function ClaimRepairOperationsTab({
                     return (
                         <div className="min-w-0 space-y-1">
                             <div className="font-medium text-ink">
-                                {operation?.name ?? `Робота #${row.original.operationId}`}
+                                {repairWork?.name ?? `Робота #${row.original.repairWorkId}`}
                             </div>
 
                             {note && (
@@ -303,13 +303,13 @@ export default function ClaimRepairOperationsTab({
         deletingId,
         employeeById,
         getRowActions,
-        repairOperationById,
+        repairWorkById,
         showActionsColumn,
         updatingId,
     ]);
 
-    const deleteOperationName = deleteItem
-        ? repairOperationById.get(deleteItem.operationId)?.name ?? `Робота #${deleteItem.operationId}`
+    const deleteRepairWorkName = deleteItem
+        ? repairWorkById.get(deleteItem.repairWorkId)?.name ?? `Робота #${deleteItem.repairWorkId}`
         : null;
 
     return (
@@ -317,7 +317,7 @@ export default function ClaimRepairOperationsTab({
             <Table
                 data={items}
                 columns={columns}
-                loading={loading || claimEmployeesLoading || repairOperationsLoading}
+                loading={loading || claimEmployeesLoading || RepairWorksLoading}
                 density="compact"
                 storageKey={`claim-repair-operations-tab-${claimId}`}
                 showPagination={false}
@@ -346,8 +346,8 @@ export default function ClaimRepairOperationsTab({
                 <CreateClaimRepairOperationModal
                     claimId={claimId}
                     currentEmployee={currentClaimEmployee}
-                    repairOperations={repairOperations}
-                    repairOperationsLoading={repairOperationsLoading}
+                    repairWorks={RepairWorks}
+                    repairWorksLoading={RepairWorksLoading}
                     creating={creating}
                     onClose={() => setCreateOpen(false)}
                     onCreate={async payload => {
@@ -361,23 +361,23 @@ export default function ClaimRepairOperationsTab({
             {editingItem && performedByEmployeeId && (
                 <EditClaimRepairOperationModal
                     claimRepairOperation={editingItem}
-                    repairOperations={repairOperations}
-                    repairOperationsLoading={repairOperationsLoading}
+                    repairWorks={RepairWorks}
+                    repairWorksLoading={RepairWorksLoading}
                     updating={updatingId === editingItem.id}
                     noteOnly={editingNoteOnly}
                     onClose={closeEdit}
                     onSave={async payload => {
                         const normalizeNote = (value?: string | null) => value?.trim() || null;
 
-                        const operationChanged = payload.operationId !== editingItem.operationId;
+                        const repairWorkChanged = payload.repairWorkId !== editingItem.repairWorkId;
                         const timeChanged = Number(payload.timeSpent) !== Number(editingItem.timeSpent);
                         const noteChanged =
                             normalizeNote(payload.note) !== normalizeNote(editingItem.note);
 
                         const isNoteOnlyUpdate =
-                            editingNoteOnly || (!operationChanged && !timeChanged && noteChanged);
+                            editingNoteOnly || (!repairWorkChanged && !timeChanged && noteChanged);
 
-                        if (!operationChanged && !timeChanged && !noteChanged) {
+                        if (!repairWorkChanged && !timeChanged && !noteChanged) {
                             // нічого не змінилось
                             closeEdit();
                             return;
@@ -407,7 +407,7 @@ export default function ClaimRepairOperationsTab({
             {deleteItem && performedByEmployeeId && (
                 <ConfirmBox
                     title="Видалити ремонтну роботу?"
-                    description={deleteOperationName ?? 'Обраний запис буде видалено'}
+                    description={deleteRepairWorkName ?? 'Обраний запис буде видалено'}
                     confirmText="Видалити"
                     confirmVariant="danger"
                     onConfirm={async () => {

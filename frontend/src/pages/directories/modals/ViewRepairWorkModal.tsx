@@ -1,8 +1,8 @@
-// pages/directories/modals/ViewRepairOperationModal.tsx
+// pages/directories/modals/ViewRepairWorkModal.tsx
 
 import type { ReactNode } from 'react';
 
-import type { RepairOperation } from '../../../types/repairOperation/repairOperation';
+import type { RepairWork } from '../../../types/repairWork/repairWork';
 
 import Button from '../../../ui/Button';
 import Modal from '../../../ui/Modal/Modal';
@@ -11,7 +11,7 @@ import ModalFooter from '../../../ui/Modal/ModalFooter';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 
 interface Props {
-    operation: RepairOperation;
+    repairWork: RepairWork;
     complexityName: string;
     onClose: () => void;
 }
@@ -37,24 +37,24 @@ function InfoCard({
     );
 }
 
-export default function ViewRepairOperationModal({
-    operation,
+export default function ViewRepairWorkModal({
+    repairWork,
     complexityName,
     onClose,
 }: Props) {
     return (
         <Modal
-            title={`Ремонтна операція: ${operation.name}`}
+            title={`Ремонтна робота: ${repairWork.name}`}
             onClose={onClose}
             width="lg"
         >
             <div className="space-y-5">
                 <div className="rounded-2xl border border-border bg-linear-to-r from-brand-soft to-surface p-5">
                     <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-                        Назва операції
+                        Назва роботи
                     </div>
                     <div className="mt-2 text-xl font-semibold text-ink">
-                        {operation.name}
+                        {repairWork.name}
                     </div>
                     <div className="mt-3 inline-flex rounded-full border border-border bg-surface px-3 py-1 text-sm text-ink-muted">
                         Складність: {complexityName}
@@ -66,27 +66,27 @@ export default function ViewRepairOperationModal({
                         Опис
                     </div>
                     <div className="mt-2 whitespace-pre-line text-sm leading-6 text-ink">
-                        {operation.description}
+                        {repairWork.description}
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InfoCard
                         label="Створив"
-                        value={`#${operation.createdByEmployeeId}`}
+                        value={`#${repairWork.createdByEmployeeId}`}
                         mono
                     />
                     <InfoCard
                         label="Створено"
-                        value={formatDateTime(operation.createdAt)}
+                        value={formatDateTime(repairWork.createdAt)}
                     />
                 </div>
 
                 <InfoCard
                     label="Оновлено"
                     value={
-                        operation.updatedAt
-                            ? formatDateTime(operation.updatedAt)
+                        repairWork.updatedAt
+                            ? formatDateTime(repairWork.updatedAt)
                             : <span className="text-ink-muted">Не оновлювалось</span>
                     }
                 />

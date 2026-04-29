@@ -9,12 +9,12 @@ import FormField from '../../../../../ui/FormField';
 import Select from '../../../../../ui/Select';
 import { inputBase } from '../../../../../ui/formStyles';
 
-import type { RepairOperationShort } from '../../../../../types/repairOperation/repairOperationShort';
+import type { RepairWorkShort } from '../../../../../types/repairWork/repairWorkShort';
 import type { CreatePredictedOperationPayload } from '../../../../../types/diagnosis/DSS/predictedOperationPayloads';
 
 interface Props {
     predictionId: number;
-    available: RepairOperationShort[];
+    available: RepairWorkShort[];
     creating: boolean;
     onClose: () => void;
     onCreate: (payload: CreatePredictedOperationPayload) => Promise<void>;
@@ -26,10 +26,10 @@ export default function CreatePredictedOperationModal({
                                                           available,
                                                           creating,
                                                           onClose,
-                                                          onCreate,
-                                                      }: Props) {
+    onCreate,
+}: Props) {
     const [form, setForm] = useState({
-        operationId: null as number | null,
+        repairWorkId: null as number | null,
         probabilityScore: '',
         predictedTimeSpent: '',
     });
@@ -37,7 +37,7 @@ export default function CreatePredictedOperationModal({
     const handleSubmit = async () => {
         await onCreate({
             predictionId,
-            operationId: form.operationId as number,
+            repairWorkId: form.repairWorkId as number,
             probabilityScore: form.probabilityScore
                 ? Number(form.probabilityScore)
                 : undefined as unknown as number,
@@ -51,21 +51,21 @@ export default function CreatePredictedOperationModal({
 
     return (
         <Modal
-            title="Додати прогнозовану операцію"
+            title="Додати прогнозовану роботу"
             onClose={onClose}
             width="lg"
         >
             <div className="space-y-3">
-                <FormField label="Операція">
+                <FormField label="Робота">
                     <Select
-                        value={form.operationId}
+                        value={form.repairWorkId}
                         onChange={(val) =>
-                            setForm({ ...form, operationId: val })
+                            setForm({ ...form, repairWorkId: val })
                         }
                         options={available}
                         getLabel={(item) => `${item.name} (${item.complexityLevelName})`}
                         getValue={(item) => item.id}
-                        placeholder="Оберіть операцію"
+                        placeholder="Оберіть роботу"
                         searchable
                     />
                 </FormField>

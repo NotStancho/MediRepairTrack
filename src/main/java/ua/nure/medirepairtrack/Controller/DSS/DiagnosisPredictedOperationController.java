@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.nure.medirepairtrack.DTO.DSS.PredictedOperationDTO.CreatePredictedOperationDTO;
 import ua.nure.medirepairtrack.DTO.DSS.PredictedOperationDTO.PredictedOperationResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.PredictedOperationDTO.UpdatePredictedOperationDTO;
-import ua.nure.medirepairtrack.DTO.repair.RepairOperation.RepairOperationShortDTO;
+import ua.nure.medirepairtrack.DTO.repair.RepairWork.RepairWorkShortDTO;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisPredictedOperationService;
 
 import java.util.List;
@@ -28,14 +28,14 @@ public class DiagnosisPredictedOperationController {
         return service.createBatch(dtos);
     }
 
-    @PutMapping("/{predictionId}/{operationId}")
-    public PredictedOperationResponseDTO update(@PathVariable Integer predictionId, @PathVariable Integer operationId, @Valid @RequestBody UpdatePredictedOperationDTO dto) {
-        return service.update(predictionId, operationId, dto);
+    @PutMapping("/{predictionId}/{repairWorkId}")
+    public PredictedOperationResponseDTO update(@PathVariable Integer predictionId, @PathVariable Integer repairWorkId, @Valid @RequestBody UpdatePredictedOperationDTO dto) {
+        return service.update(predictionId, repairWorkId, dto);
     }
 
-    @DeleteMapping("/{predictionId}/{operationId}")
-    public void delete(@PathVariable Integer predictionId, @PathVariable Integer operationId) {
-        service.delete(predictionId, operationId);
+    @DeleteMapping("/{predictionId}/{repairWorkId}")
+    public void delete(@PathVariable Integer predictionId, @PathVariable Integer repairWorkId) {
+        service.delete(predictionId, repairWorkId);
     }
 
     @GetMapping("/prediction/{predictionId}")
@@ -43,13 +43,13 @@ public class DiagnosisPredictedOperationController {
         return service.getAllByPredictionId(predictionId);
     }
 
-    @GetMapping("/prediction/{predictionId}/operation/{operationId}")
-    public PredictedOperationResponseDTO getById(@PathVariable Integer predictionId, @PathVariable Integer operationId) {
-        return service.getById(predictionId, operationId);
+    @GetMapping("/prediction/{predictionId}/repair-work/{repairWorkId}")
+    public PredictedOperationResponseDTO getById(@PathVariable Integer predictionId, @PathVariable Integer repairWorkId) {
+        return service.getById(predictionId, repairWorkId);
     }
 
     @GetMapping("/available/{predictionId}")
-    public List<RepairOperationShortDTO> getAvailableOperations(@PathVariable Integer predictionId) {
+    public List<RepairWorkShortDTO> getAvailableOperations(@PathVariable Integer predictionId) {
         return service.getAvailableOperations(predictionId);
     }
 }

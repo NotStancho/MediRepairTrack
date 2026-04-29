@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.DTO.repair.RepairOperation;
+package ua.nure.medirepairtrack.DTO.repair.RepairWork;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class RepairOperationShortDTO {
+public class RepairWorkShortDTO {
 
     private Integer id;
 

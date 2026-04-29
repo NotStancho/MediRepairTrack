@@ -223,7 +223,7 @@ Prediction є **окремим шаром між алгоритмом прогн
 
 На основі схожих заявок система прогнозує:
 - defect category
-- repair operations
+- repair works
 - required parts
 - repair time
 - repair cost
@@ -252,12 +252,12 @@ dss.predicted-parts.min-probability
 
 ## DiagnosisPredictedOperation
 
-Прогнозовані ремонтні операції зберігаються у таблиці: diagnosis_prediction_operation.
+Прогнозовані ремонтні роботи зберігаються у таблиці: diagnosis_prediction_operation.
 
-Алгоритм прогнозування ремонтних операцій
+Алгоритм прогнозування ремонтних робіт
 1. отримати similarity results
-2. знайти ремонтні операції у схожих заявках (claim_repair_operation)
-3. обчислити score для кожної операції
+2. знайти ремонтні роботи у схожих заявках (claim_repair_operation)
+3. обчислити score для кожної роботи
 4. агрегувати score
 5. обчислити ймовірність
 6. відсортувати результати

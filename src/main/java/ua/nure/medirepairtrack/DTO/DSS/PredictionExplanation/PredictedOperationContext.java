@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Builder
 public class PredictedOperationContext {
 
-    private String operationName;
+    private String repairWorkName;
 
     private BigDecimal probability;
 

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 
 import type { ClaimEmployee } from '../../../../../types/claimEmployee';
 import type { CreateClaimRepairOperationPayload } from '../../../../../types/claim/claimRepairOperationPayloads';
-import type { RepairOperation } from '../../../../../types/repairOperation/repairOperation';
+import type { RepairWork } from '../../../../../types/repairWork/repairWork';
 
 import Button from '../../../../../ui/Button';
 import InputField from '../../../../../ui/InputField';
@@ -17,8 +17,8 @@ import { inputBase } from '../../../../../ui/formStyles';
 interface Props {
     claimId: number;
     currentEmployee: ClaimEmployee;
-    repairOperations: RepairOperation[];
-    repairOperationsLoading: boolean;
+    repairWorks: RepairWork[];
+    repairWorksLoading: boolean;
     creating: boolean;
     onClose: () => void;
     onCreate: (payload: CreateClaimRepairOperationPayload) => Promise<void>;
@@ -37,24 +37,24 @@ function parsePositiveDecimal(value: string) {
 }
 
 export default function CreateClaimRepairOperationModal({
-    claimId,
-    currentEmployee,
-    repairOperations,
-    repairOperationsLoading,
-    creating,
-    onClose,
-    onCreate,
-}: Props) {
-    const [selectedOperationId, setSelectedOperationId] = useState<number | null>(null);
+                                                            claimId,
+                                                            currentEmployee,
+                                                            repairWorks,
+                                                            repairWorksLoading,
+                                                            creating,
+                                                            onClose,
+                                                            onCreate,
+                                                        }: Props) {
+    const [selectedRepairWorkId, setSelectedRepairWorkId] = useState<number | null>(null);
     const [timeSpent, setTimeSpent] = useState('');
     const [note, setNote] = useState('');
     const [submitted, setSubmitted] = useState(false);
 
     const parsedTimeSpent = useMemo(() => parsePositiveDecimal(timeSpent), [timeSpent]);
-    const canSubmit = selectedOperationId != null && parsedTimeSpent != null;
+    const canSubmit = selectedRepairWorkId != null && parsedTimeSpent != null;
 
-    const operationError = submitted && selectedOperationId == null
-        ? 'Ремонтна операція обовʼязкова'
+    const repairWorkError = submitted && selectedRepairWorkId == null
+        ? 'Ремонтна робота обовʼязкова'
         : undefined;
     const timeSpentError = submitted && parsedTimeSpent == null
         ? 'Вкажіть коректний час більше 0'
@@ -70,7 +70,7 @@ export default function CreateClaimRepairOperationModal({
         await onCreate({
             claimId,
             employeeId: currentEmployee.employeeId,
-            operationId: selectedOperationId,
+            repairWorkId: selectedRepairWorkId,
             timeSpent: parsedTimeSpent,
             note: normalizeOptionalText(note),
         });
@@ -82,41 +82,41 @@ export default function CreateClaimRepairOperationModal({
         <Modal title="Додати ремонтну роботу" onClose={onClose} width="lg">
             <div className="space-y-4">
                 <InputField
-                    label="Ремонтна операція"
+                    label="Ремонтна робота"
                     required
-                    showRequired={submitted && selectedOperationId == null}
-                    error={operationError}
-                    helperText={!repairOperationsLoading && repairOperations.length === 0
-                        ? 'У довіднику немає доступних ремонтних операцій'
+                    showRequired={submitted && selectedRepairWorkId == null}
+                    error={repairWorkError}
+                    helperText={!repairWorksLoading && repairWorks.length === 0
+                        ? 'У довіднику немає доступних ремонтних робіт'
                         : undefined
                     }
                 >
                     <Select
-                        value={selectedOperationId}
-                        onChange={setSelectedOperationId}
-                        options={repairOperations}
-                        getLabel={operation => [
-                            operation.name,
-                            operation.description,
+                        value={selectedRepairWorkId}
+                        onChange={setSelectedRepairWorkId}
+                        options={repairWorks}
+                        getLabel={repairWork => [
+                            repairWork.name,
+                            repairWork.description,
                         ].filter(Boolean).join(' ')}
-                        getValue={operation => operation.id}
-                        renderOption={operation => (
+                        getValue={repairWork => repairWork.id}
+                        renderOption={repairWork => (
                             <div className="min-w-0 py-1">
                                 <div className="font-medium text-ink">
-                                    {operation.name}
+                                    {repairWork.name}
                                 </div>
                                 <div className="text-xs text-ink-muted line-clamp-2">
-                                    {operation.description}
+                                    {repairWork.description}
                                 </div>
                             </div>
                         )}
-                        renderValue={operation => operation.name}
+                        renderValue={repairWork => repairWork.name}
                         placeholder="Оберіть ремонтну роботу"
                         searchable
-                        loading={repairOperationsLoading}
+                        loading={repairWorksLoading}
                         loadingText="Завантаження робіт…"
-                        disabled={creating || (!repairOperationsLoading && repairOperations.length === 0)}
-                        invalid={!!operationError}
+                        disabled={creating || (!repairWorksLoading && repairWorks.length === 0)}
+                        invalid={!!repairWorkError}
                         itemHeight={48}
                         maxVisibleItems={5}
                     />
@@ -162,8 +162,8 @@ export default function CreateClaimRepairOperationModal({
                     onClick={handleSubmit}
                     disabled={
                         creating ||
-                        repairOperationsLoading ||
-                        repairOperations.length === 0
+                        repairWorksLoading ||
+                        repairWorks.length === 0
                     }
                 >
                     {creating ? 'Додавання…' : 'Додати'}

@@ -3,16 +3,16 @@ package ua.nure.medirepairtrack.Service.repair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.nure.medirepairtrack.DTO.repair.RepairOperation.CreateRepairOperationDTO;
-import ua.nure.medirepairtrack.DTO.repair.RepairOperation.RepairOperationResponseDTO;
-import ua.nure.medirepairtrack.DTO.repair.RepairOperation.RepairOperationShortDTO;
-import ua.nure.medirepairtrack.DTO.repair.RepairOperation.UpdateRepairOperationDTO;
+import ua.nure.medirepairtrack.DTO.repair.RepairWork.CreateRepairWorkDTO;
+import ua.nure.medirepairtrack.DTO.repair.RepairWork.RepairWorkResponseDTO;
+import ua.nure.medirepairtrack.DTO.repair.RepairWork.RepairWorkShortDTO;
+import ua.nure.medirepairtrack.DTO.repair.RepairWork.UpdateRepairWorkDTO;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
-import ua.nure.medirepairtrack.Entity.repair.RepairOperation.RepairOperation;
+import ua.nure.medirepairtrack.Entity.repair.RepairWork.RepairWork;
 import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
-import ua.nure.medirepairtrack.Repository.repair.RepairOperationRepository;
+import ua.nure.medirepairtrack.Repository.repair.RepairWorkRepository;
 import ua.nure.medirepairtrack.Service.DSS.ComplexityLevelService;
 import ua.nure.medirepairtrack.Service.employee.EmployeeService;
 
@@ -21,23 +21,23 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class RepairOperationService {
+public class RepairWorkService {
 
-    private final RepairOperationRepository repository;
+    private final RepairWorkRepository repository;
     private final ComplexityLevelService complexityLevelService;
     private final EmployeeService employeeService;
 
     @Transactional
-    public RepairOperationResponseDTO create(CreateRepairOperationDTO dto, Integer employeeId) {
+    public RepairWorkResponseDTO create(CreateRepairWorkDTO dto, Integer employeeId) {
         if (repository.existsByName(dto.getName())) {
-            throw new BadRequestException("Операція з такою назвою вже існує");
+            throw new BadRequestException("Ремонтна робота з такою назвою вже існує");
         }
 
         ComplexityLevel complexityLevel = complexityLevelService.getEntity(dto.getComplexityLevelId());
 
         Employee employee = employeeService.getEmployeeEntity(employeeId);
 
-        RepairOperation entity = RepairOperation.builder()
+        RepairWork entity = RepairWork.builder()
                 .complexityLevel(complexityLevel)
                 .name(dto.getName())
                 .description(dto.getDescription())
@@ -49,14 +49,14 @@ public class RepairOperationService {
     }
 
     @Transactional
-    public RepairOperationResponseDTO update(Integer id, UpdateRepairOperationDTO dto) {
+    public RepairWorkResponseDTO update(Integer id, UpdateRepairWorkDTO dto) {
 
-        RepairOperation entity = getOperationEntity(id);
+        RepairWork entity = getEntity(id);
 
         if (!entity.getName().equals(dto.getName())
                 && repository.existsByName(dto.getName())) {
 
-            throw new BadRequestException("Операція з такою назвою вже існує");
+            throw new BadRequestException("Ремонтна робота з такою назвою вже існує");
         }
 
         ComplexityLevel complexityLevel = complexityLevelService.getEntity(dto.getComplexityLevelId());
@@ -69,11 +69,11 @@ public class RepairOperationService {
         return map(repository.save(entity));
     }
 
-    public RepairOperationResponseDTO getById(Integer id) {
-        return map(getOperationEntity(id));
+    public RepairWorkResponseDTO getById(Integer id) {
+        return map(getEntity(id));
     }
 
-    public List<RepairOperationResponseDTO> getAll() {
+    public List<RepairWorkResponseDTO> getAll() {
 
         return repository.findAll()
                 .stream()
@@ -81,7 +81,7 @@ public class RepairOperationService {
                 .toList();
     }
 
-    public List<RepairOperationShortDTO> getAllOperationsShort() {
+    public List<RepairWorkShortDTO> getAllShort() {
 
         return repository.findAll()
                 .stream()
@@ -92,21 +92,21 @@ public class RepairOperationService {
     @Transactional
     public void delete(Integer id) {
 
-        RepairOperation entity = getOperationEntity(id);
+        RepairWork entity = getEntity(id);
 
         repository.delete(entity);
     }
 
-    public RepairOperation getOperationEntity(Integer id) {
+    public RepairWork getEntity(Integer id) {
 
         return repository.findById(id)
                 .orElseThrow(() ->
-                        new NotFoundException("Ремонтну операцію не знайдено"));
+                        new NotFoundException("Ремонтну роботу не знайдено"));
     }
 
-    private RepairOperationResponseDTO map(RepairOperation e) {
+    private RepairWorkResponseDTO map(RepairWork e) {
 
-        return RepairOperationResponseDTO.builder()
+        return RepairWorkResponseDTO.builder()
                 .id(e.getId())
                 .complexityLevelId(e.getComplexityLevel().getId())
                 .name(e.getName())
@@ -117,8 +117,8 @@ public class RepairOperationService {
                 .build();
     }
 
-    private RepairOperationShortDTO mapShort(RepairOperation e) {
-        return RepairOperationShortDTO.builder()
+    private RepairWorkShortDTO mapShort(RepairWork e) {
+        return RepairWorkShortDTO.builder()
                 .id(e.getId())
                 .name(e.getName())
                 .complexityLevelName(e.getComplexityLevel().getName())

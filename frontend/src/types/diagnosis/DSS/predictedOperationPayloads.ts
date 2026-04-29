@@ -2,7 +2,7 @@
 
 export interface CreatePredictedOperationPayload {
     predictionId: number;
-    operationId: number;
+    repairWorkId: number;
     probabilityScore: number;
     predictedTimeSpent: number;
 }

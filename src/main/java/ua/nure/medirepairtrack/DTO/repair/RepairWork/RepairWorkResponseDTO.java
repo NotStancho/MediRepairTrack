@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.DTO.repair.RepairOperation;
+package ua.nure.medirepairtrack.DTO.repair.RepairWork;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class RepairOperationResponseDTO {
+public class RepairWorkResponseDTO {
 
     private Integer id;
 

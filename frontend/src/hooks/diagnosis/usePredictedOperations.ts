@@ -6,7 +6,7 @@ import type {
     CreatePredictedOperationPayload,
     UpdatePredictedOperationPayload
 } from '../../types/diagnosis/DSS/predictedOperationPayloads';
-import type { RepairOperationShort } from '../../types/repairOperation/repairOperationShort';
+import type { RepairWorkShort } from '../../types/repairWork/repairWorkShort';
 
 import {
     createPredictedOperation,
@@ -19,7 +19,7 @@ import {
 
 export function usePredictedOperations(predictionId: number) {
     const [data, setData] = useState<PredictedOperation[]>([]);
-    const [available, setAvailable] = useState<RepairOperationShort[]>([]);
+    const [available, setAvailable] = useState<RepairWorkShort[]>([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -90,20 +90,20 @@ export function usePredictedOperations(predictionId: number) {
     };
 
     const update = async (
-        operationId: number,
+        repairWorkId: number,
         payload: UpdatePredictedOperationPayload
     ) => {
         setUpdating(true);
         try {
             const updated = await updatePredictedOperation(
                 predictionId,
-                operationId,
+                repairWorkId,
                 payload
             );
 
             setData(prev =>
                 prev.map(op =>
-                    op.operation.id === operationId ? updated : op
+                    op.repairWork.id === repairWorkId ? updated : op
                 )
             );
 
@@ -113,13 +113,13 @@ export function usePredictedOperations(predictionId: number) {
         }
     };
 
-    const remove = async (operationId: number) => {
+    const remove = async (repairWorkId: number) => {
         setRemoving(true);
         try {
-            await deletePredictedOperation(predictionId, operationId);
+            await deletePredictedOperation(predictionId, repairWorkId);
 
             setData(prev =>
-                prev.filter(op => op.operation.id !== operationId)
+                prev.filter(op => op.repairWork.id !== repairWorkId)
             );
 
             await loadAvailable(); // sync

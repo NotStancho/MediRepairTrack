@@ -281,7 +281,7 @@ public class BillingService {
     }
 
     private String buildLaborDescription(ClaimRepairOperation operation) {
-        String base = "Робота: " + operation.getOperation().getName();
+        String base = "Робота: " + operation.getRepairWork().getName();
 
         if (operation.getNote() == null || operation.getNote().isBlank()) {
             return base;

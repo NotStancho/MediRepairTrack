@@ -7,10 +7,10 @@ public record ClaimRepairOperationUpdatedEvent(
         Integer claimRepairOperationId,
         Integer employeeId,
         String employeeDisplayName,
-        Integer oldRepairOperationId,
-        String oldRepairOperationName,
-        Integer newRepairOperationId,
-        String newRepairOperationName,
+        Integer oldRepairWorkId,
+        String oldRepairWorkName,
+        Integer newRepairWorkId,
+        String newRepairWorkName,
         BigDecimal oldTimeSpent,
         BigDecimal newTimeSpent
 ) {

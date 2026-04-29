@@ -7,8 +7,8 @@ public record ClaimRepairOperationDeletedEvent(
         Integer claimRepairOperationId,
         Integer employeeId,
         String employeeDisplayName,
-        Integer repairOperationId,
-        String repairOperationName,
+        Integer repairWorkId,
+        String repairWorkName,
         BigDecimal timeSpent
 ) {
 }

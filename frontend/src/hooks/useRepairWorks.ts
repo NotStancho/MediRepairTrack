@@ -1,26 +1,26 @@
-// hooks/useRepairOperations.ts
+// hooks/useRepairWorks.ts
 
 import { useCallback, useEffect, useState } from 'react';
 
-import type { RepairOperation } from '../types/repairOperation/repairOperation';
+import type { RepairWork } from '../types/repairWork/repairWork';
 import type {
-    CreateRepairOperationPayload,
-    UpdateRepairOperationPayload,
-} from '../types/repairOperation/repairOperationPayloads';
+    CreateRepairWorkPayload,
+    UpdateRepairWorkPayload,
+} from '../types/repairWork/repairWorkPayloads';
 
 import {
-    createRepairOperation,
-    deleteRepairOperation,
-    getAllRepairOperations,
-    getRepairOperationById,
-    updateRepairOperation,
-} from '../api/repairOperation';
+    createRepairWork,
+    deleteRepairWork,
+    getAllRepairWorks,
+    getRepairWorkById,
+    updateRepairWork,
+} from '../api/repairWork';
 
-export function useRepairOperations() {
-    const [data, setData] = useState<RepairOperation[]>([]);
+export function useRepairWorks() {
+    const [data, setData] = useState<RepairWork[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const [selected, setSelected] = useState<RepairOperation | null>(null);
+    const [selected, setSelected] = useState<RepairWork | null>(null);
     const [selectedLoading, setSelectedLoading] = useState(false);
 
     const [creating, setCreating] = useState(false);
@@ -30,7 +30,7 @@ export function useRepairOperations() {
     const load = useCallback(async (cancelled?: () => boolean) => {
         setLoading(true);
         try {
-            const res = await getAllRepairOperations();
+            const res = await getAllRepairWorks();
             if (!cancelled?.()) {
                 setData(res);
             }
@@ -49,7 +49,7 @@ export function useRepairOperations() {
 
         setSelectedLoading(true);
         try {
-            const res = await getRepairOperationById(id);
+            const res = await getRepairWorkById(id);
             setSelected(res);
             return res;
         } finally {
@@ -68,12 +68,12 @@ export function useRepairOperations() {
     }, [load]);
 
     const create = async (
-        payload: CreateRepairOperationPayload,
+        payload: CreateRepairWorkPayload,
         employeeId: number
     ) => {
         setCreating(true);
         try {
-            const created = await createRepairOperation(payload, employeeId);
+            const created = await createRepairWork(payload, employeeId);
             setData(prev => [created, ...prev]);
             return created;
         } finally {
@@ -81,10 +81,10 @@ export function useRepairOperations() {
         }
     };
 
-    const update = async (id: number, payload: UpdateRepairOperationPayload) => {
+    const update = async (id: number, payload: UpdateRepairWorkPayload) => {
         setUpdating(true);
         try {
-            const updated = await updateRepairOperation(id, payload);
+            const updated = await updateRepairWork(id, payload);
             setData(prev =>
                 prev.map(item => (item.id === id ? updated : item))
             );
@@ -102,7 +102,7 @@ export function useRepairOperations() {
     const remove = async (id: number) => {
         setDeletingId(id);
         try {
-            await deleteRepairOperation(id);
+            await deleteRepairWork(id);
             setData(prev => prev.filter(item => item.id !== id));
 
             if (selected?.id === id) {

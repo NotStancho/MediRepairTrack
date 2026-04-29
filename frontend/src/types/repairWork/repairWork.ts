@@ -1,6 +1,6 @@
-// types/repairOperation/repairOperation
+// types/repairWork/repairWork
 
-export interface RepairOperation {
+export interface RepairWork {
     id: number;
     complexityLevelId: number;
     name: string;

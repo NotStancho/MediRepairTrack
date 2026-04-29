@@ -20,7 +20,7 @@ public class InvoiceLaborRecalcListener {
     public void onCreated(ClaimRepairOperationCreatedEvent event) {
 
         log.info(
-                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_CREATED | claimId={} | operationId={}",
+                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_CREATED | claimId={} | claimRepairOperationId={}",
                 event.claimId(),
                 event.claimRepairOperationId()
         );
@@ -32,7 +32,7 @@ public class InvoiceLaborRecalcListener {
     public void onUpdated(ClaimRepairOperationUpdatedEvent event) {
 
         log.info(
-                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_UPDATED | claimId={} | operationId={} | {} -> {}",
+                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_UPDATED | claimId={} | claimRepairOperationId={} | {} -> {}",
                 event.claimId(),
                 event.claimRepairOperationId(),
                 event.oldTimeSpent(),
@@ -46,7 +46,7 @@ public class InvoiceLaborRecalcListener {
     public void onDeleted(ClaimRepairOperationDeletedEvent event) {
 
         log.info(
-                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_DELETED | claimId={} | operationId={} | timeSpent={}",
+                "[EVENT] InvoiceLaborRecalc | reason=CLAIM_REPAIR_OPERATION_DELETED | claimId={} | claimRepairOperationId={} | timeSpent={}",
                 event.claimId(),
                 event.claimRepairOperationId(),
                 event.timeSpent()

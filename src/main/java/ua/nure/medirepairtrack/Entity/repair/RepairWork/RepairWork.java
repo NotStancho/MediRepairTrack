@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.Entity.repair.RepairOperation;
+package ua.nure.medirepairtrack.Entity.repair.RepairWork;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,17 +8,17 @@ import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "repair_operation")
+@Table(name = "repair_work")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RepairOperation {
+public class RepairWork {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_operation")
+    @Column(name = "id_repair_work")
     private Integer id;
 
     @ManyToOne

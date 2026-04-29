@@ -14,6 +14,6 @@ import java.io.Serializable;
 public class DiagnosisPredictedOperationId implements Serializable {
 
     private Integer predictionId;
-    private Integer operationId;
+    private Integer repairWorkId;
 
 }

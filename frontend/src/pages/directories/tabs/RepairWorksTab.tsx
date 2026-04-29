@@ -1,12 +1,12 @@
-// pages/directories/tabs/RepairOperationsTab.tsx
+// pages/directories/tabs/RepairWorksTab.tsx
 
 import { useMemo, useState } from 'react';
 
 import { useAuth } from '../../../context/AuthContext';
-import { useRepairOperations } from '../../../hooks/useRepairOperations';
+import { useRepairWorks } from '../../../hooks/useRepairWorks';
 import { useComplexityLevels } from '../../../hooks/diagnosis/useComplexityLevels';
 
-import type { RepairOperation } from '../../../types/repairOperation/repairOperation';
+import type { RepairWork } from '../../../types/repairWork/repairWork';
 
 import Button from '../../../ui/Button';
 import ConfirmBox from '../../../ui/ConfirmBox';
@@ -16,11 +16,11 @@ import TableToolbar from '../../../ui/Table/TableToolbar';
 
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 
-import CreateRepairOperationModal from '../modals/CreateRepairOperationModal';
-import EditRepairOperationModal from '../modals/EditRepairOperationModal';
-import ViewRepairOperationModal from '../modals/ViewRepairOperationModal';
+import CreateRepairWorkModal from '../modals/CreateRepairWorkModal';
+import EditRepairWorkModal from '../modals/EditRepairWorkModal';
+import ViewRepairWorkModal from '../modals/ViewRepairWorkModal';
 
-export default function RepairOperationsTab() {
+export default function RepairWorksTab() {
     const { user } = useAuth();
     const employeeId = user?.employeeId ?? null;
 
@@ -34,17 +34,17 @@ export default function RepairOperationsTab() {
         creating,
         updating,
         deletingId,
-    } = useRepairOperations();
+    } = useRepairWorks();
 
     const {
         data: complexityLevels,
         loading: complexityLoading,
     } = useComplexityLevels();
 
-    const [viewItem, setViewItem] = useState<RepairOperation | null>(null);
+    const [viewItem, setViewItem] = useState<RepairWork | null>(null);
     const [createOpen, setCreateOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<RepairOperation | null>(null);
-    const [deleteItem, setDeleteItem] = useState<RepairOperation | null>(null);
+    const [editingItem, setEditingItem] = useState<RepairWork | null>(null);
+    const [deleteItem, setDeleteItem] = useState<RepairWork | null>(null);
 
     const complexityNames = useMemo(
         () =>
@@ -54,7 +54,7 @@ export default function RepairOperationsTab() {
         [complexityLevels]
     );
 
-    const handleView = (item: RepairOperation) => {
+    const handleView = (item: RepairWork) => {
         setViewItem(item);
 
         void loadOne(item.id).then(fresh => {
@@ -64,10 +64,10 @@ export default function RepairOperationsTab() {
         });
     };
 
-    const columns = useMemo<TableColumnDef<RepairOperation>[]>(() => [
+    const columns = useMemo<TableColumnDef<RepairWork>[]>(() => [
         {
             id: 'name',
-            header: 'Операція',
+            header: 'Робота',
             accessorFn: row => row.name,
             cell: ({ row }) => (
                 <div className="font-medium text-ink">
@@ -153,7 +153,7 @@ export default function RepairOperationsTab() {
                 loading={loading || complexityLoading}
                 density="compact"
                 striped
-                storageKey="repair-operations-table"
+                storageKey="repair-works-table"
                 onRowClick={row => handleView(row.original)}
                 renderToolbar={table => (
                     <TableToolbar
@@ -166,7 +166,7 @@ export default function RepairOperationsTab() {
                                 disabled={!employeeId}
                                 title={
                                     employeeId
-                                        ? 'Додати ремонтну операцію'
+                                        ? 'Додати ремонтну роботу'
                                         : 'Створення недоступне без employeeId'
                                 }
                             >
@@ -177,13 +177,13 @@ export default function RepairOperationsTab() {
                 )}
                 renderEmptyState={
                     <div className="text-sm text-ink-muted">
-                        Ремонтні операції ще не додані
+                        Ремонтні роботи ще не додані
                     </div>
                 }
             />
 
             {createOpen && employeeId && (
-                <CreateRepairOperationModal
+                <CreateRepairWorkModal
                     complexityLevels={complexityLevels}
                     complexityLoading={complexityLoading}
                     creating={creating}
@@ -195,8 +195,8 @@ export default function RepairOperationsTab() {
             )}
 
             {editingItem && (
-                <EditRepairOperationModal
-                    operation={editingItem}
+                <EditRepairWorkModal
+                    repairWork={editingItem}
                     complexityLevels={complexityLevels}
                     complexityLoading={complexityLoading}
                     updating={updating}
@@ -212,8 +212,8 @@ export default function RepairOperationsTab() {
             )}
 
             {viewItem && (
-                <ViewRepairOperationModal
-                    operation={viewItem}
+                <ViewRepairWorkModal
+                    repairWork={viewItem}
                     complexityName={
                         complexityNames.get(viewItem.complexityLevelId) ??
                         `Рівень #${viewItem.complexityLevelId}`
@@ -224,7 +224,7 @@ export default function RepairOperationsTab() {
 
             {deleteItem && (
                 <ConfirmBox
-                    title="Видалити ремонтну операцію?"
+                    title="Видалити ремонтну роботу?"
                     description={deleteItem.name}
                     confirmText="Видалити"
                     confirmVariant="danger"

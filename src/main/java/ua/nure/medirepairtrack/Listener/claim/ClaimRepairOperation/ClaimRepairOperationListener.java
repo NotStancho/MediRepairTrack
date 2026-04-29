@@ -22,7 +22,7 @@ public class ClaimRepairOperationListener {
     public void onCreated(ClaimRepairOperationCreatedEvent event) {
 
         log.info(
-                "[EVENT] ClaimRepairOperationCreated | claimId={} | operationId={} | employeeId={} | timeSpent={}",
+                "[EVENT] ClaimRepairOperationCreated | claimId={} | claimRepairOperationId={} | employeeId={} | timeSpent={}",
                 event.claimId(),
                 event.claimRepairOperationId(),
                 event.employeeId(),
@@ -37,7 +37,7 @@ public class ClaimRepairOperationListener {
     public void onUpdated(ClaimRepairOperationUpdatedEvent event) {
 
         log.info(
-                "[EVENT] ClaimRepairOperationUpdated | claimId={} | operationId={} | employeeId={} | {} -> {}",
+                "[EVENT] ClaimRepairOperationUpdated | claimId={} | claimRepairOperationId={} | employeeId={} | {} -> {}",
                 event.claimId(),
                 event.claimRepairOperationId(),
                 event.employeeId(),
@@ -53,7 +53,7 @@ public class ClaimRepairOperationListener {
     public void onDeleted(ClaimRepairOperationDeletedEvent event) {
 
         log.info(
-                "[EVENT] ClaimRepairOperationDeleted | claimId={} | operationId={} | employeeId={} | timeSpent={}",
+                "[EVENT] ClaimRepairOperationDeleted | claimId={} | claimRepairOperationId={} | employeeId={} | timeSpent={}",
                 event.claimId(),
                 event.claimRepairOperationId(),
                 event.employeeId(),

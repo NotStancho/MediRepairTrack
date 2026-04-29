@@ -15,7 +15,7 @@ import PredictionSimilarityTab from './tabs/PredictionSimilarityTab';
 
 const tabs: TabItem[] = [
     { key: 'general', label: 'Загальний' },
-    { key: 'operations', label: 'Операції' },
+    { key: 'operations', label: 'Роботи' },
     { key: 'parts', label: 'Запчастини' },
     { key: 'defects', label: 'Дефекти' },
     { key: 'similar', label: 'Схожі заявки' },
