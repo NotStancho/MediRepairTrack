@@ -5,7 +5,7 @@ interface ModalProps {
     title: string;
     children: ReactNode;
     onClose: () => void;
-    width?: 'sm' | 'md' | 'lg';
+    width?: 'sm' | 'md' | 'lg' | 'xl';
 
     backdrop?: 'none' | 'dim' | 'blur';
 }
@@ -14,6 +14,7 @@ const WIDTHS = {
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
+    xl: 'max-w-2xl',
 };
 
 export default function Modal({
