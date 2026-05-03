@@ -11,32 +11,37 @@ import ua.nure.medirepairtrack.Service.claim.ClaimWorkPartService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/claim-works/{claimWorkId}/parts")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ClaimWorkPartController {
 
     private final ClaimWorkPartService service;
 
-    @PostMapping
+    @PostMapping("/claim-works/{claimWorkId}/parts")
     public ClaimWorkPartResponseDTO addPart(@PathVariable Integer claimWorkId, @RequestParam Integer employeeId,
                                             @Valid @RequestBody CreateClaimWorkPartDTO dto) {
         return service.addPartToClaimWork(claimWorkId, employeeId, dto);
     }
 
-    @PutMapping
+    @PutMapping("/claim-works/{claimWorkId}/parts")
     public ClaimWorkPartResponseDTO updateQuantity(@PathVariable Integer claimWorkId, @RequestParam Integer employeeId,
                                                    @Valid @RequestBody UpdateClaimWorkPartQuantityDTO dto) {
         return service.updateClaimWorkPartQuantity(claimWorkId, employeeId, dto);
     }
 
-    @DeleteMapping("/{partId}")
+    @DeleteMapping("/claim-works/{claimWorkId}/parts/{partId}")
     public void delete(@PathVariable Integer claimWorkId, @PathVariable Integer partId,
                        @RequestParam Integer employeeId) {
         service.deleteClaimWorkPart(claimWorkId, employeeId, partId);
     }
 
-    @GetMapping
+    @GetMapping("/claim-works/{claimWorkId}/parts")
     public List<ClaimWorkPartResponseDTO> getAll(@PathVariable Integer claimWorkId) {
         return service.getPartsByClaimWork(claimWorkId);
+    }
+
+    @GetMapping("/claims/{claimId}/parts")
+    public List<ClaimWorkPartResponseDTO> getAllByClaim(@PathVariable Integer claimId) {
+        return service.getPartsByClaim(claimId);
     }
 }
