@@ -5,11 +5,13 @@ import toast from 'react-hot-toast';
 
 import { useAuth } from '../../../../context/AuthContext';
 import { useClaimEmployees } from '../../../../hooks/useClaimEmployees';
+import { useClaimPartsByClaim } from '../../../../hooks/useClaimWorkParts';
 import { useClaimWorks } from '../../../../hooks/useClaimWorks';
 import { useRepairWorks } from '../../../../hooks/useRepairWorks';
 
 import type { ClaimEmployee } from '../../../../types/claimEmployee';
 import type { ClaimWork } from '../../../../types/claim/claimWork';
+import type { ClaimWorkPart } from '../../../../types/claim/claimWorkPart';
 
 import Button from '../../../../ui/Button';
 import ConfirmBox from '../../../../ui/ConfirmBox';
@@ -18,6 +20,7 @@ import { Table, TableToolbar, type TableColumnDef } from '../../../../ui/Table';
 
 import CreateClaimWorkModal from './modals/CreateClaimWorkModal';
 import EditClaimWorkModal from './modals/EditClaimWorkModal';
+import ClaimWorkPartsModal from './modals/ClaimWorkPartsModal';
 
 import { formatDateTime } from '../../../../utils/formats/dateFormat';
 import { formatHours } from '../../../../utils/formats/hourFormat';
@@ -38,6 +41,28 @@ function getEmployeeDisplayName(employee?: ClaimEmployee) {
     return employee
         ? `${employee.lastName} ${employee.firstName}`
         : null;
+}
+
+function formatQty(value: number) {
+    return Number.isInteger(value)
+        ? String(value)
+        : value.toFixed(3).replace(/\.?0+$/, '');
+}
+
+function buildPartsPreview(parts: ClaimWorkPart[]) {
+    if (!parts.length) {
+        return 'Немає використаних запчастин';
+    }
+
+    const visible = parts.slice(0, 2).map(part =>
+        `${formatQty(part.quantity)} ${part.unitName} ${part.partName}`,
+    );
+
+    const hiddenCount = parts.length - visible.length;
+
+    return hiddenCount > 0
+        ? `${visible.join(', ')} +${hiddenCount}`
+        : visible.join(', ');
 }
 
 export default function ClaimWorksTab({
@@ -64,6 +89,12 @@ export default function ClaimWorksTab({
     } = useClaimEmployees(claimId);
 
     const {
+        data: claimParts,
+        loading: claimPartsLoading,
+        refresh: refreshClaimParts,
+    } = useClaimPartsByClaim(claimId);
+
+    const {
         data: RepairWorks,
         loading: RepairWorksLoading,
     } = useRepairWorks();
@@ -72,6 +103,7 @@ export default function ClaimWorksTab({
     const [editingItem, setEditingItem] = useState<ClaimWork | null>(null);
     const [editingNoteOnly, setEditingNoteOnly] = useState(false);
     const [deleteItem, setDeleteItem] = useState<ClaimWork | null>(null);
+    const [partsItem, setPartsItem] = useState<ClaimWork | null>(null);
 
     const performedByEmployeeId = user?.employeeId ?? null;
     const isManager = user?.role === 'EMPLOYEE' && user.position === 'MANAGER';
@@ -84,6 +116,17 @@ export default function ClaimWorksTab({
         () => new Map(RepairWorks.map(repairWork => [repairWork.id, repairWork])),
         [RepairWorks],
     );
+    const partsByClaimWorkId = useMemo(() => {
+        const grouped = new Map<number, ClaimWorkPart[]>();
+
+        for (const part of claimParts) {
+            const group = grouped.get(part.claimWorkId) ?? [];
+            group.push(part);
+            grouped.set(part.claimWorkId, group);
+        }
+
+        return grouped;
+    }, [claimParts]);
 
     const currentClaimEmployee = performedByEmployeeId != null
         ? employeeById.get(performedByEmployeeId)
@@ -115,6 +158,13 @@ export default function ClaimWorksTab({
     const getRowActions = useCallback((item: ClaimWork) => {
         const isOwnRecord = performedByEmployeeId != null && item.employeeId === performedByEmployeeId;
         const actions: RowAction[] = [];
+
+        if (canActOnWork && isOwnRecord) {
+            actions.push({
+                label: 'Запчастини',
+                onClick: () => setPartsItem(item),
+            });
+        }
 
         if (canActOnWork && isOwnRecord) {
             actions.push({
@@ -176,6 +226,41 @@ export default function ClaimWorksTab({
                                     title={note}
                                 >
                                     Примітка: {notePreview}
+                                </div>
+                            )}
+                        </div>
+                    );
+                },
+            },
+            {
+                id: 'parts',
+                header: 'Запчастини',
+                accessorFn: row => buildPartsPreview(partsByClaimWorkId.get(row.id) ?? []),
+                cell: ({ row }) => {
+                    const parts = partsByClaimWorkId.get(row.original.id) ?? [];
+
+                    if (!parts.length) {
+                        return (
+                            <span className="text-xs text-ink-muted">
+                                Немає використаних запчастин
+                            </span>
+                        );
+                    }
+
+                    return (
+                        <div className="min-w-0 space-y-1 text-xs">
+                            {parts.slice(0, 2).map(part => (
+                                <div key={part.partId} className="truncate text-ink">
+                                    <span className="font-mono">
+                                        {formatQty(part.quantity)} {part.unitName}
+                                    </span>{' '}
+                                    {part.partName}
+                                </div>
+                            ))}
+
+                            {parts.length > 2 && (
+                                <div className="text-ink-muted">
+                                    Ще {parts.length - 2}
                                 </div>
                             )}
                         </div>
@@ -303,6 +388,7 @@ export default function ClaimWorksTab({
         deletingId,
         employeeById,
         getRowActions,
+        partsByClaimWorkId,
         repairWorkById,
         showActionsColumn,
         updatingId,
@@ -317,14 +403,14 @@ export default function ClaimWorksTab({
             <Table
                 data={items}
                 columns={columns}
-                loading={loading || claimEmployeesLoading || RepairWorksLoading}
+                loading={loading || claimEmployeesLoading || RepairWorksLoading || claimPartsLoading}
                 density="compact"
                 storageKey={`claim-works-tab-${claimId}`}
                 showPagination={false}
                 renderToolbar={table => (
                     <TableToolbar
                         table={table}
-                        globalFilterPlaceholder="Пошук за роботою, виконавцем або приміткою"
+                        globalFilterPlaceholder="Пошук за роботою, запчастиною, виконавцем або приміткою"
                         rightSlot={canCreateOwnWork && currentClaimEmployee ? (
                             <Button
                                 variant="primary"
@@ -412,11 +498,31 @@ export default function ClaimWorksTab({
                     confirmVariant="danger"
                     onConfirm={async () => {
                         await remove(deleteItem.id, performedByEmployeeId);
-                        await syncClaimSummary();
+                        await refreshClaimParts();
                         toast.success('Ремонтну роботу видалено');
                         setDeleteItem(null);
                     }}
                     onCancel={() => setDeleteItem(null)}
+                />
+            )}
+
+            {partsItem && (
+                <ClaimWorkPartsModal
+                    claimWork={partsItem}
+                    repairWorkName={
+                        repairWorkById.get(partsItem.repairWorkId)?.name ??
+                        `Робота #${partsItem.repairWorkId}`
+                    }
+                    canManage={
+                        canActOnWork &&
+                        performedByEmployeeId != null &&
+                        partsItem.employeeId === performedByEmployeeId
+                    }
+                    employeeId={performedByEmployeeId}
+                    onClose={() => setPartsItem(null)}
+                    onChanged={async () => {
+                        await refreshClaimParts();
+                    }}
                 />
             )}
         </>

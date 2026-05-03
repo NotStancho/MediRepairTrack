@@ -1,5 +1,7 @@
-export interface UsedPart {
-    claimId: number;
+// types/claim/claimWorkPart
+
+export interface ClaimWorkPart {
+    claimWorkId: number;
     partId: number;
     partCode: string;
     partName: string;
