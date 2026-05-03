@@ -17,6 +17,7 @@ import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictedPartRepository;
 import ua.nure.medirepairtrack.Repository.DSS.DiagnosisPredictionRepository;
+import ua.nure.medirepairtrack.Repository.claim.ClaimWorkPartRepository;
 import ua.nure.medirepairtrack.Service.repair.PartService;
 
 import java.math.BigDecimal;
@@ -39,6 +40,7 @@ public class DiagnosisPredictedPartService {
     private final DiagnosisPredictedPartRepository repository;
 
     private final PartService partService;
+    private final ClaimWorkPartRepository claimWorkPartRepository;
     private final DiagnosisSimilarityResultService similarityResultService;
 
     private final PredictionStateService predictionStateService;
@@ -115,11 +117,20 @@ public class DiagnosisPredictedPartService {
             Integer claimId = result.getClaim().getId();
             double similarity = result.getSimilarityScore().doubleValue();
 
-            var usedParts = partService.getUsedPartsByClaim(claimId);
+            // TODO: Тимчасова логіка.
+            // Зараз агрегуємо запчастини на рівні всієї заявки (claim),
+            // без урахування конкретної ремонтної роботи.
+            //
+            // У майбутньому:
+            // необхідно прив’язати прогнозовані запчастини до конкретних
+            // прогнозованих ремонтних робіт (DiagnosisPredictionWork),
+            // тобто використовувати:
+            // similar claim + repairWork -> claim_work_part
+            var usedParts = claimWorkPartRepository.findByClaimWorkClaimId(claimId);
 
             for (var part : usedParts) {
 
-                Integer partId = part.getPartId();
+                Integer partId = part.getPart().getId();
 
                 partScores.merge(partId, similarity, Double::sum);
             }

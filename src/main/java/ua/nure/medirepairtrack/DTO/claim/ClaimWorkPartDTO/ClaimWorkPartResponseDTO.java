@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.DTO.claim.UsedPartDTO;
+package ua.nure.medirepairtrack.DTO.claim.ClaimWorkPartDTO;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,9 +7,9 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class UsedPartResponseDTO {
+public class ClaimWorkPartResponseDTO {
 
-    private Integer claimId;
+    private Integer claimWorkId;
 
     private Integer partId;
     private String partCode;

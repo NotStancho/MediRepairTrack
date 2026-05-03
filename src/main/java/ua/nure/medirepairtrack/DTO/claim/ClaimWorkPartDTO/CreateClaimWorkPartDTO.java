@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.DTO.claim.UsedPartDTO;
+package ua.nure.medirepairtrack.DTO.claim.ClaimWorkPartDTO;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class UsePartDTO {
+public class CreateClaimWorkPartDTO {
 
     @NotNull(message = "ID запчастини обов'язковий")
     private Integer partId;

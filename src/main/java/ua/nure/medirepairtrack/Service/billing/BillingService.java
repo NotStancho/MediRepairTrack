@@ -7,17 +7,17 @@ import ua.nure.medirepairtrack.DTO.billing.BillingDTO.BillingResultDTO;
 import ua.nure.medirepairtrack.DTO.billing.BillingDTO.BillingSectionResultDTO;
 import ua.nure.medirepairtrack.DTO.billing.PricingConfigDTO.PricingConfigResponseDTO;
 import ua.nure.medirepairtrack.DTO.claim.ClaimDTO.ClaimResponseDTO;
-import ua.nure.medirepairtrack.DTO.claim.UsedPartDTO.UsedPartResponseDTO;
+import ua.nure.medirepairtrack.DTO.claim.ClaimWorkPartDTO.ClaimWorkPartResponseDTO;
 import ua.nure.medirepairtrack.DTO.client.ClientContractDTO.ContractDiscountDTO;
 import ua.nure.medirepairtrack.DTO.delivery.DeliveryDTO.DeliveryResponseDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.RepairType;
 import ua.nure.medirepairtrack.Entity.claim.ClaimWork.ClaimWork;
 import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Service.claim.ClaimService;
+import ua.nure.medirepairtrack.Service.claim.ClaimWorkPartService;
 import ua.nure.medirepairtrack.Service.claim.ClaimWorkService;
 import ua.nure.medirepairtrack.Service.client.ClientContractService;
 import ua.nure.medirepairtrack.Service.delivery.DeliveryService;
-import ua.nure.medirepairtrack.Service.repair.PartService;
 import ua.nure.medirepairtrack.Workflow.DeliveryStatusMachine;
 
 import java.math.BigDecimal;
@@ -33,7 +33,7 @@ public class BillingService {
 
     private final ClaimService claimService;
     private final ClaimWorkService claimWorkService;
-    private final PartService partService;
+    private final ClaimWorkPartService claimWorkPartService;
     private final DeliveryService deliveryService;
     private final PricingConfigService pricingConfigService;
     private final ClientContractService clientContractService;
@@ -114,13 +114,13 @@ public class BillingService {
         PricingConfigResponseDTO pricing = pricingConfigService.getByRepairType(claim.getRepairType());
         ContractDiscountDTO discount = clientContractService.getActiveDiscounts(claim.getClientId());
 
-        List<UsedPartResponseDTO> usedParts = partService.getUsedPartsByClaim(claimId);
+        List<ClaimWorkPartResponseDTO> claimWorkParts = claimWorkPartService.getPartsByClaim(claimId);
 
         List<BillingItemDTO> items = new ArrayList<>();
 
         BigDecimal beforeDiscount = BigDecimal.ZERO;
 
-        for (UsedPartResponseDTO part : usedParts) {
+        for (ClaimWorkPartResponseDTO part : claimWorkParts) {
 
             BigDecimal base = part.getQuantity().multiply(part.getUnitPrice());
 

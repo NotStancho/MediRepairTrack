@@ -1,11 +1,13 @@
-package ua.nure.medirepairtrack.Event.Part;
+package ua.nure.medirepairtrack.Event.ClaimWorkPart;
 
 import ua.nure.medirepairtrack.Entity.repair.Part.UnitType;
 
 import java.math.BigDecimal;
 
-public record PartUsageUpdatedEvent(
+public record ClaimWorkPartRemovedEvent(
         Integer claimId,
+        Integer claimWorkId,
+        String repairWorkName,
         Integer employeeId,
 
         Integer partId,
@@ -15,10 +17,5 @@ public record PartUsageUpdatedEvent(
         String unitName,
         UnitType unitType,
 
-        BigDecimal oldQuantity,
-        BigDecimal newQuantity,
-        BigDecimal delta,
-
-        BigDecimal unitPrice
-) {
-}
+        BigDecimal removedQuantity
+) {}
