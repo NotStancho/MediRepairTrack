@@ -6,16 +6,11 @@ import { useClaimPartsByClaim } from '../../../hooks/useClaimWorkParts';
 import type { ClaimWorkPart } from '../../../types/claim/claimWorkPart';
 
 import { formatMoney } from '../../../utils/formats/moneyFormat';
+import { formatPartQuantity } from '../../../utils/formats/partQuantityFormat';
 import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
 
 interface Props {
     claimId: number;
-}
-
-function formatQty(value: number) {
-    return Number.isInteger(value)
-        ? String(value)
-        : value.toFixed(3).replace(/\.?0+$/, '');
 }
 
 interface ClaimPartSummary {
@@ -25,7 +20,6 @@ interface ClaimPartSummary {
     quantity: number;
     unitPrice: number;
     unitName: string;
-    claimWorkCount: number;
 }
 
 function aggregateParts(items: ClaimWorkPart[]): ClaimPartSummary[] {
@@ -36,7 +30,6 @@ function aggregateParts(items: ClaimWorkPart[]): ClaimPartSummary[] {
 
         if (existing) {
             existing.quantity += item.quantity;
-            existing.claimWorkCount += 1;
         } else {
             byPart.set(item.partId, {
                 partId: item.partId,
@@ -45,7 +38,6 @@ function aggregateParts(items: ClaimWorkPart[]): ClaimPartSummary[] {
                 quantity: item.quantity,
                 unitPrice: item.unitPrice,
                 unitName: item.unitName,
-                claimWorkCount: 1,
             });
         }
     }
@@ -97,11 +89,11 @@ export default function ClaimPartsTab({ claimId }: Props) {
             id: 'quantity',
             header: 'Кількість',
             accessorFn: row =>
-                `${formatQty(row.quantity)} ${row.unitName}`,
+                formatPartQuantity(row.quantity, row.unitName),
             meta: { align: 'right' },
             cell: ({ row }) => (
                 <span className="font-mono">
-                    {formatQty(row.original.quantity)} {row.original.unitName}
+                    {formatPartQuantity(row.original.quantity, row.original.unitName)}
                 </span>
             ),
         },

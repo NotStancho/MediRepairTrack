@@ -24,6 +24,7 @@ import ClaimWorkPartsModal from './modals/ClaimWorkPartsModal';
 
 import { formatDateTime } from '../../../../utils/formats/dateFormat';
 import { formatHours } from '../../../../utils/formats/hourFormat';
+import { formatPartQuantity } from '../../../../utils/formats/partQuantityFormat';
 import {
     EMPLOYEE_POSITION_LABELS,
 } from '../../../../utils/employeeLabels';
@@ -43,19 +44,13 @@ function getEmployeeDisplayName(employee?: ClaimEmployee) {
         : null;
 }
 
-function formatQty(value: number) {
-    return Number.isInteger(value)
-        ? String(value)
-        : value.toFixed(3).replace(/\.?0+$/, '');
-}
-
 function buildPartsPreview(parts: ClaimWorkPart[]) {
     if (!parts.length) {
         return 'Немає використаних запчастин';
     }
 
     const visible = parts.slice(0, 2).map(part =>
-        `${formatQty(part.quantity)} ${part.unitName} ${part.partName}`,
+        `${formatPartQuantity(part.quantity, part.unitName)} ${part.partName}`,
     );
 
     const hiddenCount = parts.length - visible.length;
@@ -95,8 +90,8 @@ export default function ClaimWorksTab({
     } = useClaimPartsByClaim(claimId);
 
     const {
-        data: RepairWorks,
-        loading: RepairWorksLoading,
+        data: repairWorks,
+        loading: repairWorksLoading,
     } = useRepairWorks();
 
     const [createOpen, setCreateOpen] = useState(false);
@@ -113,8 +108,8 @@ export default function ClaimWorksTab({
         [claimEmployees],
     );
     const repairWorkById = useMemo(
-        () => new Map(RepairWorks.map(repairWork => [repairWork.id, repairWork])),
-        [RepairWorks],
+        () => new Map(repairWorks.map(repairWork => [repairWork.id, repairWork])),
+        [repairWorks],
     );
     const partsByClaimWorkId = useMemo(() => {
         const grouped = new Map<number, ClaimWorkPart[]>();
@@ -252,7 +247,7 @@ export default function ClaimWorksTab({
                             {parts.slice(0, 2).map(part => (
                                 <div key={part.partId} className="truncate text-ink">
                                     <span className="font-mono">
-                                        {formatQty(part.quantity)} {part.unitName}
+                                        {formatPartQuantity(part.quantity, part.unitName)}
                                     </span>{' '}
                                     {part.partName}
                                 </div>
@@ -403,7 +398,7 @@ export default function ClaimWorksTab({
             <Table
                 data={items}
                 columns={columns}
-                loading={loading || claimEmployeesLoading || RepairWorksLoading || claimPartsLoading}
+                loading={loading || claimEmployeesLoading || repairWorksLoading || claimPartsLoading}
                 density="compact"
                 storageKey={`claim-works-tab-${claimId}`}
                 showPagination={false}
@@ -432,8 +427,8 @@ export default function ClaimWorksTab({
                 <CreateClaimWorkModal
                     claimId={claimId}
                     currentEmployee={currentClaimEmployee}
-                    repairWorks={RepairWorks}
-                    repairWorksLoading={RepairWorksLoading}
+                    repairWorks={repairWorks}
+                    repairWorksLoading={repairWorksLoading}
                     creating={creating}
                     onClose={() => setCreateOpen(false)}
                     onCreate={async payload => {
@@ -447,8 +442,8 @@ export default function ClaimWorksTab({
             {editingItem && performedByEmployeeId && (
                 <EditClaimWorkModal
                     claimWork={editingItem}
-                    repairWorks={RepairWorks}
-                    repairWorksLoading={RepairWorksLoading}
+                    repairWorks={repairWorks}
+                    repairWorksLoading={repairWorksLoading}
                     updating={updatingId === editingItem.id}
                     noteOnly={editingNoteOnly}
                     onClose={closeEdit}
@@ -498,6 +493,7 @@ export default function ClaimWorksTab({
                     confirmVariant="danger"
                     onConfirm={async () => {
                         await remove(deleteItem.id, performedByEmployeeId);
+                        await syncClaimSummary();
                         await refreshClaimParts();
                         toast.success('Ремонтну роботу видалено');
                         setDeleteItem(null);

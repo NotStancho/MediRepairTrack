@@ -11,7 +11,14 @@ import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
 import { inputBase } from '../../../ui/formStyles';
 
-import { formatPartQuantity } from '../../../utils/formats/partQuantityFormat';
+import {
+    formatPartQuantity,
+    getPartQuantityError,
+    getPartQuantityMin,
+    getPartQuantityStep,
+    normalizePartQuantityInput,
+    parsePartQuantityInput,
+} from '../../../utils/formats/partQuantityFormat';
 
 interface Props {
     part: Part;
@@ -28,18 +35,19 @@ export default function AddPartStockModal({
 }: Props) {
     const [quantity, setQuantity] = useState('');
 
-    const quantityNumber = Number(quantity);
-    const isPiece = part.unitType === 'PIECE';
-
-    const canSubmit = useMemo(() => {
-        if (!quantity.trim()) return false;
-        if (Number.isNaN(quantityNumber) || quantityNumber <= 0) return false;
-        if (isPiece && !Number.isInteger(quantityNumber)) return false;
-        return true;
-    }, [isPiece, quantity, quantityNumber]);
+    const quantityNumber = useMemo(
+        () => parsePartQuantityInput(quantity),
+        [quantity],
+    );
+    const quantityError = getPartQuantityError(quantityNumber, {
+        unitType: part.unitType,
+        unitName: part.unitName,
+        requiredMessage: 'Вкажіть коректну кількість більше 0',
+    });
+    const canSubmit = !quantityError;
 
     const handleSubmit = async () => {
-        if (!canSubmit) return;
+        if (!canSubmit || quantityNumber == null) return;
 
         await onSave({ quantity: quantityNumber });
         onClose();
@@ -63,12 +71,19 @@ export default function AddPartStockModal({
                 <FormField label="Кількість для додавання">
                     <input
                         type="number"
-                        min={isPiece ? '1' : '0.001'}
-                        step={isPiece ? '1' : '0.001'}
+                        min={getPartQuantityMin(part.unitType)}
+                        step={getPartQuantityStep(part.unitType)}
                         className={inputBase}
                         value={quantity}
-                        onChange={e => setQuantity(e.target.value)}
+                        onChange={e => setQuantity(
+                            normalizePartQuantityInput(e.target.value, part.unitType),
+                        )}
                     />
+                    {quantity.trim() && quantityError && (
+                        <div className="mt-1 text-xs text-danger">
+                            {quantityError}
+                        </div>
+                    )}
                 </FormField>
             </div>
 

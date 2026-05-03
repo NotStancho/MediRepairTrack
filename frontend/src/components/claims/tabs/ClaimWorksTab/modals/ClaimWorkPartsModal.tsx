@@ -8,7 +8,6 @@ import { usePart } from '../../../../../hooks/usePart';
 
 import type { ClaimWork } from '../../../../../types/claim/claimWork';
 import type { ClaimWorkPart } from '../../../../../types/claim/claimWorkPart';
-import type { Part } from '../../../../../types/part/part';
 
 import Button from '../../../../../ui/Button';
 import ConfirmBox from '../../../../../ui/ConfirmBox';
@@ -18,6 +17,14 @@ import ModalFooter from '../../../../../ui/Modal/ModalFooter';
 import Select from '../../../../../ui/Select';
 import { Table, TableToolbar, type TableColumnDef } from '../../../../../ui/Table';
 import { inputBase } from '../../../../../ui/formStyles';
+import {
+    formatPartQuantity,
+    getPartQuantityError,
+    getPartQuantityMin,
+    getPartQuantityStep,
+    normalizePartQuantityInput,
+    parsePartQuantityInput,
+} from '../../../../../utils/formats/partQuantityFormat';
 
 interface Props {
     claimWork: ClaimWork;
@@ -26,35 +33,6 @@ interface Props {
     employeeId: number | null;
     onClose: () => void;
     onChanged?: () => Promise<void> | void;
-}
-
-function formatQty(value: number) {
-    return Number.isInteger(value)
-        ? String(value)
-        : value.toFixed(3).replace(/\.?0+$/, '');
-}
-
-function parsePositiveQuantity(value: string) {
-    const normalized = value.replace(',', '.').trim();
-    const parsed = Number(normalized);
-
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-}
-
-function getQuantityError(part: Part | undefined, quantity: number | null, maxQuantity?: number) {
-    if (quantity == null) {
-        return 'Вкажіть коректну кількість більше 0';
-    }
-
-    if (part?.unitType === 'PIECE' && !Number.isInteger(quantity)) {
-        return `Для одиниці "${part.unitName}" потрібне ціле число`;
-    }
-
-    if (maxQuantity != null && quantity > maxQuantity) {
-        return `На складі доступно: ${formatQty(maxQuantity)} ${part?.unitName ?? ''}`;
-    }
-
-    return undefined;
 }
 
 export default function ClaimWorkPartsModal({
@@ -106,12 +84,17 @@ export default function ClaimWorkPartsModal({
     );
 
     const parsedQuantity = useMemo(
-        () => parsePositiveQuantity(quantity),
+        () => parsePartQuantityInput(quantity),
         [quantity],
     );
 
     const quantityError = submitted
-        ? getQuantityError(selectedPart, parsedQuantity, selectedPart?.stockQuantity)
+        ? getPartQuantityError(parsedQuantity, {
+            unitType: selectedPart?.unitType,
+            unitName: selectedPart?.unitName,
+            max: selectedPart?.stockQuantity,
+            requiredMessage: 'Вкажіть коректну кількість більше 0',
+        })
         : undefined;
 
     const selectedPartError = submitted && selectedPartId == null
@@ -122,7 +105,12 @@ export default function ClaimWorkPartsModal({
         canManage &&
         employeeId != null &&
         selectedPartId != null &&
-        !getQuantityError(selectedPart, parsedQuantity, selectedPart?.stockQuantity);
+        !getPartQuantityError(parsedQuantity, {
+            unitType: selectedPart?.unitType,
+            unitName: selectedPart?.unitName,
+            max: selectedPart?.stockQuantity,
+            requiredMessage: 'Вкажіть коректну кількість більше 0',
+        });
 
     const handleCreate = async () => {
         setSubmitted(true);
@@ -156,12 +144,17 @@ export default function ClaimWorkPartsModal({
     const handleUpdate = async (item: ClaimWorkPart) => {
         setEditingSubmitted(true);
 
-        const parsed = parsePositiveQuantity(editingQuantity);
+        const parsed = parsePartQuantityInput(editingQuantity);
         const catalogPart = partById.get(item.partId);
         const maxQuantity = catalogPart
             ? catalogPart.stockQuantity + item.quantity
             : undefined;
-        const error = getQuantityError(catalogPart, parsed, maxQuantity);
+        const error = getPartQuantityError(parsed, {
+            unitType: catalogPart?.unitType,
+            unitName: catalogPart?.unitName,
+            max: maxQuantity,
+            requiredMessage: 'Вкажіть коректну кількість більше 0',
+        });
 
         if (error || parsed == null || employeeId == null) {
             return;
@@ -216,18 +209,23 @@ export default function ClaimWorkPartsModal({
                 const item = row.original;
                 const isEditing = editingPartId === item.partId;
                 const catalogPart = partById.get(item.partId);
-                const parsedEditingQuantity = parsePositiveQuantity(editingQuantity);
+                const parsedEditingQuantity = parsePartQuantityInput(editingQuantity);
                 const editMaxQuantity = catalogPart
                     ? catalogPart.stockQuantity + item.quantity
                     : undefined;
                 const editError = editingSubmitted && isEditing
-                    ? getQuantityError(catalogPart, parsedEditingQuantity, editMaxQuantity)
+                    ? getPartQuantityError(parsedEditingQuantity, {
+                        unitType: catalogPart?.unitType,
+                        unitName: catalogPart?.unitName,
+                        max: editMaxQuantity,
+                        requiredMessage: 'Вкажіть коректну кількість більше 0',
+                    })
                     : undefined;
 
                 if (!isEditing) {
                     return (
                         <span className="font-mono">
-                            {formatQty(item.quantity)} {item.unitName}
+                            {formatPartQuantity(item.quantity, item.unitName)}
                         </span>
                     );
                 }
@@ -236,10 +234,12 @@ export default function ClaimWorkPartsModal({
                     <div className="ml-auto max-w-32 space-y-1">
                         <input
                             type="number"
-                            min="0.001"
-                            step={catalogPart?.unitType === 'PIECE' ? 1 : 0.001}
+                            min={getPartQuantityMin(catalogPart?.unitType)}
+                            step={getPartQuantityStep(catalogPart?.unitType)}
                             value={editingQuantity}
-                            onChange={event => setEditingQuantity(event.target.value)}
+                            onChange={event => setEditingQuantity(
+                                normalizePartQuantityInput(event.target.value, catalogPart?.unitType),
+                            )}
                             className={`${inputBase} h-9 text-right font-mono`}
                             disabled={updatingPartId === item.partId}
                         />
@@ -345,7 +345,7 @@ export default function ClaimWorkPartsModal({
                                                 {part.partName}
                                             </div>
                                             <div className="text-xs text-ink-muted">
-                                                {part.partCode} · {formatQty(part.stockQuantity)} {part.unitName}
+                                                {part.partCode} · {formatPartQuantity(part.stockQuantity, part.unitName)}
                                             </div>
                                         </div>
                                     )}
@@ -367,16 +367,18 @@ export default function ClaimWorkPartsModal({
                                 showRequired={!!quantityError}
                                 error={quantityError}
                                 helperText={selectedPart
-                                    ? `Склад: ${formatQty(selectedPart.stockQuantity)} ${selectedPart.unitName}`
+                                    ? `Склад: ${formatPartQuantity(selectedPart.stockQuantity, selectedPart.unitName)}`
                                     : undefined
                                 }
                             >
                                 <input
                                     type="number"
-                                    min="0.001"
-                                    step={selectedPart?.unitType === 'PIECE' ? 1 : 0.001}
+                                    min={getPartQuantityMin(selectedPart?.unitType)}
+                                    step={getPartQuantityStep(selectedPart?.unitType)}
                                     value={quantity}
-                                    onChange={event => setQuantity(event.target.value)}
+                                    onChange={event => setQuantity(
+                                        normalizePartQuantityInput(event.target.value, selectedPart?.unitType),
+                                    )}
                                     className={`${inputBase} font-mono`}
                                     disabled={creating}
                                 />
@@ -425,7 +427,7 @@ export default function ClaimWorkPartsModal({
             {deleteItem && (
                 <ConfirmBox
                     title="Видалити запчастину з роботи?"
-                    description={`${deleteItem.partName} (${formatQty(deleteItem.quantity)} ${deleteItem.unitName})`}
+                    description={`${deleteItem.partName} (${formatPartQuantity(deleteItem.quantity, deleteItem.unitName)})`}
                     confirmText="Видалити"
                     confirmVariant="danger"
                     onConfirm={() => void handleDelete()}
