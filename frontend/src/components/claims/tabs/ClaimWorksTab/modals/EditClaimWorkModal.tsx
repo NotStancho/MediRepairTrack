@@ -122,7 +122,8 @@ export default function EditClaimWorkModal({
                                     (!repairWorksLoading && repairWorks.length === 0)
                                 }
                                 invalid={!!repairWorkError}
-                                itemHeight={64}
+                                itemHeight={48}
+                                maxVisibleItems={5}
                             />
                         </InputField>
 
