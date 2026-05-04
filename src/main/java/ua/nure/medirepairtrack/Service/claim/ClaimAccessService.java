@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.ClaimEmployeeId;
 import ua.nure.medirepairtrack.Entity.claim.ClaimEmployee.RoleInClaim;
+import ua.nure.medirepairtrack.Entity.claim.ClaimWork.ClaimWork;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Position;
 import ua.nure.medirepairtrack.Exception.OperationNotAllowedException;
@@ -47,6 +48,20 @@ public class ClaimAccessService {
 
         if (!isAssignedToClaim(claimId, employeeId)) {
             throw new OperationNotAllowedException("Працівник не призначений до заявки");
+        }
+    }
+
+    public void validateEmployeeOwnsClaimWork(ClaimWork claimWork, Integer employeeId) {
+        if (claimWork == null || employeeId == null) {
+            throw new OperationNotAllowedException("Недостатньо даних для перевірки доступу до ремонтної роботи");
+        }
+
+        if (!isAssignedToClaim(claimWork.getClaim().getId(), employeeId)) {
+            throw new OperationNotAllowedException("Працівник не призначений до заявки");
+        }
+
+        if (!claimWork.getEmployee().getId().equals(employeeId)) {
+            throw new OperationNotAllowedException("Змінювати запчастини може тільки власник цієї ремонтної роботи");
         }
     }
 

@@ -42,12 +42,10 @@ public class ClaimWorkPartService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    // -------------------- USE PART IN CLAIM_WORK --------------------
-
     /**
-     * Використати запчастину у ремонтній роботі:
+     * Додати запчастину до ремонтній роботі:
      * - списати зі складу
-     * - записати/оновити claim_work_part (upsert)
+     * - створити/оновити claim_work_part (upsert)
      * - подія ClaimWorkPartAddedEvent (claim_history + billing)
      */
     @Transactional
@@ -61,7 +59,7 @@ public class ClaimWorkPartService {
             throw new OperationNotAllowedException(StatusMessageUtil.denied("використати запчастини", claim.getStatus(), claimStatusMachine.allowedPartUsageStatuses()));
         }
 
-        accessService.validateEmployeeCanAccessClaim(claim.getId(), employeeId);
+        accessService.validateEmployeeOwnsClaimWork(claimWork, employeeId);
 
         Part part = partRepository.findById(dto.getPartId())
                 .orElseThrow(() -> new NotFoundException("Запчастина не знайдена"));
@@ -130,7 +128,7 @@ public class ClaimWorkPartService {
         if (!claimStatusMachine.allowsPartUsage(claim.getStatus())) {
             throw new OperationNotAllowedException(StatusMessageUtil.denied("корекція запчастин", claim.getStatus(), claimStatusMachine.allowedPartUsageStatuses()));
         }
-        accessService.validateEmployeeCanAccessClaim(claim.getId(), employeeId);
+        accessService.validateEmployeeOwnsClaimWork(claimWork, employeeId);
 
         ClaimWorkPartId id = new ClaimWorkPartId(claimWorkId, dto.getPartId());
 
@@ -214,7 +212,7 @@ public class ClaimWorkPartService {
             );
         }
 
-        accessService.validateEmployeeCanAccessClaim(claim.getId(), employeeId);
+        accessService.validateEmployeeOwnsClaimWork(claimWork, employeeId);
 
         ClaimWorkPartId id = new ClaimWorkPartId(claimWorkId, partId);
 
