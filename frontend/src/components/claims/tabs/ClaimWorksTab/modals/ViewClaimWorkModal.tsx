@@ -141,7 +141,7 @@ export default function ViewClaimWorkModal({
         },
         {
             id: 'total',
-            header: 'Сума',
+            header: 'Каталожна сума',
             accessorFn: row => String(row.quantity * row.unitPrice),
             meta: { align: 'right' },
             cell: ({ row }) => (
@@ -283,7 +283,7 @@ export default function ViewClaimWorkModal({
                             Використані запчастини
                         </div>
                         <div className="rounded border border-border bg-surface px-3 py-1 text-sm">
-                            <span className="text-ink-muted">Сума: </span>
+                            <span className="text-ink-muted">Каталожна сума: </span>
                             <span className="font-mono font-semibold text-ink">
                                 {formatMoney(partsTotal)}
                             </span>
