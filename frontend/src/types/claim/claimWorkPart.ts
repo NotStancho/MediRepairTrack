@@ -8,4 +8,6 @@ export interface ClaimWorkPart {
     quantity: number;
     unitPrice: number;
     unitName: string;
+    createdAt: string;
+    updatedAt?: string | null;
 }

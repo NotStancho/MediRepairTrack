@@ -18,6 +18,7 @@ import ConfirmBox from '../../../../ui/ConfirmBox';
 import RowActionsMenu, { type RowAction } from '../../../../ui/RowActionsMenu';
 import { Table, TableToolbar, type TableColumnDef } from '../../../../ui/Table';
 
+import ViewClaimWorkModal from './modals/ViewClaimWorkModal';
 import CreateClaimWorkModal from './modals/CreateClaimWorkModal';
 import EditClaimWorkModal from './modals/EditClaimWorkModal';
 import ClaimWorkPartsModal from './modals/ClaimWorkPartsModal';
@@ -95,6 +96,7 @@ export default function ClaimWorksTab({
     } = useRepairWorks();
 
     const [createOpen, setCreateOpen] = useState(false);
+    const [viewItem, setViewItem] = useState<ClaimWork | null>(null);
     const [editingItem, setEditingItem] = useState<ClaimWork | null>(null);
     const [editingNoteOnly, setEditingNoteOnly] = useState(false);
     const [deleteItem, setDeleteItem] = useState<ClaimWork | null>(null);
@@ -392,6 +394,9 @@ export default function ClaimWorksTab({
     const deleteRepairWorkName = deleteItem
         ? repairWorkById.get(deleteItem.repairWorkId)?.name ?? `Робота #${deleteItem.repairWorkId}`
         : null;
+    const selectedViewItem = viewItem
+        ? items.find(item => item.id === viewItem.id) ?? viewItem
+        : null;
 
     return (
         <>
@@ -402,6 +407,7 @@ export default function ClaimWorksTab({
                 density="compact"
                 storageKey={`claim-works-tab-${claimId}`}
                 showPagination={false}
+                onRowClick={row => setViewItem(row.original)}
                 renderToolbar={table => (
                     <TableToolbar
                         table={table}
@@ -465,13 +471,19 @@ export default function ClaimWorksTab({
                         }
 
                         if (isNoteOnlyUpdate) {
-                            await updateNote(
+                            const updated = await updateNote(
                                 editingItem.id,
                                 { note: normalizeNote(payload.note) },
                                 performedByEmployeeId
                             );
+                            setViewItem(current =>
+                                current?.id === updated.id ? updated : current
+                            );
                         } else {
-                            await update(editingItem.id, payload, performedByEmployeeId);
+                            const updated = await update(editingItem.id, payload, performedByEmployeeId);
+                            setViewItem(current =>
+                                current?.id === updated.id ? updated : current
+                            );
                         }
 
                         await syncClaimSummary();
@@ -496,9 +508,19 @@ export default function ClaimWorksTab({
                         await syncClaimSummary();
                         await refreshClaimParts();
                         toast.success('Ремонтну роботу видалено');
+                        setViewItem(current =>
+                            current?.id === deleteItem.id ? null : current
+                        );
                         setDeleteItem(null);
                     }}
                     onCancel={() => setDeleteItem(null)}
+                />
+            )}
+
+            {selectedViewItem && (
+                <ViewClaimWorkModal
+                    claimWork={selectedViewItem}
+                    onClose={() => setViewItem(null)}
                 />
             )}
 
