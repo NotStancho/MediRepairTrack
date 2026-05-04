@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -19,4 +20,7 @@ public class ClaimWorkPartResponseDTO {
     private BigDecimal unitPrice;
 
     private String unitName;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

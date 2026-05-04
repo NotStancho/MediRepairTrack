@@ -286,6 +286,8 @@ public class ClaimWorkPartService {
                 .quantity(claimWorkPart.getQuantity())
                 .unitPrice(p.getPrice())
                 .unitName(p.getUnitName())
+                .createdAt(claimWorkPart.getCreatedAt())
+                .updatedAt(claimWorkPart.getUpdatedAt())
                 .build();
     }
 }
