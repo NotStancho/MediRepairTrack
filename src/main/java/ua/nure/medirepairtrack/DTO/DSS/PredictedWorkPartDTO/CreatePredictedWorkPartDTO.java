@@ -1,4 +1,4 @@
-package ua.nure.medirepairtrack.DTO.DSS.PredictedPartDTO;
+package ua.nure.medirepairtrack.DTO.DSS.PredictedWorkPartDTO;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -8,13 +8,20 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class CreatePredictedPartDTO {
+public class CreatePredictedWorkPartDTO {
 
     @NotNull(message = "Прогноз обовʼязковий")
     private Integer predictionId;
 
+    @NotNull(message = "Ремонтна робота обовʼязкова")
+    private Integer repairWorkId;
+
     @NotNull(message = "Запчастина обовʼязкова")
     private Integer partId;
+
+    @NotNull(message = "Прогнозована кількість обовʼязкова")
+    @DecimalMin(value = "0.001", message = "Прогнозована кількість має бути більше 0")
+    private BigDecimal predictedQuantity;
 
     @NotNull(message = "Ймовірність обовʼязкова")
     @DecimalMin(value = "0.0", message = "Ймовірність не може бути менше 0")

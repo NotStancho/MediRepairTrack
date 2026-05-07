@@ -10,4 +10,6 @@ public interface ClaimWorkPartRepository extends JpaRepository<ClaimWorkPart, Cl
     List<ClaimWorkPart> findByIdClaimWorkId(Integer claimWorkId);
 
     List<ClaimWorkPart> findByClaimWorkClaimId(Integer claimId);
+
+    List<ClaimWorkPart> findByClaimWorkClaimIdAndClaimWorkRepairWorkId(Integer claimId, Integer repairWorkId);
 }

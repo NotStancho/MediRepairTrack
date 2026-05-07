@@ -635,19 +635,21 @@ CREATE TABLE IF NOT EXISTS `MediRepairTrack`.`diagnosis_prediction_work` (
 
 
 -- -----------------------------------------------------
--- Table `MediRepairTrack`.`diagnosis_predicted_part`
+-- Table `MediRepairTrack`.`diagnosis_predicted_work_part`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `MediRepairTrack`.`diagnosis_predicted_part` (
+CREATE TABLE IF NOT EXISTS `MediRepairTrack`.`diagnosis_predicted_work_part` (
   `fk_prediction` INT NOT NULL,
+  `fk_repair_work` INT NOT NULL,
   `fk_part` INT NOT NULL,
+  `predicted_quantity` DECIMAL(10, 3) NOT NULL,
   `probability_score` DECIMAL(5,4) NOT NULL,
   `rank_position` INT NOT NULL,
   `created_at` TIMESTAMP NOT NULL,
-  PRIMARY KEY (`fk_prediction`, `fk_part`),
-  INDEX `fk_predicted_part_part_idx` (`fk_part`),
-  CONSTRAINT `fk_predicted_part_prediction`
-    FOREIGN KEY (`fk_prediction`)
-    REFERENCES `MediRepairTrack`.`diagnosis_prediction` (`id_prediction`)
+  PRIMARY KEY (`fk_prediction`, `fk_repair_work`, `fk_part`),
+  INDEX `fk_dpwp_part_idx` (`fk_part`),
+  CONSTRAINT `fk_dpwp_predicted_work`
+    FOREIGN KEY (`fk_prediction`, `fk_repair_work`)
+    REFERENCES `MediRepairTrack`.`diagnosis_prediction_work` (`fk_prediction`, `fk_repair_work`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_predicted_part_part`

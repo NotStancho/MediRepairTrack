@@ -12,8 +12,8 @@ SELECT * FROM diagnosis;
 
 SELECT * FROM diagnosis_prediction;
 SELECT * FROM diagnosis_similarity_result;
-SELECT * FROM diagnosis_predicted_part;
 SELECT * FROM diagnosis_prediction_work;
+SELECT * FROM diagnosis_predicted_work_part;
 SELECT * FROM diagnosis_prediction_defect;
 
 SELECT * FROM delivery;
