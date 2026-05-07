@@ -150,8 +150,10 @@ public class PartService {
                 .id(p.getId())
                 .partCode(p.getPartCode())
                 .partName(p.getPartName())
+                .stockQuantity(p.getStockQuantity())
                 .price(p.getPrice())
                 .unitName(p.getUnitName())
+                .unitType(p.getUnitType())
                 .build();
     }
 }
