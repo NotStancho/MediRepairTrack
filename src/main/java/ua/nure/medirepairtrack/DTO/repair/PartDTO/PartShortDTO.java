@@ -3,6 +3,7 @@ package ua.nure.medirepairtrack.DTO.repair.PartDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import ua.nure.medirepairtrack.Entity.repair.Part.UnitType;
 
 import java.math.BigDecimal;
 
@@ -16,6 +17,9 @@ public class PartShortDTO {
     private String partCode;
     private String partName;
 
+    private BigDecimal stockQuantity;
     private BigDecimal price;
+
     private String unitName;
+    private UnitType unitType;
 }

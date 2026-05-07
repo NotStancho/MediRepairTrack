@@ -13,8 +13,8 @@ import java.util.List;
 public class PredictionExplanationService {
 
     private final DiagnosisSimilarityResultService diagnosisSimilarityResultService;
-    private final DiagnosisPredictedPartService predictedPartService;
     private final DiagnosisPredictedWorkService predictedWorkService;
+    private final DiagnosisPredictedWorkPartService predictedWorkPartService;
     private final DiagnosisPredictionDefectService predictionDefectService;
 
     private final GeminiTextClient geminiTextClient;
@@ -52,10 +52,10 @@ public class PredictionExplanationService {
                 .limit(3)
                 .map(r ->
                         SimilarCaseContext.builder()
-                            .equipmentModel(r.getClaim().getEquipmentModel())
-                            .defectDescription(r.getClaim().getDefectDescription())
-                            .similarityScore(r.getSimilarityScore())
-                            .build()
+                                .equipmentModel(r.getClaim().getEquipmentModel())
+                                .defectDescription(r.getClaim().getDefectDescription())
+                                .similarityScore(r.getSimilarityScore())
+                                .build()
                 )
                 .toList();
     }
@@ -67,10 +67,10 @@ public class PredictionExplanationService {
         return defects.stream()
                 .map(d ->
                         PredictedDefectContext.builder()
-                            .name(d.getDefectCategory().getName())
-                            .description(d.getDefectCategory().getDescription())
-                            .probability(d.getProbabilityScore())
-                            .build()
+                                .name(d.getDefectCategory().getName())
+                                .description(d.getDefectCategory().getDescription())
+                                .probability(d.getProbabilityScore())
+                                .build()
                 )
                 .toList();
     }
@@ -90,13 +90,16 @@ public class PredictionExplanationService {
 
     private List<PredictedPartContext> buildParts(DiagnosisPrediction prediction) {
 
-        var parts = predictedPartService.getAllByPredictionId(prediction.getId());
+        var parts = predictedWorkPartService.getAllByPredictionId(prediction.getId());
 
         return parts.stream()
                 .map(p -> PredictedPartContext.builder()
-                            .partName(p.getPart().getPartName())
-                            .probability(p.getProbabilityScore())
-                            .build()
+                        .partName(p.getPart().getPartName())
+                        .probability(p.getProbabilityScore())
+                        .predictedQuantity(p.getPredictedQuantity())
+                        .unitName(p.getPart().getUnitName())
+                        .repairWorkId(p.getRepairWorkId())
+                        .build()
                 )
                 .toList();
     }
@@ -156,7 +159,11 @@ public class PredictionExplanationService {
 
             sb.append("- ")
                     .append(p.getPartName())
-                    .append(" (ймовірність ")
+                    .append(" (кількість ")
+                    .append(p.getPredictedQuantity())
+                    .append(" ")
+                    .append(p.getUnitName())
+                    .append(", ймовірність ")
                     .append(p.getProbability())
                     .append(")\n");
         }

@@ -1,25 +1,62 @@
-import { useEffect, useMemo, useState } from 'react';
-import { getUsedPartsByClaim } from '../../../api/usedPart';
-import type { UsedPart } from '../../../types/usedPart';
+// components/claims/tabs/ClaimPartsTab
+
+import { useMemo } from 'react';
+
+import { useClaimPartsByClaim } from '../../../hooks/useClaimWorkParts';
+import type { ClaimWorkPart } from '../../../types/claim/claimWorkPart';
+
 import { formatMoney } from '../../../utils/formats/moneyFormat';
+import { formatPartQuantity } from '../../../utils/formats/partQuantityFormat';
 import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
 
 interface Props {
     claimId: number;
 }
 
-const formatQty = (v: number) =>
-    Number.isInteger(v) ? v.toString() : v.toString();
+interface ClaimPartSummary {
+    partId: number;
+    partCode: string;
+    partName: string;
+    quantity: number;
+    unitPrice: number;
+    unitName: string;
+}
+
+function aggregateParts(items: ClaimWorkPart[]): ClaimPartSummary[] {
+    const byPart = new Map<number, ClaimPartSummary>();
+
+    for (const item of items) {
+        const existing = byPart.get(item.partId);
+
+        if (existing) {
+            existing.quantity += item.quantity;
+        } else {
+            byPart.set(item.partId, {
+                partId: item.partId,
+                partCode: item.partCode,
+                partName: item.partName,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                unitName: item.unitName,
+            });
+        }
+    }
+
+    return [...byPart.values()].sort((left, right) =>
+        left.partName.localeCompare(right.partName, 'uk'),
+    );
+}
 
 export default function ClaimPartsTab({ claimId }: Props) {
-    const [items, setItems] = useState<UsedPart[]>([]);
-    const [loading, setLoading] = useState(true);
+    const {
+        data: claimWorkParts,
+        loading,
+    } = useClaimPartsByClaim(claimId);
 
-    useEffect(() => {
-        getUsedPartsByClaim(claimId)
-            .then(setItems)
-            .finally(() => setLoading(false));
-    }, [claimId]);
+    const items = useMemo(
+        () => aggregateParts(claimWorkParts),
+        [claimWorkParts],
+    );
 
     const totalSum = useMemo(
         () =>
@@ -30,15 +67,15 @@ export default function ClaimPartsTab({ claimId }: Props) {
         [items]
     );
 
-    const columns = useMemo<TableColumnDef<UsedPart>[]>(() => [
+    const columns = useMemo<TableColumnDef<ClaimPartSummary>[]>(() => [
         {
             id: 'partName',
             header: 'Запчастина',
             accessorFn: row => row.partName,
             cell: ({ row }) => (
                 <span className="font-medium">
-                {row.original.partName}
-            </span>
+                    {row.original.partName}
+                </span>
             ),
         },
         {
@@ -52,12 +89,12 @@ export default function ClaimPartsTab({ claimId }: Props) {
             id: 'quantity',
             header: 'Кількість',
             accessorFn: row =>
-                `${formatQty(row.quantity)} ${row.unitName}`,
+                formatPartQuantity(row.quantity, row.unitName),
             meta: { align: 'right' },
             cell: ({ row }) => (
                 <span className="font-mono">
-                {formatQty(row.original.quantity)} {row.original.unitName}
-            </span>
+                    {formatPartQuantity(row.original.quantity, row.original.unitName)}
+                </span>
             ),
         },
         {
@@ -67,8 +104,8 @@ export default function ClaimPartsTab({ claimId }: Props) {
             meta: { align: 'right' },
             cell: ({ row }) => (
                 <span className="font-mono">
-                {formatMoney(row.original.unitPrice)}
-            </span>
+                    {formatMoney(row.original.unitPrice)}
+                </span>
             ),
         },
         {
@@ -79,8 +116,8 @@ export default function ClaimPartsTab({ claimId }: Props) {
             meta: { align: 'right' },
             cell: ({ row }) => (
                 <span className="font-mono font-semibold">
-                {formatMoney(row.original.quantity * row.original.unitPrice)}
-            </span>
+                    {formatMoney(row.original.quantity * row.original.unitPrice)}
+                </span>
             ),
         },
     ], []);
@@ -103,7 +140,7 @@ export default function ClaimPartsTab({ claimId }: Props) {
                 )}
                 renderEmptyState={
                     <div className="text-sm text-ink-muted">
-                        Запчастини не використовувались
+                        Запчастини не використовувались у ремонтних роботах
                     </div>
                 }
             />

@@ -26,8 +26,8 @@ import java.util.Optional;
 public class PredictionAggregationService {
 
     private final DiagnosisSimilarityResultService similarityResultService;
-    private final DiagnosisPredictedPartService predictedPartService;
     private final DiagnosisPredictedWorkService predictedWorkService;
+    private final DiagnosisPredictedWorkPartService predictedWorkPartService;
     private final DiagnosisPredictionDefectService predictedDefectService;
     private final PredictionExplanationService explanationService;
 
@@ -45,8 +45,8 @@ public class PredictionAggregationService {
         similarityResultService.generateSimilarityResults(prediction);
 
         // 2. predicted entities
-        predictedPartService.generatePredictedParts(prediction);
         predictedWorkService.generatePredictedWorks(prediction);
+        predictedWorkPartService.generatePredictedWorkParts(prediction);
         predictedDefectService.generatePredictedDefects(prediction);
 
         // 3. aggregated metrics
@@ -107,11 +107,13 @@ public class PredictionAggregationService {
 
         BigDecimal laborCost = predictedHours.multiply(config.getLaborPricePerHour());
 
-        var predictedParts = predictedPartService.getAllByPredictionId(prediction.getId());
+        var predictedWorkParts = predictedWorkPartService.getAllByPredictionId(prediction.getId());
 
-        BigDecimal partsCost = predictedParts.stream()
+        BigDecimal partsCost = predictedWorkParts.stream()
                 .map(p ->
-                    p.getPart().getPrice().multiply(p.getProbabilityScore())
+                    p.getPart().getPrice()
+                            .multiply(p.getPredictedQuantity())
+                            .multiply(p.getProbabilityScore())
                 )
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -195,7 +197,7 @@ public class PredictionAggregationService {
                 .orElse(BigDecimal.ZERO);
 
         int worksCount = predictedWorkService.getAllByPredictionId(prediction.getId()).size();
-        int partsCount = predictedPartService.getAllByPredictionId(prediction.getId()).size();
+        int partsCount = predictedWorkPartService.getAllByPredictionId(prediction.getId()).size();
 
         if (predictedHours.compareTo(BigDecimal.valueOf(6)) >= 0) {
             complexityScore += 3;

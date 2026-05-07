@@ -3,9 +3,6 @@ package ua.nure.medirepairtrack.Controller.repair;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ua.nure.medirepairtrack.DTO.claim.UsedPartDTO.UpdateUsedPartQuantityDTO;
-import ua.nure.medirepairtrack.DTO.claim.UsedPartDTO.UsePartDTO;
-import ua.nure.medirepairtrack.DTO.claim.UsedPartDTO.UsedPartResponseDTO;
 import ua.nure.medirepairtrack.DTO.repair.PartDTO.AddStockDTO;
 import ua.nure.medirepairtrack.DTO.repair.PartDTO.CreatePartDTO;
 import ua.nure.medirepairtrack.DTO.repair.PartDTO.PartResponseDTO;
@@ -21,7 +18,6 @@ public class PartController {
 
     private final PartService partService;
 
-    // CRUD
     @PostMapping
     public PartResponseDTO create(@Valid @RequestBody CreatePartDTO dto) {
         return partService.create(dto);
@@ -51,21 +47,5 @@ public class PartController {
     @PatchMapping("/{partId}/add-stock")
     public PartResponseDTO addStock(@PathVariable Integer partId, @Valid @RequestBody AddStockDTO dto) {
         return partService.addStock(partId, dto);
-    }
-
-    // use in claim
-    @PostMapping("/claim/{claimId}/use")
-    public UsedPartResponseDTO usePart(@PathVariable Integer claimId, @RequestParam Integer employeeId, @Valid @RequestBody UsePartDTO dto) {
-        return partService.usePart(claimId, employeeId, dto);
-    }
-
-    @PatchMapping("/claim/{claimId}/used")
-    public UsedPartResponseDTO updateUsedPartQuantity(@PathVariable Integer claimId, @RequestParam Integer employeeId, @Valid @RequestBody UpdateUsedPartQuantityDTO dto) {
-        return partService.updateUsedPartQuantity(claimId, employeeId, dto);
-    }
-
-    @GetMapping("/claim/{claimId}/used")
-    public List<UsedPartResponseDTO> getUsedByClaim(@PathVariable Integer claimId) {
-        return partService.getUsedPartsByClaim(claimId);
     }
 }

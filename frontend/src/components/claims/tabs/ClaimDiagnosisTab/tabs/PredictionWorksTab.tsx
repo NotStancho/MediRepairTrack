@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 
+import { usePredictedWorkParts } from '../../../../../hooks/diagnosis/usePredictedWorkParts';
 import { usePredictedWorks } from '../../../../../hooks/diagnosis/usePredictedWorks';
 
+import type { PredictedWorkPart } from '../../../../../types/diagnosis/DSS/predictedWorkPart';
 import type { PredictedWork } from '../../../../../types/diagnosis/DSS/predictedWork';
 
 import { Table, type TableColumnDef } from '../../../../../ui/Table';
@@ -12,9 +14,30 @@ import RowActionsMenu from '../../../../../ui/RowActionsMenu';
 
 import CreatePredictedWorkModal from '../modals/CreatePredictedWorkModal';
 import EditPredictedWorkModal from '../modals/EditPredictedWorkModal';
+import PredictedWorkPartsModal from '../modals/PredictedWorkPartsModal';
+import ViewPredictedWorkModal from '../modals/ViewPredictedWorkModal';
+
+import { formatHours } from '../../../../../utils/formats/hourFormat';
+import { formatPartQuantity } from '../../../../../utils/formats/partQuantityFormat';
 
 interface Props {
     predictionId: number;
+}
+
+function buildPartsPreview(parts: PredictedWorkPart[]) {
+    if (!parts.length) {
+        return 'Немає прогнозованих запчастин';
+    }
+
+    const visible = parts.slice(0, 2).map(part =>
+        `${formatPartQuantity(part.predictedQuantity, part.part.unitName)} ${part.part.partName}`,
+    );
+
+    const hiddenCount = parts.length - visible.length;
+
+    return hiddenCount > 0
+        ? `${visible.join(', ')} +${hiddenCount}`
+        : visible.join(', ');
 }
 
 export default function PredictionWorksTab({ predictionId }: Props) {
@@ -32,15 +55,34 @@ export default function PredictionWorksTab({ predictionId }: Props) {
         update,
         remove,
     } = usePredictedWorks(predictionId);
+    const {
+        data: predictedParts,
+        loading: predictedPartsLoading,
+        refresh: refreshPredictedParts,
+    } = usePredictedWorkParts(predictionId);
 
     const [createOpen, setCreateOpen] = useState(false);
+    const [viewItem, setViewItem] = useState<PredictedWork | null>(null);
     const [editingItem, setEditingItem] = useState<PredictedWork | null>(null);
     const [deleteItem, setDeleteItem] = useState<PredictedWork | null>(null);
+    const [partsItem, setPartsItem] = useState<PredictedWork | null>(null);
+
+    const partsByRepairWorkId = useMemo(() => {
+        const grouped = new Map<number, PredictedWorkPart[]>();
+
+        for (const part of predictedParts) {
+            const group = grouped.get(part.repairWorkId) ?? [];
+            group.push(part);
+            grouped.set(part.repairWorkId, group);
+        }
+
+        return grouped;
+    }, [predictedParts]);
 
     const columns = useMemo<TableColumnDef<PredictedWork>[]>(() => [
         {
             id: 'name',
-            header: 'Робота',
+            header: 'Ремонтна робота',
             accessorFn: row => row.repairWork.name,
             cell: ({ row }) => (
                 <div className="min-w-0">
@@ -50,6 +92,41 @@ export default function PredictionWorksTab({ predictionId }: Props) {
 
                 </div>
             ),
+        },
+        {
+            id: 'parts',
+            header: 'Запчастини',
+            accessorFn: row => buildPartsPreview(partsByRepairWorkId.get(row.repairWork.id) ?? []),
+            cell: ({ row }) => {
+                const parts = partsByRepairWorkId.get(row.original.repairWork.id) ?? [];
+
+                if (!parts.length) {
+                    return (
+                        <span className="text-xs text-ink-muted">
+                            Немає прогнозованих запчастин
+                        </span>
+                    );
+                }
+
+                return (
+                    <div className="min-w-0 space-y-1 text-xs">
+                        {parts.slice(0, 2).map(part => (
+                            <div key={part.part.id} className="truncate text-ink">
+                                <span className="font-mono">
+                                    {formatPartQuantity(part.predictedQuantity, part.part.unitName)}
+                                </span>{' '}
+                                {part.part.partName}
+                            </div>
+                        ))}
+
+                        {parts.length > 2 && (
+                            <div className="text-ink-muted">
+                                Ще {parts.length - 2}
+                            </div>
+                        )}
+                    </div>
+                );
+            },
         },
         {
             id: 'complexity',
@@ -76,7 +153,7 @@ export default function PredictionWorksTab({ predictionId }: Props) {
             cell: ({ row }) => (
                 <span className="font-mono">
                     {row.original.predictedTimeSpent != null
-                        ? `${row.original.predictedTimeSpent} год`
+                        ? formatHours(row.original.predictedTimeSpent)
                         : '—'}
                 </span>
             ),
@@ -102,6 +179,10 @@ export default function PredictionWorksTab({ predictionId }: Props) {
                 <RowActionsMenu
                     actions={[
                         {
+                            label: 'Запчастини',
+                            onClick: () => setPartsItem(row.original),
+                        },
+                        {
                             label: 'Редагувати',
                             onClick: () => setEditingItem(row.original),
                         },
@@ -112,8 +193,7 @@ export default function PredictionWorksTab({ predictionId }: Props) {
                         },
                     ]}
                     trigger={
-                        <button
-                            type="button"
+                        <span
                             className="
                                 px-2 py-1 rounded
                                 text-ink-muted
@@ -121,12 +201,12 @@ export default function PredictionWorksTab({ predictionId }: Props) {
                             "
                         >
                             ⋯
-                        </button>
+                        </span>
                     }
                 />
             ),
         },
-    ], []);
+    ], [partsByRepairWorkId]);
 
     return (
         <div className="space-y-4">
@@ -145,27 +225,28 @@ export default function PredictionWorksTab({ predictionId }: Props) {
                     className="h-8 px-3 text-xs"
                     onClick={() => setCreateOpen(true)}
                 >
-                    + Додати роботу
+                    + Додати ремонтну роботу
                 </Button>
             </div>
 
             <Table
                 data={data}
                 columns={columns}
-                loading={loading}
+                loading={loading || predictedPartsLoading}
                 density="compact"
                 striped
                 showPagination={false}
                 storageKey="prediction-repair-works-tab"
+                onRowClick={row => setViewItem(row.original)}
                 renderToolbar={(table) => (
                     <TableToolbar
                         table={table}
-                        globalFilterPlaceholder="Пошук за назвою, описом або складністю"
+                        globalFilterPlaceholder="Пошук за роботою, запчастиною або складністю"
                     />
                 )}
                 renderEmptyState={
                     <div className="text-sm text-ink-muted italic">
-                        Роботи ще не додано
+                        Ремонтні роботи ще не додано
                     </div>
                 }
             />
@@ -207,9 +288,34 @@ export default function PredictionWorksTab({ predictionId }: Props) {
                     confirmVariant="danger"
                     onConfirm={async () => {
                         await remove(deleteItem.repairWork.id);
+                        await refreshPredictedParts();
+                        setViewItem(current =>
+                            current?.repairWork.id === deleteItem.repairWork.id
+                                ? null
+                                : current
+                        );
                         setDeleteItem(null);
                     }}
                     onCancel={() => setDeleteItem(null)}
+                />
+            )}
+
+            {viewItem && (
+                <ViewPredictedWorkModal
+                    predictedWork={viewItem}
+                    onClose={() => setViewItem(null)}
+                />
+            )}
+
+            {partsItem && (
+                <PredictedWorkPartsModal
+                    predictionId={predictionId}
+                    repairWorkId={partsItem.repairWork.id}
+                    repairWorkName={partsItem.repairWork.name}
+                    onClose={() => setPartsItem(null)}
+                    onChanged={async () => {
+                        await refreshPredictedParts();
+                    }}
                 />
             )}
         </div>

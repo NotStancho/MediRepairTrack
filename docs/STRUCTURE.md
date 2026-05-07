@@ -41,7 +41,7 @@
 - ClaimHistory
 - ClaimEmployee
 - ClaimWork
-- UsedPart
+- ClaimWorkPart
 
 ### Repair
 - Part

@@ -17,6 +17,13 @@ import {
     PART_UNIT_TYPE_OPTIONS,
     getPartUnitTypeLabel,
 } from '../../../utils/partLabel';
+import {
+    getPartQuantityError,
+    getPartQuantityMin,
+    getPartQuantityStep,
+    normalizePartQuantityInput,
+    parsePartQuantityInput,
+} from '../../../utils/formats/partQuantityFormat';
 
 interface Props {
     creating: boolean;
@@ -40,16 +47,21 @@ export default function CreatePartModal({
         description: '',
     });
 
-    const isPiece = form.unitType === 'PIECE';
-    const stockNumber = Number(form.stockQuantity);
+    const stockNumber = useMemo(
+        () => parsePartQuantityInput(form.stockQuantity),
+        [form.stockQuantity],
+    );
     const priceNumber = Number(form.price);
 
-    const stockIsValid = useMemo(() => {
-        if (!form.stockQuantity.trim()) return false;
-        if (Number.isNaN(stockNumber) || stockNumber < 0) return false;
-        if (isPiece && !Number.isInteger(stockNumber)) return false;
-        return true;
-    }, [form.stockQuantity, isPiece, stockNumber]);
+    const stockError = useMemo(
+        () => getPartQuantityError(stockNumber, {
+            unitType: form.unitType,
+            unitName: form.unitName,
+            allowZero: true,
+            requiredMessage: 'Вкажіть коректний залишок на складі',
+        }),
+        [form.unitName, form.unitType, stockNumber],
+    );
 
     const priceIsValid = form.price.trim() !== '' && !Number.isNaN(priceNumber) && priceNumber > 0;
 
@@ -59,11 +71,11 @@ export default function CreatePartModal({
         form.partName.trim() &&
         form.unitName.trim() &&
         form.unitType &&
-        stockIsValid &&
+        !stockError &&
         priceIsValid;
 
     const handleSubmit = async () => {
-        if (!canSubmit) return;
+        if (!canSubmit || stockNumber == null || form.unitType == null) return;
 
         await onCreate({
             supplierName: form.supplierName.trim(),
@@ -72,7 +84,7 @@ export default function CreatePartModal({
             stockQuantity: stockNumber,
             price: priceNumber,
             unitName: form.unitName.trim(),
-            unitType: form.unitType as PartUnitType,
+            unitType: form.unitType,
             description: form.description.trim() || null,
         });
 
@@ -129,7 +141,14 @@ export default function CreatePartModal({
                         <Select
                             value={form.unitType}
                             onChange={value =>
-                                setForm({ ...form, unitType: value })
+                                setForm({
+                                    ...form,
+                                    unitType: value,
+                                    stockQuantity: normalizePartQuantityInput(
+                                        form.stockQuantity,
+                                        value,
+                                    ),
+                                })
                             }
                             options={PART_UNIT_TYPE_OPTIONS}
                             getLabel={item => getPartUnitTypeLabel(item)}
@@ -156,14 +175,25 @@ export default function CreatePartModal({
                     <FormField label="Залишок на складі">
                         <input
                             type="number"
-                            min="0"
-                            step={isPiece ? '1' : '0.001'}
+                            min={getPartQuantityMin(form.unitType, { allowZero: true })}
+                            step={getPartQuantityStep(form.unitType)}
                             className={inputBase}
                             value={form.stockQuantity}
                             onChange={e =>
-                                setForm({ ...form, stockQuantity: e.target.value })
+                                setForm({
+                                    ...form,
+                                    stockQuantity: normalizePartQuantityInput(
+                                        e.target.value,
+                                        form.unitType,
+                                    ),
+                                })
                             }
                         />
+                        {form.stockQuantity.trim() && stockError && (
+                            <div className="mt-1 text-xs text-danger">
+                                {stockError}
+                            </div>
+                        )}
                     </FormField>
 
                     <FormField label="Ціна">

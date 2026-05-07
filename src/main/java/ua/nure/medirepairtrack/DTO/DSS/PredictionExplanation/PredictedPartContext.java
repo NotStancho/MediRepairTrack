@@ -10,7 +10,9 @@ import java.math.BigDecimal;
 public class PredictedPartContext {
 
     private String partName;
-
     private BigDecimal probability;
+    private BigDecimal predictedQuantity;
+    private String unitName;
+    private Integer repairWorkId;
 
 }
