@@ -1,9 +1,11 @@
-﻿import { useCallback, useEffect, useState } from 'react';
+﻿// pages/claims/ClaimDetailsPage.tsx
+
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Claim } from '../../types/claim/claim';
-import ClaimHeader from '../../components/claims/ClaimHeader';
-import ClaimTabs from '../../components/claims/ClaimTabs';
-import ClaimStatusUpdate from '../../components/claims/ClaimStatusUpdate';
+import ClaimHeader from './components/ClaimHeader';
+import ClaimTabs from './components/ClaimTabs';
+import ClaimStatusUpdate from './components/ClaimStatusUpdate';
 import { getClaimById } from '../../api/claim';
 
 import { getEquipmentFullById } from '../../api/equipment';
