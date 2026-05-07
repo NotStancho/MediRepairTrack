@@ -5,6 +5,7 @@ import {
     HiOutlineArrowPath,
     HiOutlineWrenchScrewdriver,
     HiOutlineTruck,
+    HiOutlineUserPlus,
 } from 'react-icons/hi2';
 
 import type { ReactNode } from 'react';
@@ -22,6 +23,11 @@ export const HISTORY_ICONS: Record<
         icon: <HiOutlineArrowPath />,
         color: 'bg-brand',
         label: 'Зміна статусу',
+    },
+    EMPLOYEE_ASSIGNMENT: {
+        icon: <HiOutlineUserPlus />,
+        color: 'bg-sky-600',
+        label: 'Призначення працівника',
     },
     WORK_LOG: {
         icon: <HiOutlineClock />,

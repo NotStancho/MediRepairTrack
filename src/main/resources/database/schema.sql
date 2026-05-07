@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS `MediRepairTrack`.`claim_history` (
   `id_claim_history` INT NOT NULL AUTO_INCREMENT,
   `fk_claim` INT NOT NULL COMMENT 'Посилання на заявку',
   `fk_employee` INT NOT NULL COMMENT 'Працівник, який виконав дію',
-  `action_type` ENUM('STATUS_CHANGE', 'EMPLOYEE_ASSIGMENT', 'WORK_LOG', 'COMMENT', 'SYSTEM_EVENT', 'PART_USED', 'DELIVERY_EVENT') NOT NULL COMMENT 'Тип події',
+  `action_type` ENUM('STATUS_CHANGE', 'EMPLOYEE_ASSIGNMENT', 'WORK_LOG', 'COMMENT', 'SYSTEM_EVENT', 'PART_USED', 'DELIVERY_EVENT') NOT NULL COMMENT 'Тип події',
   `action_date` TIMESTAMP NOT NULL COMMENT 'Дата та час події',
   `action_description` TEXT NOT NULL COMMENT 'Опис події',
   PRIMARY KEY (`id_claim_history`),

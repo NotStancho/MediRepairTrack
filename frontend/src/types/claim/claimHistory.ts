@@ -1,5 +1,6 @@
 export type ClaimHistoryActionType =
     | 'STATUS_CHANGE'
+    | 'EMPLOYEE_ASSIGNMENT'
     | 'WORK_LOG'
     | 'COMMENT'
     | 'SYSTEM_EVENT'

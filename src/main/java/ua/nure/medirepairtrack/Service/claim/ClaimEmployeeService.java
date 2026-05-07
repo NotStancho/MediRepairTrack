@@ -354,7 +354,7 @@ public class ClaimEmployeeService {
 
     private String getShortName(Employee e) {
         return String.format(
-                "%s %s.",
+                "%s %s",
                 e.getUser().getLastName(),
                 e.getUser().getFirstName()
         );

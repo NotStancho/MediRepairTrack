@@ -23,7 +23,7 @@ public class ClaimEmployeeAssignmentListener {
         claimHistoryService.addSystemEvent(
                 event.claimId(),
                 event.performedByEmployeeId(),
-                ActionType.SYSTEM_EVENT,
+                ActionType.EMPLOYEE_ASSIGNMENT,
                 event.description()
         );
     }
