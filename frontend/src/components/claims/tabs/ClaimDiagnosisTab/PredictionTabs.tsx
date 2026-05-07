@@ -9,14 +9,12 @@ import type {DiagnosisPrediction} from "../../../../types/diagnosis/DSS/diagnosi
 
 import PredictionGeneralTab from './tabs/PredictionGeneralTab';
 import PredictionWorksTab from './tabs/PredictionWorksTab';
-import PredictionPartsTab from './tabs/PredictionPartsTab';
 import PredictionDefectsTab from './tabs/PredictionDefectsTab';
 import PredictionSimilarityTab from './tabs/PredictionSimilarityTab';
 
 const tabs: TabItem[] = [
     { key: 'general', label: 'Загальний' },
-    { key: 'works', label: 'Роботи' },
-    { key: 'parts', label: 'Запчастини' },
+    { key: 'works', label: 'Ремонтні роботи' },
     { key: 'defects', label: 'Дефекти' },
     { key: 'similar', label: 'Схожі заявки' },
 ];
@@ -45,10 +43,6 @@ export default function PredictionTabs({ prediction,
 
             {active === 'works' && (
                 <PredictionWorksTab predictionId={prediction.id} />
-            )}
-
-            {active === 'parts' && (
-                <PredictionPartsTab predictionId={prediction.id} />
             )}
 
             {active === 'defects' && (
