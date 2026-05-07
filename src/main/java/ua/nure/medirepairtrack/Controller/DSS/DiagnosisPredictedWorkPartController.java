@@ -53,7 +53,7 @@ public class DiagnosisPredictedWorkPartController {
     }
 
     @GetMapping("/available/{predictionId}/{repairWorkId}")
-    public List<PartShortDTO> getAvailableParts(@PathVariable Integer predictionId, @PathVariable Integer repairWorkId) {
-        return service.getAvailableParts(predictionId, repairWorkId);
+    public List<PartShortDTO> getAvailablePartsForPredictedWork(@PathVariable Integer predictionId, @PathVariable Integer repairWorkId) {
+        return service.getAvailablePartsForPredictedWork(predictionId, repairWorkId);
     }
 }

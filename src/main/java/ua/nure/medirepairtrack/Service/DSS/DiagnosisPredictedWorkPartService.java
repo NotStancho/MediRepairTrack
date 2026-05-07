@@ -352,7 +352,7 @@ public class DiagnosisPredictedWorkPartService {
                 .orElseThrow(() -> new NotFoundException("Прогнозовану запчастину для роботи не знайдено"));
     }
 
-    public List<PartShortDTO> getAvailableParts(Integer predictionId, Integer repairWorkId) {
+    public List<PartShortDTO> getAvailablePartsForPredictedWork(Integer predictionId, Integer repairWorkId) {
 
         DiagnosisPredictedWorkId predictedWorkId = new DiagnosisPredictedWorkId(predictionId, repairWorkId);
 
