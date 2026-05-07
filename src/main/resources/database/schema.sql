@@ -429,7 +429,7 @@ CREATE TABLE IF NOT EXISTS `MediRepairTrack`.`client_contract` (
   `valid_to` DATE NOT NULL COMMENT 'Закінчення дії',
   `discount_labor` DECIMAL(5,2) NOT NULL COMMENT 'Знижка на роботу (%)',
   `discount_parts` DECIMAL(5,2) NOT NULL COMMENT 'Знижка на запчастини (%)',
-  `discount_transport` DECIMAL(5,2) NOT NULL COMMENT 'Знижка на доставку (%)',
+  `discount_delivery` DECIMAL(5,2) NOT NULL COMMENT 'Знижка на доставку (%)',
   `notes` TEXT NULL COMMENT 'Додаткова інформація',
   `created_at` TIMESTAMP NOT NULL COMMENT 'Дата створення контракту',
   `updated_at` TIMESTAMP NULL COMMENT 'Дата оновлення',
