@@ -14,7 +14,7 @@ import ClaimEmployeesTab from '../tabs/ClaimEmployeesTab/ClaimEmployeesTab';
 import ClaimWorksTab from '../tabs/ClaimWorksTab/ClaimWorksTab';
 import ClaimPartsTab from '../tabs/ClaimPartsTab';
 import ClaimDeliveryTab from '../tabs/ClaimDeliveryTab';
-import ClaimInvoiceTab from '../tabs/ClaimInvoiceTab';
+import ClaimInvoiceTab from '../tabs/ClaimInvoiceTab/ClaimInvoiceTab';
 import ClaimPaymentTab from '../tabs/ClaimPaymentTab';
 
 import {

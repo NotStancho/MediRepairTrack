@@ -36,3 +36,10 @@ export interface InvoiceDetail {
 export interface InvoiceFull extends Invoice {
     items: InvoiceDetail[];
 }
+
+export interface InvoiceOtherItemPayload {
+    description: string;
+    quantity: number;
+    unitName: string;
+    pricePerUnit: number;
+}

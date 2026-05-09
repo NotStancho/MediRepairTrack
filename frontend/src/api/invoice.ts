@@ -1,5 +1,10 @@
 import { api } from './api';
-import type {Invoice, InvoiceDetail, InvoiceFull} from '../types/invoice';
+import type {
+    Invoice,
+    InvoiceDetail,
+    InvoiceFull,
+    InvoiceOtherItemPayload,
+} from '../types/invoice';
 
 export const getAllInvoices = async () =>
     (await api.get<Invoice[]>('/api/invoice')).data;
@@ -41,12 +46,7 @@ export const updateInvoiceDueDate = async (
 
 export const addOtherItem = async (
     invoiceId: number,
-    dto: {
-        description: string;
-        quantity: number;
-        unitName: string;
-        pricePerUnit: number;
-    }
+    dto: InvoiceOtherItemPayload
 ) =>
     (await api.post<InvoiceDetail>(
         `/api/invoice/${invoiceId}/items/other`,
@@ -56,12 +56,7 @@ export const addOtherItem = async (
 export const updateOtherItem = async (
     invoiceId: number,
     itemId: number,
-    dto: {
-        description: string;
-        quantity: number;
-        unitName: string;
-        pricePerUnit: number;
-    }
+    dto: InvoiceOtherItemPayload
 ) =>
     (await api.patch<InvoiceDetail>(
         `/api/invoice/${invoiceId}/items/other/${itemId}`,

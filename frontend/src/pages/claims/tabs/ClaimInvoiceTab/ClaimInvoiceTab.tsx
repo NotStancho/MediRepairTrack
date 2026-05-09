@@ -1,26 +1,20 @@
-// pages/claims/tabs/ClaimInvoiceTab.tsx
+// pages/claims/tabs/ClaimInvoiceTab/ClaimInvoiceTab.tsx
 
-import { INVOICE_ITEM_LABELS } from '../../../utils/invoiceLabels';
-import { useAuth } from '../../../context/AuthContext';
-import { formatDateTime } from '../../../utils/formats/dateFormat';
-import { formatMoney } from '../../../utils/formats/moneyFormat';
-import {
-    DUE_DATE_EXTENSION_MAX_DAYS,
-    getDueDateExtensionLimits,
-    toLocalDateTimePayload,
-} from '../../../utils/invoiceDueDate';
-import ConfirmBox from '../../../ui/ConfirmBox';
+import { INVOICE_ITEM_LABELS } from '../../../../utils/invoiceLabels';
+import { useAuth } from '../../../../context/AuthContext';
+import { formatDateTime } from '../../../../utils/formats/dateFormat';
+import { formatMoney } from '../../../../utils/formats/moneyFormat';
+import ConfirmBox from '../../../../ui/ConfirmBox';
 import { useMemo, useState, useCallback } from 'react';
-import { useInvoice } from '../../../hooks/useInvoice';
-import type { InvoiceDetail } from '../../../types/invoice';
+import { useInvoice } from '../../../../hooks/useInvoice';
+import type { InvoiceDetail } from '../../../../types/invoice';
 
-import Modal from '../../../ui/Modal/Modal';
-import ModalFooter from '../../../ui/Modal/ModalFooter';
-import RowActionsMenu from '../../../ui/RowActionsMenu';
-import FormField from '../../../ui/FormField';
-import { inputBase, primaryButton, secondaryButton } from '../../../ui/formStyles';
-import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
-import InvoiceStatusBadge from '../../../components/badges/InvoiceStatusBadge';
+import Button from '../../../../ui/Button';
+import RowActionsMenu from '../../../../ui/RowActionsMenu';
+import { Table, TableToolbar, type TableColumnDef } from '../../../../ui/Table';
+import InvoiceStatusBadge from '../../../../components/badges/InvoiceStatusBadge';
+import InvoiceOtherItemModal from './modals/InvoiceOtherItemModal';
+import InvoiceDueDateModal from './modals/InvoiceDueDateModal';
 
 interface Props {
     claimId: number;
@@ -49,68 +43,14 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
     const [editingItem, setEditingItem] = useState<InvoiceDetail | null>(null);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [dueDateModalOpen, setDueDateModalOpen] = useState(false);
-    const [newDueAt, setNewDueAt] = useState('');
-
-    const dueDateLimits = useMemo(
-        () => getDueDateExtensionLimits(invoice?.dueAt),
-        [invoice?.dueAt]
-    );
-
-    const dueDateValidationError = useMemo(() => {
-        if (!dueDateModalOpen) return '';
-
-        if (!dueDateLimits) {
-            return 'Неможливо визначити поточний термін оплати.';
-        }
-
-        if (!dueDateLimits.hasAllowedRange) {
-            return 'Для цього рахунку вже немає доступних дат у межах продовження.';
-        }
-
-        if (!newDueAt) {
-            return 'Оберіть новий термін оплати.';
-        }
-
-        const value = newDueAt.slice(0, 16);
-
-        if (value < dueDateLimits.min || value > dueDateLimits.max) {
-            return 'Дата має бути в дозволеному періоді.';
-        }
-
-        return '';
-    }, [dueDateLimits, dueDateModalOpen, newDueAt]);
-
-    const [form, setForm] = useState<{
-        description: string;
-        quantity: number;
-        unitName: string;
-        pricePerUnit: number | '';
-    }>({
-        description: '',
-        quantity: 1,
-        unitName: 'послуга',
-        pricePerUnit: '',
-    });
 
     const openAddOther = () => {
         setEditingItem(null);
-        setForm({
-            description: '',
-            quantity: 1,
-            unitName: 'послуга',
-            pricePerUnit: '',
-        });
         setOtherModalOpen(true);
     };
 
     const openEditOther = useCallback((item: InvoiceDetail) => {
         setEditingItem(item);
-        setForm({
-            description: item.description,
-            quantity: item.quantity,
-            unitName: item.unitName,
-            pricePerUnit: item.pricePerUnit,
-        });
         setOtherModalOpen(true);
     }, []);
 
@@ -186,7 +126,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                                 },
                             ]}
                             trigger={
-                                <button
+                                <span
                                     className="
                                         px-2 py-1 rounded
                                         text-ink-muted
@@ -195,7 +135,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                                     "
                                 >
                                     ...
-                                </button>
+                                </span>
                             }
                         />
                     ) : null,
@@ -217,14 +157,14 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
         }
 
         return (
-            <button
+            <Button
+                variant="primary"
                 onClick={async () => {
                     await createDraft();
                 }}
-                className={primaryButton}
             >
                 Створити рахунок
-            </button>
+            </Button>
         );
     }
 
@@ -260,15 +200,13 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                             </span>
 
                             {canUpdateDueDate && (
-                                <button
-                                    onClick={() => {
-                                        setNewDueAt(dueDateLimits?.hasAllowedRange ? dueDateLimits.min : '');
-                                        setDueDateModalOpen(true);
-                                    }}
-                                    className="text-xs text-brand hover:underline"
+                                <Button
+                                    variant="default"
+                                    onClick={() => setDueDateModalOpen(true)}
+                                    className="h-auto px-0 bg-transparent text-xs text-brand shadow-none hover:bg-transparent hover:underline"
                                 >
                                     Продовжити
-                                </button>
+                                </Button>
                             )}
                         </div>
                     )}
@@ -293,21 +231,21 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                     <div className="flex gap-2">
                         {canManageInvoice && (
                             <>
-                                <button onClick={recalc} className={secondaryButton}>
+                                <Button variant="secondary" onClick={recalc}>
                                     Перерахувати
-                                </button>
+                                </Button>
 
-                                <button onClick={() => setConfirmIssueOpen(true)} className={primaryButton}>
+                                <Button variant="primary" onClick={() => setConfirmIssueOpen(true)}>
                                     Виставити рахунок
-                                </button>
+                                </Button>
                             </>
                         )}
                     </div>
 
                     {canEditOtherItems && (
-                        <button onClick={openAddOther} className={secondaryButton}>
+                        <Button variant="secondary" onClick={openAddOther}>
                             + Додати інше
-                        </button>
+                        </Button>
                     )}
                 </div>
             )}
@@ -349,168 +287,26 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                 </div>
             </div>
 
-            {/* OTHER MODAL */}
             {otherModalOpen && (
-                <Modal
-                    title={
-                        editingItem
-                            ? 'Редагувати позицію'
-                            : 'Додати позицію'
-                    }
+                <InvoiceOtherItemModal
+                    item={editingItem}
                     onClose={() => setOtherModalOpen(false)}
-                    width="md"
-                    backdrop="dim"
-                >
-                    <FormField label="Опис">
-                        <textarea
-                            value={form.description}
-                            onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    description: e.target.value,
-                                })
-                            }
-                            className={inputBase}
-                        />
-                    </FormField>
-
-                    <div className="grid grid-cols-3 gap-2">
-                        <FormField label="Кількість">
-                            <input
-                                type="number"
-                                value={form.quantity}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        quantity: +e.target.value,
-                                    })
-                                }
-                                className={inputBase}
-                            />
-                        </FormField>
-
-                        <FormField label="Одиниця">
-                            <input
-                                value={form.unitName}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        unitName: e.target.value,
-                                    })
-                                }
-                                className={inputBase}
-                            />
-                        </FormField>
-
-                        <FormField label="Ціна">
-                            <input
-                                type="number"
-                                value={form.pricePerUnit}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        pricePerUnit:
-                                            e.target.value === ''
-                                                ? ''
-                                                : +e.target.value,
-                                    })
-                                }
-                                className={inputBase}
-                            />
-                        </FormField>
-                    </div>
-
-                    <ModalFooter>
-                        <button
-                            onClick={() =>
-                                setOtherModalOpen(false)
-                            }
-                            className={secondaryButton}
-                        >
-                            Скасувати
-                        </button>
-
-                        <button
-                            onClick={async () => {
-                                const dto = { ...form,
-                                    pricePerUnit: Number(form.pricePerUnit),
-                                };
-
-                                if (editingItem) {
-                                    await updateOther(editingItem.id, dto);
-                                } else {
-                                    await addOther(dto);
-                                }
-
-                                setOtherModalOpen(false);
-                            }}
-                            className={primaryButton}
-                        >
-                            {editingItem ? 'Зберегти' : 'Додати'}
-                        </button>
-                    </ModalFooter>
-                </Modal>
+                    onSave={async (payload) => {
+                        if (editingItem) {
+                            await updateOther(editingItem.id, payload);
+                        } else {
+                            await addOther(payload);
+                        }
+                    }}
+                />
             )}
 
-            {/* DUE DATE MODAL */}
             {dueDateModalOpen && (
-                <Modal
-                    title="Продовжити термін оплати"
+                <InvoiceDueDateModal
+                    dueAt={invoice.dueAt}
                     onClose={() => setDueDateModalOpen(false)}
-                    width="sm"
-                >
-                    <FormField label="Новий термін оплати">
-                        <input
-                            type="datetime-local"
-                            value={newDueAt}
-                            min={dueDateLimits?.min}
-                            max={dueDateLimits?.max}
-                            disabled={!dueDateLimits?.hasAllowedRange}
-                            aria-invalid={Boolean(dueDateValidationError)}
-                            onChange={(e) =>
-                                setNewDueAt(e.target.value)
-                            }
-                            className={inputBase}
-                        />
-                        {dueDateLimits?.hasAllowedRange ? (
-                            <p className="mt-2 text-xs text-ink-muted">
-                                Доступний період: {formatDateTime(dueDateLimits.min)} - {formatDateTime(dueDateLimits.max)}.
-                                Максимум +{DUE_DATE_EXTENSION_MAX_DAYS} днів від поточного терміну.
-                            </p>
-                        ) : (
-                            <p className="mt-2 text-xs text-red-700">
-                                Немає доступних дат для продовження в межах +{DUE_DATE_EXTENSION_MAX_DAYS} днів.
-                            </p>
-                        )}
-                        {dueDateValidationError && (
-                            <p className="mt-1 text-xs text-red-700">
-                                {dueDateValidationError}
-                            </p>
-                        )}
-                    </FormField>
-
-                    <ModalFooter>
-                        <button
-                            onClick={() => setDueDateModalOpen(false) }
-                            className={secondaryButton}
-                        >
-                            Скасувати
-                        </button>
-
-                        <button
-                            onClick={async () => {
-                                if (dueDateValidationError) return;
-
-                                await updateDueDate(toLocalDateTimePayload(newDueAt));
-                                setDueDateModalOpen(false);
-                            }}
-                            disabled={Boolean(dueDateValidationError)}
-                            className={primaryButton}
-                        >
-                            Зберегти
-                        </button>
-                    </ModalFooter>
-                </Modal>
+                    onSave={updateDueDate}
+                />
             )}
 
             {/* CONFIRM DELETE */}

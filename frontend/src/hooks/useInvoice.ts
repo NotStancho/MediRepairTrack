@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import type { InvoiceFull } from '../types/invoice';
+import { useCallback, useEffect, useState } from 'react';
+import type { InvoiceFull, InvoiceOtherItemPayload } from '../types/invoice';
 import {
     getInvoiceFullByClaim,
     createInvoiceDraft,
@@ -15,21 +15,36 @@ export function useInvoice(claimId: number) {
     const [invoice, setInvoice] = useState<InvoiceFull | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const reload = async () => {
+    const reload = useCallback(async (cancelled?: () => boolean) => {
+        if (cancelled?.()) return;
+
         setLoading(true);
         try {
             const full = await getInvoiceFullByClaim(claimId);
-            setInvoice(full);
+
+            if (!cancelled?.()) {
+                setInvoice(full);
+            }
         } catch {
-            setInvoice(null);
+            if (!cancelled?.()) {
+                setInvoice(null);
+            }
         } finally {
-            setLoading(false);
+            if (!cancelled?.()) {
+                setLoading(false);
+            }
         }
-    };
+    }, [claimId]);
 
     useEffect(() => {
-        reload();
-    }, [claimId]);
+        let cancelled = false;
+
+        void reload(() => cancelled);
+
+        return () => {
+            cancelled = true;
+        };
+    }, [reload]);
 
     /* ======================
        BASIC ACTIONS
@@ -62,12 +77,7 @@ export function useInvoice(claimId: number) {
         await reload();
     };
 
-    const addOther = async (dto: {
-        description: string;
-        quantity: number;
-        unitName: string;
-        pricePerUnit: number;
-    }) => {
+    const addOther = async (dto: InvoiceOtherItemPayload) => {
         if (!invoice) return;
         await addOtherItem(invoice.id, dto);
         await reload();
@@ -75,12 +85,7 @@ export function useInvoice(claimId: number) {
 
     const updateOther = async (
         itemId: number,
-        dto: {
-            description: string;
-            quantity: number;
-            unitName: string;
-            pricePerUnit: number;
-        }
+        dto: InvoiceOtherItemPayload
     ) => {
         if (!invoice) return;
         await updateOtherItem(invoice.id, itemId, dto);
