@@ -13,10 +13,10 @@ import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
 
 import {
-    PART_UNIT_TYPE_COLORS,
     PART_UNIT_TYPE_OPTIONS,
     getPartUnitTypeLabel,
 } from '../../../utils/partLabel';
+import PartUnitTypeBadge from '../../../components/badges/PartUnitTypeBadge';
 import {
     getPartQuantityError,
     getPartQuantityMin,
@@ -154,18 +154,10 @@ export default function CreatePartModal({
                             getLabel={item => getPartUnitTypeLabel(item)}
                             getValue={item => item}
                             renderOption={item => (
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${PART_UNIT_TYPE_COLORS[item]}`}
-                                >
-                                    {getPartUnitTypeLabel(item)}
-                                </span>
+                                <PartUnitTypeBadge type={item} />
                             )}
                             renderValue={item => (
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${PART_UNIT_TYPE_COLORS[item]}`}
-                                >
-                                    {getPartUnitTypeLabel(item)}
-                                </span>
+                                <PartUnitTypeBadge type={item} />
                             )}
                         />
                     </FormField>

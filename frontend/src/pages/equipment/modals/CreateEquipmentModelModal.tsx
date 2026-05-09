@@ -9,10 +9,11 @@ import FormField from '../../../ui/FormField';
 import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
 
-import { EQUIPMENT_TYPE_OPTIONS, EQUIPMENT_TYPE_COLORS, getEquipmentTypeLabel } from '../../../utils/equipmentLabel';
+import { EQUIPMENT_TYPE_OPTIONS, getEquipmentTypeLabel } from '../../../utils/equipmentLabel';
 
 import type { EquipmentType } from '../../../types/equipmentModel/equipmentType';
 import type { CreateEquipmentModelPayload } from '../../../types/equipmentModel/equipmentModelPayloads';
+import EquipmentTypeBadge from '../../../components/badges/EquipmentTypeBadge';
 
 interface Props {
     creating: boolean;
@@ -75,17 +76,13 @@ export default function CreateEquipmentModelModal({
 
                             renderOption={(item, { selected }) => (
                                 <div className="flex items-center gap-2">
-                                    <span className={`px-2 py-0.5 rounded text-xs ${EQUIPMENT_TYPE_COLORS[item]}`}>
-                                        {getEquipmentTypeLabel(item)}
-                                    </span>
+                                    <EquipmentTypeBadge type={item} shape="rounded" />
                                     {selected && <span className="text-xs text-ink-muted">✓</span>}
                                 </div>
                             )}
                             renderValue={(item) =>
                                 item ? (
-                                    <span className={`px-2 py-0.5 rounded text-xs ${EQUIPMENT_TYPE_COLORS[item]}`}>
-                                        {getEquipmentTypeLabel(item)}
-                                    </span>
+                                    <EquipmentTypeBadge type={item} shape="rounded" />
                                 ) : (
                                     <span className="text-ink-muted">Оберіть тип</span>
                                 )

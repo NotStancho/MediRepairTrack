@@ -10,13 +10,11 @@ import ModalFooter from '../../../ui/Modal/ModalFooter';
 
 import {
     DELIVERY_PROVIDER_LABELS,
-    DELIVERY_STATUS_COLORS,
-    DELIVERY_STATUS_LABELS,
-    DELIVERY_TYPE_COLORS,
-    DELIVERY_TYPE_LABELS,
 } from '../../../utils/deliveryLabels';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
+import DeliveryStatusBadge from '../../../components/badges/DeliveryStatusBadge';
+import DeliveryTypeBadge from '../../../components/badges/DeliveryTypeBadge';
 
 interface Props {
     delivery: DeliveryView;
@@ -89,12 +87,8 @@ export default function ViewDeliveryModal({ delivery, onClose }: Props) {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                            <span className={`inline-flex rounded-full px-3 py-1 text-sm ${DELIVERY_TYPE_COLORS[delivery.type]}`}>
-                                {DELIVERY_TYPE_LABELS[delivery.type]}
-                            </span>
-                            <span className={`inline-flex rounded-full px-3 py-1 text-sm ${DELIVERY_STATUS_COLORS[delivery.status]}`}>
-                                {DELIVERY_STATUS_LABELS[delivery.status]}
-                            </span>
+                            <DeliveryTypeBadge type={delivery.type} size="md" />
+                            <DeliveryStatusBadge status={delivery.status} size="md" />
                         </div>
                     </div>
                 </div>

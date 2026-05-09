@@ -2,9 +2,10 @@
 
 import type { Claim } from '../../../types/claim/claim';
 import type { EquipmentFull } from "../../../types/equipment/equipmentFull";
-import { CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS, STATUS_COLORS, REPAIR_TYPE_COLORS } from '../../../utils/claimLabels';
 import { FiClock } from "react-icons/fi";
 import * as React from "react";
+import ClaimStatusBadge from '../../../components/badges/ClaimStatusBadge';
+import RepairTypeBadge from '../../../components/badges/RepairTypeBadge';
 
 interface Props {
     claim: Claim;
@@ -21,19 +22,9 @@ export default function ClaimHeader({ claim, equipment, actions }: Props) {
                     Заявка #{claim.id}
                 </span>
 
-                <span
-                    className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[claim.status]}`}
-                >
-                    {CLAIM_STATUS_LABELS[claim.status]}
-                </span>
+                <ClaimStatusBadge status={claim.status} shape="rounded" />
 
-                <span
-                    className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        REPAIR_TYPE_COLORS?.[claim.repairType] ?? 'bg-surface-muted text-ink-muted'
-                    }`}
-                >
-                    {REPAIR_TYPE_LABELS[claim.repairType]}
-                </span>
+                <RepairTypeBadge type={claim.repairType} shape="rounded" />
             </div>
 
             {/* Equipment */}

@@ -5,12 +5,9 @@ import { useState } from 'react';
 import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
 import type { CreateManualPredictionPayload } from '../../../../types/diagnosis/DSS/diagnosisPredictionPayloads';
 
-import {
-    DIAGNOSIS_TYPE_LABELS,
-    DIAGNOSIS_TYPE_COLORS,
-} from '../../../../utils/diagnosisLabels';
 import { formatDateTime } from '../../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../../utils/formats/moneyFormat';
+import DiagnosisTypeBadge from '../../../../components/badges/DiagnosisTypeBadge';
 
 import DiagnosisStatusActions from './DiagnosisStatusActions';
 import PredictionSection from './PredictionSection';
@@ -83,11 +80,7 @@ export default function DiagnosisCard({
                             Діагностика #{diagnosis.id}
                         </span>
 
-                        <span
-                            className={`px-2 py-0.5 rounded text-xs font-medium ${DIAGNOSIS_TYPE_COLORS[diagnosis.diagnosisType]}`}
-                        >
-                            {DIAGNOSIS_TYPE_LABELS[diagnosis.diagnosisType]}
-                        </span>
+                        <DiagnosisTypeBadge type={diagnosis.diagnosisType} shape="rounded" />
 
                         <DiagnosisStatusActions
                             diagnosis={diagnosis}

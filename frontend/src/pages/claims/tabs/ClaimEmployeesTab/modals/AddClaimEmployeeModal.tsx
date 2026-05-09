@@ -16,16 +16,16 @@ import Select from '../../../../../ui/Select';
 import TextArea from '../../../../../ui/TextArea';
 
 import {
-    EMPLOYEE_AVAILABILITY_COLORS,
     EMPLOYEE_AVAILABILITY_LABELS,
-    EMPLOYEE_POSITION_COLORS,
     EMPLOYEE_POSITION_LABELS,
 } from '../../../../../utils/employeeLabels';
 import {
-    ROLE_IN_CLAIM_COLORS,
     ROLE_IN_CLAIM_LABELS,
     ROLE_IN_CLAIM_OPTIONS,
 } from '../../../../../utils/roleInClaimLabels';
+import EmployeeAvailabilityBadge from '../../../../../components/badges/EmployeeAvailabilityBadge';
+import EmployeePositionBadge from '../../../../../components/badges/EmployeePositionBadge';
+import RoleInClaimBadge from '../../../../../components/badges/RoleInClaimBadge';
 
 interface Props {
     claimId: number;
@@ -88,16 +88,8 @@ export default function AddClaimEmployeeModal({
             </span>
 
             <div className="flex flex-wrap gap-2 text-xs">
-                <span
-                    className={`inline-flex rounded-full px-2 py-0.5 ${EMPLOYEE_POSITION_COLORS[employee.position]}`}
-                >
-                    {EMPLOYEE_POSITION_LABELS[employee.position]}
-                </span>
-                <span
-                    className={`inline-flex rounded-full px-2 py-0.5 ${EMPLOYEE_AVAILABILITY_COLORS[employee.availabilityStatus]}`}
-                >
-                    {EMPLOYEE_AVAILABILITY_LABELS[employee.availabilityStatus]}
-                </span>
+                <EmployeePositionBadge position={employee.position} />
+                <EmployeeAvailabilityBadge status={employee.availabilityStatus} />
             </div>
         </div>
     );
@@ -134,11 +126,7 @@ export default function AddClaimEmployeeModal({
                                 <span>
                                     {employee.lastName} {employee.firstName}
                                 </span>
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_POSITION_COLORS[employee.position]}`}
-                                >
-                                    {EMPLOYEE_POSITION_LABELS[employee.position]}
-                                </span>
+                                <EmployeePositionBadge position={employee.position} />
                             </span>
                         )}
                         placeholder="Оберіть працівника"
@@ -164,18 +152,10 @@ export default function AddClaimEmployeeModal({
                         getLabel={role => ROLE_IN_CLAIM_LABELS[role]}
                         getValue={role => role}
                         renderOption={role => (
-                            <span
-                                className={`inline-flex rounded-full px-2 py-0.5 text-xs ${ROLE_IN_CLAIM_COLORS[role]}`}
-                            >
-                                {ROLE_IN_CLAIM_LABELS[role]}
-                            </span>
+                            <RoleInClaimBadge role={role} />
                         )}
                         renderValue={role => (
-                            <span
-                                className={`inline-flex rounded-full px-2 py-0.5 text-xs ${ROLE_IN_CLAIM_COLORS[role]}`}
-                            >
-                                {ROLE_IN_CLAIM_LABELS[role]}
-                            </span>
+                            <RoleInClaimBadge role={role} />
                         )}
                         placeholder="Оберіть роль"
                         disabled={creating}

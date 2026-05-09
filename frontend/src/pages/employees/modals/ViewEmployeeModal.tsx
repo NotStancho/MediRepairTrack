@@ -11,12 +11,8 @@ import ModalFooter from '../../../ui/Modal/ModalFooter';
 import { formatDateShort } from '../../../utils/formats/dateShortFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
 import { formatPhoneNumber } from '../../../utils/phone';
-import {
-    EMPLOYEE_AVAILABILITY_COLORS,
-    EMPLOYEE_AVAILABILITY_LABELS,
-    EMPLOYEE_POSITION_COLORS,
-    EMPLOYEE_POSITION_LABELS,
-} from '../../../utils/employeeLabels';
+import EmployeeAvailabilityBadge from '../../../components/badges/EmployeeAvailabilityBadge';
+import EmployeePositionBadge from '../../../components/badges/EmployeePositionBadge';
 
 const ROLE_LABELS: Record<EmployeeFull['role'], string> = {
     CLIENT: 'Клієнт',
@@ -73,16 +69,8 @@ export default function ViewEmployeeModal({ employee, onClose }: {
                         {employee.email}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
-                        <span
-                            className={`inline-flex rounded-full px-3 py-1 text-sm ${EMPLOYEE_POSITION_COLORS[employee.position]}`}
-                        >
-                            {EMPLOYEE_POSITION_LABELS[employee.position]}
-                        </span>
-                        <span
-                            className={`inline-flex rounded-full px-3 py-1 text-sm ${EMPLOYEE_AVAILABILITY_COLORS[employee.availabilityStatus]}`}
-                        >
-                            {EMPLOYEE_AVAILABILITY_LABELS[employee.availabilityStatus]}
-                        </span>
+                        <EmployeePositionBadge position={employee.position} size="md" />
+                        <EmployeeAvailabilityBadge status={employee.availabilityStatus} size="md" />
                     </div>
                 </div>
 

@@ -9,8 +9,9 @@ import { getEmployeeById } from '../../../api/employee';
 
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { HISTORY_ICONS } from '../../../utils/claimHistoryLabels';
-import { EMPLOYEE_POSITION_LABELS, EMPLOYEE_POSITION_COLORS } from '../../../utils/employeeLabels';
-import { CLAIM_STATUS_LABELS, STATUS_COLORS } from '../../../utils/claimLabels';
+import type { ClaimStatus } from '../../../types/claim/claim';
+import EmployeePositionBadge from '../../../components/badges/EmployeePositionBadge';
+import ClaimStatusBadge from '../../../components/badges/ClaimStatusBadge';
 
 interface Props {
     claimId: number;
@@ -74,16 +75,16 @@ export default function ClaimHistoryTab({ claimId }: Props) {
     if (!items.length) return <div className="text-sm text-ink-muted">Історія порожня</div>;
 
     function parseStatusTransition(text: string): {
-        from: keyof typeof CLAIM_STATUS_LABELS;
-        to: keyof typeof CLAIM_STATUS_LABELS;
+        from: ClaimStatus;
+        to: ClaimStatus;
     } | null {
         const match = text.match(STATUS_TRANSITION_REGEX);
 
         if (!match) return null;
 
         return {
-            from: match[1] as keyof typeof CLAIM_STATUS_LABELS,
-            to: match[2] as keyof typeof CLAIM_STATUS_LABELS,
+            from: match[1] as ClaimStatus,
+            to: match[2] as ClaimStatus,
         };
     }
 
@@ -119,36 +120,24 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                                 <div className="text-xs text-ink-muted">
                                     {employee.userLastName} {employee.userFirstName}
                                     {' • '}
-                                    <span
-                                        className={`
-                                            inline-flex items-center
-                                            px-2 py-0.5
-                                            rounded-full
-                                            text-xs font-medium
-                                            ${EMPLOYEE_POSITION_COLORS[employee.position]}
-                                        `}
-                                    >
-                                        {EMPLOYEE_POSITION_LABELS[employee.position]}
-                                    </span>
+                                    <EmployeePositionBadge position={employee.position} />
                                 </div>
                             )}
 
                             {statusTransition && (
                                 <div className="text-sm mt-1 text-ink-muted">
                                     Статус заявки змінено:{' '}
-                                    <span
-                                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mx-1
-                                            ${STATUS_COLORS[statusTransition.from]}`}
-                                    >
-                                        {CLAIM_STATUS_LABELS[statusTransition.from]}
-                                    </span>
+                                    <ClaimStatusBadge
+                                        status={statusTransition.from}
+                                        shape="rounded"
+                                        className="mx-1"
+                                    />
                                     →
-                                    <span
-                                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ml-1
-                                            ${STATUS_COLORS[statusTransition.to]}`}
-                                    >
-                                        {CLAIM_STATUS_LABELS[statusTransition.to]}
-                                    </span>
+                                    <ClaimStatusBadge
+                                        status={statusTransition.to}
+                                        shape="rounded"
+                                        className="ml-1"
+                                    />
                                 </div>
                             )}
 

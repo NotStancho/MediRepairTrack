@@ -12,10 +12,8 @@ import { formatMoney } from '../../../utils/formats/moneyFormat';
 import { formatPartQuantity } from '../../../utils/formats/partQuantityFormat';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 
-import {
-    PART_UNIT_TYPE_COLORS,
-    getPartUnitTypeLabel,
-} from '../../../utils/partLabel';
+import PartUnitTypeBadge from '../../../components/badges/PartUnitTypeBadge';
+import Badge from '../../../components/badges/Badge';
 
 interface Props {
     part: Part;
@@ -66,9 +64,13 @@ export default function ViewPartModal({ part, onClose }: Props) {
                                 {part.partName}
                             </div>
 
-                            <div className="mt-2 inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-sm text-ink-muted">
+                            <Badge
+                                size="md"
+                                colorClassName="border border-border bg-surface text-ink-muted"
+                                className="mt-2"
+                            >
                                 Постачальник: {part.supplierName}
-                            </div>
+                            </Badge>
                         </div>
 
                         <div className="shrink-0 rounded-xl border border-border bg-surface px-4 py-3 text-right">
@@ -91,13 +93,7 @@ export default function ViewPartModal({ part, onClose }: Props) {
 
                     <InfoCard
                         label="Тип одиниці"
-                        value={
-                            <span
-                                className={`inline-flex rounded-full px-2 py-0.5 text-xs ${PART_UNIT_TYPE_COLORS[part.unitType]}`}
-                            >
-                                {getPartUnitTypeLabel(part.unitType)}
-                            </span>
-                        }
+                        value={<PartUnitTypeBadge type={part.unitType} />}
                     />
                     <InfoCard label="Одиниця виміру" value={part.unitName || '-'} />
                 </div>

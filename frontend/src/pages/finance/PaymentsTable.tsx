@@ -8,11 +8,11 @@ import { Table, TableToolbar, type TableColumnDef } from '../../ui/Table';
 
 import {
     PAYMENT_METHOD_LABELS,
-    PAYMENT_STATUS_COLORS,
     PAYMENT_STATUS_LABELS,
 } from '../../utils/paymentLabels';
 import { formatDateShort } from '../../utils/formats/dateShortFormat';
 import { formatMoney } from '../../utils/formats/moneyFormat';
+import PaymentStatusBadge from '../../components/badges/PaymentStatusBadge';
 
 interface Props {
     data: PaymentView[];
@@ -77,11 +77,7 @@ export default function PaymentsTable({
                 id: 'status',
                 header: 'Статус',
                 accessorFn: row => PAYMENT_STATUS_LABELS[row.status],
-                cell: ({ row }) => (
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${PAYMENT_STATUS_COLORS[row.original.status]}`}>
-                        {PAYMENT_STATUS_LABELS[row.original.status]}
-                    </span>
-                ),
+                cell: ({ row }) => <PaymentStatusBadge status={row.original.status} />,
             },
             {
                 id: 'createdAt',

@@ -14,10 +14,8 @@ import TableToolbar from '../../../ui/Table/TableToolbar';
 
 import { formatMoney } from '../../../utils/formats/moneyFormat';
 import { formatPartQuantity } from '../../../utils/formats/partQuantityFormat';
-import {
-    PART_UNIT_TYPE_COLORS,
-    getPartUnitTypeLabel,
-} from '../../../utils/partLabel';
+import { getPartUnitTypeLabel } from '../../../utils/partLabel';
+import PartUnitTypeBadge from '../../../components/badges/PartUnitTypeBadge';
 
 import AddPartStockModal from '../modals/AddPartStockModal';
 import CreatePartModal from '../modals/CreatePartModal';
@@ -87,9 +85,7 @@ export default function PartListTab() {
                     <span className="font-medium text-ink">
                         {row.original.unitName}
                     </span>
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${PART_UNIT_TYPE_COLORS[row.original.unitType]}`}>
-                        {getPartUnitTypeLabel(row.original.unitType)}
-                    </span>
+                    <PartUnitTypeBadge type={row.original.unitType} />
                 </div>
             ),
         },

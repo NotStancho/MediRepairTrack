@@ -4,11 +4,11 @@ import { useMemo } from 'react';
 import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
 import {
     DIAGNOSIS_STATUS_LABELS,
-    DIAGNOSIS_STATUS_COLORS,
     DIAGNOSIS_STATUS_ACTION_LABELS
 } from '../../../../utils/diagnosisLabels';
 
 import RowActionsMenu from '../../../../ui/RowActionsMenu';
+import DiagnosisStatusBadge from '../../../../components/badges/DiagnosisStatusBadge';
 
 interface Props {
     diagnosis: Diagnosis;
@@ -60,11 +60,11 @@ export default function DiagnosisStatusActions({
             actions={actions}
             disabled={allowedStatusesLoading || busy || !hasActions}
             trigger={
-                <span
+                <DiagnosisStatusBadge
+                    status={diagnosis.status}
+                    shape="rounded"
                     className={`
-                        inline-flex items-center gap-2
-                        px-2 py-0.5 rounded text-xs font-medium
-                        ${DIAGNOSIS_STATUS_COLORS[diagnosis.status]}
+                        gap-2
                         ${hasActions ? 'cursor-pointer hover:opacity-90' : ''}
                         ${(allowedStatusesLoading || busy) ? 'opacity-70' : ''}
                     `}
@@ -76,7 +76,7 @@ export default function DiagnosisStatusActions({
                     ) : hasActions ? (
                         <span className="text-[10px]">▾</span>
                     ) : null}
-                </span>
+                </DiagnosisStatusBadge>
             }
         />
     );

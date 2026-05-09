@@ -14,13 +14,13 @@ import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
 
 import {
-    CONTRACT_STATUS_COLORS,
     CONTRACT_STATUS_OPTIONS,
-    CONTRACT_TYPE_COLORS,
     CONTRACT_TYPE_OPTIONS,
     getContractStatusLabel,
     getContractTypeLabel,
 } from '../../../utils/clientContractLabel';
+import ContractStatusBadge from '../../../components/badges/ContractStatusBadge';
+import ContractTypeBadge from '../../../components/badges/ContractTypeBadge';
 
 interface Props {
     contract: ClientContract;
@@ -127,14 +127,10 @@ export default function EditClientContractModal({
                             getLabel={item => getContractTypeLabel(item)}
                             getValue={item => item}
                             renderOption={item => (
-                                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${CONTRACT_TYPE_COLORS[item]}`}>
-                                    {getContractTypeLabel(item)}
-                                </span>
+                                <ContractTypeBadge type={item} />
                             )}
                             renderValue={item => (
-                                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${CONTRACT_TYPE_COLORS[item]}`}>
-                                    {getContractTypeLabel(item)}
-                                </span>
+                                <ContractTypeBadge type={item} />
                             )}
                         />
                     </FormField>
@@ -147,14 +143,10 @@ export default function EditClientContractModal({
                             getLabel={item => getContractStatusLabel(item)}
                             getValue={item => item}
                             renderOption={item => (
-                                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${CONTRACT_STATUS_COLORS[item]}`}>
-                                    {getContractStatusLabel(item)}
-                                </span>
+                                <ContractStatusBadge status={item} />
                             )}
                             renderValue={item => (
-                                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${CONTRACT_STATUS_COLORS[item]}`}>
-                                    {getContractStatusLabel(item)}
-                                </span>
+                                <ContractStatusBadge status={item} />
                             )}
                         />
                     </FormField>

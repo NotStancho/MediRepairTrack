@@ -9,13 +9,14 @@ import { getAssignedActiveClaims } from '../../api/claimEmployee';
 import type { Claim } from '../../types/claim/claim';
 import type { AssignedActiveClaim } from '../../types/claim/assignedClaim';
 
-import { CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS, STATUS_COLORS } from '../../utils/claimLabels';
-import { ROLE_IN_CLAIM_LABELS, ROLE_IN_CLAIM_COLORS } from '../../utils/roleInClaimLabels';
+import { REPAIR_TYPE_LABELS } from '../../utils/claimLabels';
 
 import Button from '../../ui/Button';
 import { Table, TableToolbar, type TableColumnDef } from '../../ui/Table';
 
 import { formatDateTime } from '../../utils/formats/dateFormat';
+import ClaimStatusBadge from '../../components/badges/ClaimStatusBadge';
+import RoleInClaimBadge from '../../components/badges/RoleInClaimBadge';
 
 export default function ClaimListPage() {
     const { user } = useAuth();
@@ -82,11 +83,7 @@ export default function ClaimListPage() {
             accessorKey: 'status',
             header: 'Статус',
             meta: { align: 'center' },
-            cell: ({ row }) => (
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[row.original.status]}`}>
-                    {CLAIM_STATUS_LABELS[row.original.status]}
-                </span>
-            ),
+            cell: ({ row }) => <ClaimStatusBadge status={row.original.status} shape="rounded" />,
         },
         {
             accessorKey: 'defectDescription',
@@ -146,29 +143,13 @@ export default function ClaimListPage() {
             accessorKey: 'status',
             header: 'Статус',
             meta: { align: 'center' },
-            cell: ({ row }) => (
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[row.original.status]}`}>
-                    {CLAIM_STATUS_LABELS[row.original.status]}
-                </span>
-            ),
+            cell: ({ row }) => <ClaimStatusBadge status={row.original.status} shape="rounded" />,
         },
         {
             accessorKey: 'role',
             header: 'Моя роль',
             meta: { align: 'center' },
-            cell: ({ row }) => (
-                <span
-                    className={`
-                        inline-flex items-center
-                        px-2 py-0.5
-                        rounded-full
-                        text-xs font-medium
-                        ${ROLE_IN_CLAIM_COLORS[row.original.role]}
-                    `}
-                >
-                    {ROLE_IN_CLAIM_LABELS[row.original.role]}
-                </span>
-            ),
+            cell: ({ row }) => <RoleInClaimBadge role={row.original.role} />,
         },
         {
             accessorKey: 'hoursWorked',

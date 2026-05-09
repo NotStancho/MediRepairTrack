@@ -16,8 +16,10 @@ import { Table, TableToolbar, type TableColumnDef } from '../../../../ui/Table';
 import AddClaimEmployeeModal from './modals/AddClaimEmployeeModal';
 import EditClaimEmployeeModal from './modals/EditClaimEmployeeModal';
 
-import { EMPLOYEE_POSITION_COLORS, EMPLOYEE_POSITION_LABELS } from '../../../../utils/employeeLabels';
-import { ROLE_IN_CLAIM_COLORS, ROLE_IN_CLAIM_LABELS } from '../../../../utils/roleInClaimLabels';
+import { EMPLOYEE_POSITION_LABELS } from '../../../../utils/employeeLabels';
+import { ROLE_IN_CLAIM_LABELS } from '../../../../utils/roleInClaimLabels';
+import EmployeePositionBadge from '../../../../components/badges/EmployeePositionBadge';
+import RoleInClaimBadge from '../../../../components/badges/RoleInClaimBadge';
 
 interface Props {
     claimId: number;
@@ -68,38 +70,14 @@ export default function ClaimEmployeesTab({ claimId }: Props) {
                 id: 'position',
                 header: 'Посада',
                 accessorFn: row => EMPLOYEE_POSITION_LABELS[row.position],
-                cell: ({ row }) => (
-                    <span
-                        className={`
-                            inline-flex items-center
-                            rounded-full
-                            px-2 py-0.5
-                            text-xs font-medium
-                            ${EMPLOYEE_POSITION_COLORS[row.original.position]}
-                        `}
-                    >
-                        {EMPLOYEE_POSITION_LABELS[row.original.position]}
-                    </span>
-                ),
+                cell: ({ row }) => <EmployeePositionBadge position={row.original.position} />,
             },
             {
                 id: 'roleInClaim',
                 header: 'Роль у заявці',
                 accessorFn: row => ROLE_IN_CLAIM_LABELS[row.roleInClaim],
                 meta: { align: 'center' },
-                cell: ({ row }) => (
-                    <span
-                        className={`
-                            inline-flex items-center
-                            rounded-full
-                            px-2 py-0.5
-                            text-xs font-medium
-                            ${ROLE_IN_CLAIM_COLORS[row.original.roleInClaim]}
-                        `}
-                    >
-                        {ROLE_IN_CLAIM_LABELS[row.original.roleInClaim]}
-                    </span>
-                ),
+                cell: ({ row }) => <RoleInClaimBadge role={row.original.roleInClaim} />,
             },
             {
                 id: 'hoursWorked',

@@ -6,6 +6,8 @@ import type { Delivery } from '../../../types/delivery';
 import { DELIVERY_PROVIDER_LABELS, DELIVERY_STATUS_LABELS, DELIVERY_TYPE_LABELS } from '../../../utils/deliveryLabels';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
 import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
+import DeliveryStatusBadge from '../../../components/badges/DeliveryStatusBadge';
+import DeliveryTypeBadge from '../../../components/badges/DeliveryTypeBadge';
 
 interface Props {
     claimId: number;
@@ -26,7 +28,7 @@ export default function ClaimDeliveryTab({ claimId }: Props) {
             id: 'type',
             header: 'Тип',
             accessorFn: row => DELIVERY_TYPE_LABELS[row.type],
-            cell: ({ row }) => DELIVERY_TYPE_LABELS[row.original.type],
+            cell: ({ row }) => <DeliveryTypeBadge type={row.original.type} />,
         },
         {
             id: 'provider',
@@ -38,7 +40,7 @@ export default function ClaimDeliveryTab({ claimId }: Props) {
             id: 'status',
             header: 'Статус',
             accessorFn: row => DELIVERY_STATUS_LABELS[row.status],
-            cell: ({ row }) => DELIVERY_STATUS_LABELS[row.original.status],
+            cell: ({ row }) => <DeliveryStatusBadge status={row.original.status} />,
         },
         {
             id: 'tracking',

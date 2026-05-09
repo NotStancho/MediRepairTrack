@@ -9,13 +9,10 @@ import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
 import { Table, type TableColumnDef } from '../../../ui/Table';
 
-import {
-    INVOICE_ITEM_LABELS,
-    INVOICE_STATUS_COLORS,
-    INVOICE_STATUS_LABELS,
-} from '../../../utils/invoiceLabels';
+import { INVOICE_ITEM_LABELS } from '../../../utils/invoiceLabels';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
+import InvoiceStatusBadge from '../../../components/badges/InvoiceStatusBadge';
 
 interface Props {
     invoice: InvoiceFull;
@@ -117,9 +114,7 @@ export default function ViewInvoiceModal({ invoice, onClose }: Props) {
                             </div>
                         </div>
 
-                        <span className={`inline-flex rounded-full px-3 py-1 text-sm ${INVOICE_STATUS_COLORS[invoice.status]}`}>
-                            {INVOICE_STATUS_LABELS[invoice.status]}
-                        </span>
+                        <InvoiceStatusBadge status={invoice.status} size="md" />
                     </div>
                 </div>
 

@@ -18,13 +18,13 @@ import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
 
 import {
-    EMPLOYEE_AVAILABILITY_COLORS,
     EMPLOYEE_AVAILABILITY_LABELS,
     EMPLOYEE_AVAILABILITY_OPTIONS,
-    EMPLOYEE_POSITION_COLORS,
     EMPLOYEE_POSITION_LABELS,
     EMPLOYEE_POSITION_OPTIONS,
 } from '../../../utils/employeeLabels';
+import EmployeeAvailabilityBadge from '../../../components/badges/EmployeeAvailabilityBadge';
+import EmployeePositionBadge from '../../../components/badges/EmployeePositionBadge';
 
 interface Props {
     employee: Employee;
@@ -94,18 +94,10 @@ export default function EditEmployeeModal({
                             getLabel={item => EMPLOYEE_POSITION_LABELS[item]}
                             getValue={item => item}
                             renderOption={item => (
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_POSITION_COLORS[item]}`}
-                                >
-                                    {EMPLOYEE_POSITION_LABELS[item]}
-                                </span>
+                                <EmployeePositionBadge position={item} />
                             )}
                             renderValue={item => (
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_POSITION_COLORS[item]}`}
-                                >
-                                    {EMPLOYEE_POSITION_LABELS[item]}
-                                </span>
+                                <EmployeePositionBadge position={item} />
                             )}
                         />
                     </FormField>
@@ -123,18 +115,10 @@ export default function EditEmployeeModal({
                             getLabel={item => EMPLOYEE_AVAILABILITY_LABELS[item]}
                             getValue={item => item}
                             renderOption={item => (
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_AVAILABILITY_COLORS[item]}`}
-                                >
-                                    {EMPLOYEE_AVAILABILITY_LABELS[item]}
-                                </span>
+                                <EmployeeAvailabilityBadge status={item} />
                             )}
                             renderValue={item => (
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_AVAILABILITY_COLORS[item]}`}
-                                >
-                                    {EMPLOYEE_AVAILABILITY_LABELS[item]}
-                                </span>
+                                <EmployeeAvailabilityBadge status={item} />
                             )}
                         />
                     </FormField>

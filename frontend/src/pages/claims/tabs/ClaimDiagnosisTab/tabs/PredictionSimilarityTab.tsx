@@ -14,8 +14,9 @@ import RowActionsMenu from '../../../../../ui/RowActionsMenu';
 
 import {
     CLAIM_STATUS_LABELS, REPAIR_TYPE_LABELS,
-    STATUS_COLORS, REPAIR_TYPE_COLORS
 } from '../../../../../utils/claimLabels';
+import ClaimStatusBadge from '../../../../../components/badges/ClaimStatusBadge';
+import RepairTypeBadge from '../../../../../components/badges/RepairTypeBadge';
 
 import CreateSimilarityResultModal from '../modals/CreateSimilarityResultModal';
 import EditSimilarityResultModal from '../modals/EditSimilarityResultModal';
@@ -86,36 +87,18 @@ export default function PredictionSimilarityTab({ predictionId }: Props) {
         {
             id: 'repairType',
             header: 'Тип ремонту',
-            accessorFn: row => row.claim.repairType,
-            cell: ({ row }) => {
-                const type = row.original.claim.repairType;
-
-                return (
-                    <span className={`
-                px-2 py-0.5 rounded text-xs font-medium
-                ${REPAIR_TYPE_COLORS[type]}
-            `}>
-                {REPAIR_TYPE_LABELS[type]}
-            </span>
-                );
-            },
+            accessorFn: row => REPAIR_TYPE_LABELS[row.claim.repairType],
+            cell: ({ row }) => (
+                <RepairTypeBadge type={row.original.claim.repairType} shape="rounded" />
+            ),
         },
         {
             id: 'status',
             header: 'Статус',
-            accessorFn: row => row.claim.status,
-            cell: ({ row }) => {
-                const status = row.original.claim.status;
-
-                return (
-                    <span className={`
-                px-2 py-0.5 rounded text-xs font-medium
-                ${STATUS_COLORS[status]}
-            `}>
-                {CLAIM_STATUS_LABELS[status]}
-            </span>
-                );
-            },
+            accessorFn: row => CLAIM_STATUS_LABELS[row.claim.status],
+            cell: ({ row }) => (
+                <ClaimStatusBadge status={row.original.claim.status} shape="rounded" />
+            ),
         },
         {
             id: 'similarity',

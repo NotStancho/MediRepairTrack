@@ -1,6 +1,6 @@
 // pages/claims/tabs/ClaimInvoiceTab.tsx
 
-import { INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS, INVOICE_ITEM_LABELS } from '../../../utils/invoiceLabels';
+import { INVOICE_ITEM_LABELS } from '../../../utils/invoiceLabels';
 import { useAuth } from '../../../context/AuthContext';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
@@ -15,6 +15,7 @@ import RowActionsMenu from '../../../ui/RowActionsMenu';
 import FormField from '../../../ui/FormField';
 import { inputBase, primaryButton, secondaryButton } from '../../../ui/formStyles';
 import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
+import InvoiceStatusBadge from '../../../components/badges/InvoiceStatusBadge';
 
 interface Props {
     claimId: number;
@@ -203,9 +204,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                     <div className="font-medium">
                         Рахунок {invoice.invoiceNumber}
                     </div>
-                    <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${INVOICE_STATUS_COLORS[invoice.status]}`}>
-                        {INVOICE_STATUS_LABELS[invoice.status]}
-                    </div>
+                    <InvoiceStatusBadge status={invoice.status} />
                 </div>
 
                 <div className="text-right">

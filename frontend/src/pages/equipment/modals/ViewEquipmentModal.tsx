@@ -11,6 +11,7 @@ import type { Equipment } from '../../../types/equipment/equipment';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
 import { formatDateShort } from '../../../utils/formats/dateShortFormat';
+import Badge from '../../../components/badges/Badge';
 
 interface Props {
     equipment: Equipment;
@@ -57,9 +58,13 @@ export default function ViewEquipmentModal({ equipment, onClose }: Props) {
                                 {equipment.model.modelName}
                             </div>
 
-                            <div className="mt-2 inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-sm text-ink-muted">
+                            <Badge
+                                size="md"
+                                colorClassName="border border-border bg-surface text-ink-muted"
+                                className="mt-2"
+                            >
                                 Виробник: {equipment.model.manufacturer}
-                            </div>
+                            </Badge>
                         </div>
 
                         <div className="shrink-0 rounded-xl border border-border bg-surface px-4 py-3 text-right">

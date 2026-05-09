@@ -8,13 +8,13 @@ import { Table, TableToolbar, type TableColumnDef } from '../../ui/Table';
 
 import {
     DELIVERY_PROVIDER_LABELS,
-    DELIVERY_STATUS_COLORS,
     DELIVERY_STATUS_LABELS,
-    DELIVERY_TYPE_COLORS,
     DELIVERY_TYPE_LABELS,
 } from '../../utils/deliveryLabels';
 import { formatDateShort } from '../../utils/formats/dateShortFormat';
 import { formatMoney } from '../../utils/formats/moneyFormat';
+import DeliveryStatusBadge from '../../components/badges/DeliveryStatusBadge';
+import DeliveryTypeBadge from '../../components/badges/DeliveryTypeBadge';
 
 interface Props {
     data: DeliveryView[];
@@ -68,10 +68,7 @@ export default function DeliveriesTable({
                     return (
                         <div className="space-y-1">
                             <div className="flex flex-wrap items-center gap-2">
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${DELIVERY_TYPE_COLORS[row.original.type]}`}>
-                                    {DELIVERY_TYPE_LABELS[row.original.type]}
-                                </span>
+                                <DeliveryTypeBadge type={row.original.type} />
                                 {!isEngineer && (
                                     <span className="text-xs text-ink-muted">
                                         {DELIVERY_PROVIDER_LABELS[row.original.provider]}
@@ -112,11 +109,7 @@ export default function DeliveriesTable({
                 id: 'status',
                 header: 'Статус',
                 accessorFn: row => DELIVERY_STATUS_LABELS[row.status],
-                cell: ({ row }) => (
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${DELIVERY_STATUS_COLORS[row.original.status]}`}>
-                        {DELIVERY_STATUS_LABELS[row.original.status]}
-                    </span>
-                ),
+                cell: ({ row }) => <DeliveryStatusBadge status={row.original.status} />,
             },
             {
                 id: 'details',

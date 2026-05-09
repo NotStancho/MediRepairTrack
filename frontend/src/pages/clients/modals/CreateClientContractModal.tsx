@@ -13,10 +13,10 @@ import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
 
 import {
-    CONTRACT_TYPE_COLORS,
     CONTRACT_TYPE_OPTIONS,
     getContractTypeLabel,
 } from '../../../utils/clientContractLabel';
+import ContractTypeBadge from '../../../components/badges/ContractTypeBadge';
 
 interface Props {
     clients: Client[];
@@ -110,6 +110,8 @@ export default function CreateClientContractModal({
                                 </div>
                             </div>
                         )}
+                        maxVisibleItems={6}
+                        itemHeight={48}
                     />
                 </FormField>
 
@@ -129,14 +131,10 @@ export default function CreateClientContractModal({
                         getLabel={item => getContractTypeLabel(item)}
                         getValue={item => item}
                         renderOption={item => (
-                            <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${CONTRACT_TYPE_COLORS[item]}`}>
-                                {getContractTypeLabel(item)}
-                            </span>
+                            <ContractTypeBadge type={item} />
                         )}
                         renderValue={item => (
-                            <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${CONTRACT_TYPE_COLORS[item]}`}>
-                                {getContractTypeLabel(item)}
-                            </span>
+                            <ContractTypeBadge type={item} />
                         )}
                     />
                 </FormField>

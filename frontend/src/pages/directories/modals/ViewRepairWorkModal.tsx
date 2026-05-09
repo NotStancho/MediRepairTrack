@@ -9,6 +9,7 @@ import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
 
 import { formatDateTime } from '../../../utils/formats/dateFormat';
+import Badge from '../../../components/badges/Badge';
 
 interface Props {
     repairWork: RepairWork;
@@ -56,9 +57,13 @@ export default function ViewRepairWorkModal({
                     <div className="mt-2 text-xl font-semibold text-ink">
                         {repairWork.name}
                     </div>
-                    <div className="mt-3 inline-flex rounded-full border border-border bg-surface px-3 py-1 text-sm text-ink-muted">
+                    <Badge
+                        size="md"
+                        colorClassName="border border-border bg-surface text-ink-muted"
+                        className="mt-3"
+                    >
                         Складність: {complexityName}
-                    </div>
+                    </Badge>
                 </div>
 
                 <div className="rounded-xl border border-border bg-surface-muted p-4">

@@ -29,10 +29,8 @@ import { formatPartQuantity } from '../../../../utils/formats/partQuantityFormat
 import {
     EMPLOYEE_POSITION_LABELS,
 } from '../../../../utils/employeeLabels';
-import {
-    ROLE_IN_CLAIM_COLORS,
-    ROLE_IN_CLAIM_LABELS,
-} from '../../../../utils/roleInClaimLabels';
+import { ROLE_IN_CLAIM_LABELS } from '../../../../utils/roleInClaimLabels';
+import RoleInClaimBadge from '../../../../components/badges/RoleInClaimBadge';
 
 interface Props {
     claimId: number;
@@ -298,11 +296,7 @@ export default function ClaimWorksTab({
                                 {employee.lastName} {employee.firstName}
                             </div>
                             <div className="mt-1 flex flex-wrap gap-1 text-xs">
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 ${ROLE_IN_CLAIM_COLORS[employee.roleInClaim]}`}
-                                >
-                                    {ROLE_IN_CLAIM_LABELS[employee.roleInClaim]}
-                                </span>
+                                <RoleInClaimBadge role={employee.roleInClaim} />
                             </div>
                         </div>
                     );

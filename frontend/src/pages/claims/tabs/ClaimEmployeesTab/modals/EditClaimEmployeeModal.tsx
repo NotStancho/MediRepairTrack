@@ -13,14 +13,11 @@ import Select from '../../../../../ui/Select';
 import TextArea from '../../../../../ui/TextArea';
 
 import {
-    EMPLOYEE_POSITION_COLORS,
-    EMPLOYEE_POSITION_LABELS,
-} from '../../../../../utils/employeeLabels';
-import {
-    ROLE_IN_CLAIM_COLORS,
     ROLE_IN_CLAIM_LABELS,
     ROLE_IN_CLAIM_OPTIONS,
 } from '../../../../../utils/roleInClaimLabels';
+import EmployeePositionBadge from '../../../../../components/badges/EmployeePositionBadge';
+import RoleInClaimBadge from '../../../../../components/badges/RoleInClaimBadge';
 
 interface Props {
     claimEmployee: ClaimEmployee;
@@ -74,11 +71,7 @@ export default function EditClaimEmployeeModal({
                         {claimEmployee.lastName} {claimEmployee.firstName}
                     </div>
                     <div className="mt-2 flex flex-wrap gap-2">
-                        <span
-                            className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_POSITION_COLORS[claimEmployee.position]}`}
-                        >
-                            {EMPLOYEE_POSITION_LABELS[claimEmployee.position]}
-                        </span>
+                        <EmployeePositionBadge position={claimEmployee.position} />
                         <span className="inline-flex rounded-full border border-border bg-surface px-2 py-0.5 text-xs text-ink-muted">
                             Відпрацьовано годин: {claimEmployee.hoursWorked ?? 0}
                         </span>
@@ -98,18 +91,10 @@ export default function EditClaimEmployeeModal({
                         getLabel={role => ROLE_IN_CLAIM_LABELS[role]}
                         getValue={role => role}
                         renderOption={role => (
-                            <span
-                                className={`inline-flex rounded-full px-2 py-0.5 text-xs ${ROLE_IN_CLAIM_COLORS[role]}`}
-                            >
-                                {ROLE_IN_CLAIM_LABELS[role]}
-                            </span>
+                            <RoleInClaimBadge role={role} />
                         )}
                         renderValue={role => (
-                            <span
-                                className={`inline-flex rounded-full px-2 py-0.5 text-xs ${ROLE_IN_CLAIM_COLORS[role]}`}
-                            >
-                                {ROLE_IN_CLAIM_LABELS[role]}
-                            </span>
+                            <RoleInClaimBadge role={role} />
                         )}
                         placeholder="Оберіть роль"
                         disabled={saving}

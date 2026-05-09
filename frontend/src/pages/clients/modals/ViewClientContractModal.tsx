@@ -8,15 +8,11 @@ import Button from '../../../ui/Button';
 import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
 
-import {
-    CONTRACT_STATUS_COLORS,
-    CONTRACT_TYPE_COLORS,
-    getContractStatusLabel,
-    getContractTypeLabel,
-} from '../../../utils/clientContractLabel';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatDateShort } from '../../../utils/formats/dateShortFormat';
 import { formatPercent } from '../../../utils/formats/percentFormat';
+import ContractStatusBadge from '../../../components/badges/ContractStatusBadge';
+import ContractTypeBadge from '../../../components/badges/ContractTypeBadge';
 
 interface Props {
     contract: ClientContract;
@@ -72,12 +68,8 @@ export default function ViewClientContractModal({
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                            <span className={`inline-flex rounded-full px-3 py-1 text-sm ${CONTRACT_TYPE_COLORS[contract.contractType]}`}>
-                                {getContractTypeLabel(contract.contractType)}
-                            </span>
-                            <span className={`inline-flex rounded-full px-3 py-1 text-sm ${CONTRACT_STATUS_COLORS[contract.status]}`}>
-                                {getContractStatusLabel(contract.status)}
-                            </span>
+                            <ContractTypeBadge type={contract.contractType} size="md" />
+                            <ContractStatusBadge status={contract.status} size="md" />
                         </div>
                     </div>
                 </div>

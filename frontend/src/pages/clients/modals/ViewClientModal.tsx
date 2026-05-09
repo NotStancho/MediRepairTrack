@@ -8,6 +8,7 @@ import Button from '../../../ui/Button';
 import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
 import { formatPhoneNumber } from '../../../utils/phone';
+import Badge from '../../../components/badges/Badge';
 
 interface Props {
     client: ClientFull;
@@ -56,9 +57,13 @@ export default function ViewClientModal({ client, onClose }: Props) {
                     <div className="mt-2 text-xl font-semibold text-ink">
                         {client.organizationName}
                     </div>
-                    <div className="mt-3 inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-sm text-ink-muted">
+                    <Badge
+                        size="md"
+                        colorClassName="border border-border bg-surface text-ink-muted"
+                        className="mt-3"
+                    >
                         Контактна особа: {client.contactPersonName ?? 'Не вказано'}
-                    </div>
+                    </Badge>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

@@ -19,11 +19,11 @@ import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
 
 import {
-    EMPLOYEE_POSITION_COLORS,
     EMPLOYEE_POSITION_LABELS,
     EMPLOYEE_POSITION_OPTIONS,
 } from '../../../utils/employeeLabels';
 import { isPhoneNumberValid } from '../../../utils/phone';
+import EmployeePositionBadge from '../../../components/badges/EmployeePositionBadge';
 
 interface Props {
     creating: boolean;
@@ -171,18 +171,10 @@ export default function CreateEmployeeModal({
                             getLabel={item => EMPLOYEE_POSITION_LABELS[item]}
                             getValue={item => item}
                             renderOption={item => (
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_POSITION_COLORS[item]}`}
-                                >
-                                    {EMPLOYEE_POSITION_LABELS[item]}
-                                </span>
+                                <EmployeePositionBadge position={item} />
                             )}
                             renderValue={item => (
-                                <span
-                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_POSITION_COLORS[item]}`}
-                                >
-                                    {EMPLOYEE_POSITION_LABELS[item]}
-                                </span>
+                                <EmployeePositionBadge position={item} />
                             )}
                         />
                     </FormField>

@@ -8,10 +8,10 @@ import type { PricingConfig } from '../../../types/pricingConfig';
 
 import Button from '../../../ui/Button';
 
-import { REPAIR_TYPE_COLORS, REPAIR_TYPE_LABELS } from '../../../utils/claimLabels';
 import { formatHours } from "../../../utils/formats/hourFormat";
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
+import RepairTypeBadge from '../../../components/badges/RepairTypeBadge';
 
 import EditPricingConfigModal from '../modals/EditPricingConfigModal';
 
@@ -80,9 +80,7 @@ export default function PricingConfigTab() {
                     >
                         <div className="flex flex-wrap items-start justify-between gap-3">
                             <div className="min-w-0">
-                                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${REPAIR_TYPE_COLORS[config.repairType]}`}>
-                                    {REPAIR_TYPE_LABELS[config.repairType]}
-                                </span>
+                                <RepairTypeBadge type={config.repairType} size="md" />
                                 <div className="mt-3 text-sm leading-6 text-ink-muted">
                                     {config.description?.trim() || 'Опис тарифу не вказаний'}
                                 </div>

@@ -15,11 +15,11 @@ import TableToolbar from '../../../ui/Table/TableToolbar';
 import { formatDateShort } from '../../../utils/formats/dateShortFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
 import {
-    EMPLOYEE_AVAILABILITY_COLORS,
     EMPLOYEE_AVAILABILITY_LABELS,
-    EMPLOYEE_POSITION_COLORS,
     EMPLOYEE_POSITION_LABELS,
 } from '../../../utils/employeeLabels';
+import EmployeeAvailabilityBadge from '../../../components/badges/EmployeeAvailabilityBadge';
+import EmployeePositionBadge from '../../../components/badges/EmployeePositionBadge';
 
 import CreateEmployeeModal from '../modals/CreateEmployeeModal';
 import EditEmployeeModal from '../modals/EditEmployeeModal';
@@ -72,13 +72,7 @@ export default function EmployeesListTab() {
             id: 'position',
             header: 'Посада',
             accessorFn: row => EMPLOYEE_POSITION_LABELS[row.position],
-            cell: ({ row }) => (
-                <span
-                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_POSITION_COLORS[row.original.position]}`}
-                >
-                    {EMPLOYEE_POSITION_LABELS[row.original.position]}
-                </span>
-            ),
+            cell: ({ row }) => <EmployeePositionBadge position={row.original.position} />,
         },
         {
             id: 'specialization',
@@ -95,13 +89,7 @@ export default function EmployeesListTab() {
             header: 'Статус',
             accessorFn: row =>
                 EMPLOYEE_AVAILABILITY_LABELS[row.availabilityStatus],
-            cell: ({ row }) => (
-                <span
-                    className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_AVAILABILITY_COLORS[row.original.availabilityStatus]}`}
-                >
-                    {EMPLOYEE_AVAILABILITY_LABELS[row.original.availabilityStatus]}
-                </span>
-            ),
+            cell: ({ row }) => <EmployeeAvailabilityBadge status={row.original.availabilityStatus} />,
         },
         {
             id: 'ratePerHour',

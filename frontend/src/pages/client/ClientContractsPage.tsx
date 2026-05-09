@@ -10,13 +10,13 @@ import type { ClientContract } from '../../types/clientContract/clientContract';
 import { Table, TableToolbar, type TableColumnDef } from '../../ui/Table';
 
 import {
-    CONTRACT_STATUS_COLORS,
-    CONTRACT_TYPE_COLORS,
     getContractStatusLabel,
     getContractTypeLabel,
 } from '../../utils/clientContractLabel';
 import { formatDateShort } from '../../utils/formats/dateShortFormat';
 import { formatPercent } from '../../utils/formats/percentFormat';
+import ContractStatusBadge from '../../components/badges/ContractStatusBadge';
+import ContractTypeBadge from '../../components/badges/ContractTypeBadge';
 
 import ViewClientContractModal from '../clients/modals/ViewClientContractModal';
 
@@ -61,21 +61,13 @@ export default function ClientContractsPage() {
             id: 'contractType',
             header: 'Тип',
             accessorFn: row => getContractTypeLabel(row.contractType),
-            cell: ({ row }) => (
-                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${CONTRACT_TYPE_COLORS[row.original.contractType]}`}>
-                    {getContractTypeLabel(row.original.contractType)}
-                </span>
-            ),
+            cell: ({ row }) => <ContractTypeBadge type={row.original.contractType} />,
         },
         {
             id: 'status',
             header: 'Статус',
             accessorFn: row => getContractStatusLabel(row.status),
-            cell: ({ row }) => (
-                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${CONTRACT_STATUS_COLORS[row.original.status]}`}>
-                    {getContractStatusLabel(row.original.status)}
-                </span>
-            ),
+            cell: ({ row }) => <ContractStatusBadge status={row.original.status} />,
         },
         {
             id: 'period',
@@ -100,7 +92,7 @@ export default function ClientContractsPage() {
                 </div>
             ),
         }
-    ], [handleView]);
+    ], []);
 
     if (!user?.clientId) {
         return (

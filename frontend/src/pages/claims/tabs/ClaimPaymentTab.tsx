@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { Payment, PaymentMethod } from '../../../types/payment';
-import { PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_COLORS } from '../../../utils/paymentLabels';
+import { PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS } from '../../../utils/paymentLabels';
 import { useInvoice } from '../../../hooks/useInvoice';
 import { usePayments } from '../../../hooks/usePayments';
 
@@ -14,6 +14,8 @@ import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from "../../../ui/Modal/ModalFooter";
 import FormField from "../../../ui/FormField";
 import { Table, TableToolbar, type TableColumnDef } from '../../../ui/Table';
+import PaymentStatusBadge from '../../../components/badges/PaymentStatusBadge';
+import Badge from '../../../components/badges/Badge';
 
 interface Props {
     claimId: number;
@@ -91,13 +93,7 @@ export default function ClaimPaymentTab({ claimId }: Props) {
             header: 'Статус',
             accessorFn: row => PAYMENT_STATUS_LABELS[row.status], // 🔑
             meta: { align: 'center' },
-            cell: ({ row }) => (
-                <span
-                    className={`px-2 py-0.5 rounded text-xs font-medium ${PAYMENT_STATUS_COLORS[row.original.status]}`}
-                >
-                {PAYMENT_STATUS_LABELS[row.original.status]}
-            </span>
-            ),
+            cell: ({ row }) => <PaymentStatusBadge status={row.original.status} shape="rounded" />,
         },
         {
             id: 'amount',
@@ -166,9 +162,13 @@ export default function ClaimPaymentTab({ claimId }: Props) {
                     </div>
 
                     {invoice.status === 'PAID' && (
-                        <span className="mt-1 inline-block px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                        <Badge
+                            shape="rounded"
+                            colorClassName="bg-green-100 text-green-700"
+                            className="mt-1"
+                        >
                             Рахунок закрито
-                        </span>
+                        </Badge>
                     )}
                 </div>
             </div>

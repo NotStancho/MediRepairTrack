@@ -15,6 +15,7 @@ import { Table, type TableColumnDef } from '../../../ui/Table';
 import TableToolbar from '../../../ui/Table/TableToolbar';
 
 import { formatDateTime } from '../../../utils/formats/dateFormat';
+import Badge from '../../../components/badges/Badge';
 
 import CreateRepairWorkModal from '../modals/CreateRepairWorkModal';
 import EditRepairWorkModal from '../modals/EditRepairWorkModal';
@@ -81,10 +82,10 @@ export default function RepairWorksTab() {
             accessorFn: row =>
                 complexityNames.get(row.complexityLevelId) ?? String(row.complexityLevelId),
             cell: ({ row }) => (
-                <span className="inline-flex rounded-full bg-brand-soft px-2 py-0.5 text-xs text-brand-strong">
+                <Badge colorClassName="bg-brand-soft text-brand-strong">
                     {complexityNames.get(row.original.complexityLevelId) ??
                         `Рівень #${row.original.complexityLevelId}`}
-                </span>
+                </Badge>
             ),
         },
         {

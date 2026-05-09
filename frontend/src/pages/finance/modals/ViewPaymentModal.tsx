@@ -8,14 +8,12 @@ import Button from '../../../ui/Button';
 import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
 
-import { INVOICE_STATUS_COLORS, INVOICE_STATUS_LABELS } from '../../../utils/invoiceLabels';
-import {
-    PAYMENT_METHOD_LABELS,
-    PAYMENT_STATUS_COLORS,
-    PAYMENT_STATUS_LABELS,
-} from '../../../utils/paymentLabels';
+import { INVOICE_STATUS_LABELS } from '../../../utils/invoiceLabels';
+import { PAYMENT_METHOD_LABELS } from '../../../utils/paymentLabels';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
+import InvoiceStatusBadge from '../../../components/badges/InvoiceStatusBadge';
+import PaymentStatusBadge from '../../../components/badges/PaymentStatusBadge';
 
 interface Props {
     payment: PaymentView;
@@ -68,12 +66,10 @@ export default function ViewPaymentModal({ payment, onClose }: Props) {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                            <span className={`inline-flex rounded-full px-3 py-1 text-sm ${PAYMENT_STATUS_COLORS[payment.status]}`}>
-                                {PAYMENT_STATUS_LABELS[payment.status]}
-                            </span>
-                            <span className={`inline-flex rounded-full px-3 py-1 text-sm ${INVOICE_STATUS_COLORS[payment.invoiceStatus]}`}>
+                            <PaymentStatusBadge status={payment.status} size="md" />
+                            <InvoiceStatusBadge status={payment.invoiceStatus} size="md">
                                 Рахунок: {INVOICE_STATUS_LABELS[payment.invoiceStatus]}
-                            </span>
+                            </InvoiceStatusBadge>
                         </div>
                     </div>
                 </div>

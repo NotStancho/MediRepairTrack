@@ -15,18 +15,12 @@ import Modal from '../../../../../ui/Modal/Modal';
 import ModalFooter from '../../../../../ui/Modal/ModalFooter';
 import { Table, type TableColumnDef } from '../../../../../ui/Table';
 
-import {
-    EMPLOYEE_POSITION_COLORS,
-    EMPLOYEE_POSITION_LABELS,
-} from '../../../../../utils/employeeLabels';
 import { formatDateTime } from '../../../../../utils/formats/dateFormat';
 import { formatHours } from '../../../../../utils/formats/hourFormat';
 import { formatMoney } from '../../../../../utils/formats/moneyFormat';
 import { formatPartQuantity } from '../../../../../utils/formats/partQuantityFormat';
-import {
-    ROLE_IN_CLAIM_COLORS,
-    ROLE_IN_CLAIM_LABELS,
-} from '../../../../../utils/roleInClaimLabels';
+import EmployeePositionBadge from '../../../../../components/badges/EmployeePositionBadge';
+import RoleInClaimBadge from '../../../../../components/badges/RoleInClaimBadge';
 
 interface Props {
     claimWork: ClaimWork;
@@ -203,9 +197,7 @@ export default function ViewClaimWorkModal({
                                 {formatHours(claimWork.timeSpent, '0 год')}
                             </span>
                             {employee && (
-                                <span className={`inline-flex rounded-full px-3 py-1 text-sm ${ROLE_IN_CLAIM_COLORS[employee.roleInClaim]}`}>
-                                    {ROLE_IN_CLAIM_LABELS[employee.roleInClaim]}
-                                </span>
+                                <RoleInClaimBadge role={employee.roleInClaim} size="md" />
                             )}
                         </div>
                     </div>
@@ -221,12 +213,8 @@ export default function ViewClaimWorkModal({
                                 </div>
                                 {employee ? (
                                     <div className="flex flex-wrap gap-2">
-                                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${EMPLOYEE_POSITION_COLORS[employee.position]}`}>
-                                            {EMPLOYEE_POSITION_LABELS[employee.position]}
-                                        </span>
-                                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${ROLE_IN_CLAIM_COLORS[employee.roleInClaim]}`}>
-                                            {ROLE_IN_CLAIM_LABELS[employee.roleInClaim]}
-                                        </span>
+                                        <EmployeePositionBadge position={employee.position} />
+                                        <RoleInClaimBadge role={employee.roleInClaim} />
                                     </div>
                                 ) : (
                                     <div className="text-xs text-ink-muted">

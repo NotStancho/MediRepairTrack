@@ -4,12 +4,10 @@ import type { Invoice } from '../../types/invoice';
 
 import { Table, TableToolbar, type TableColumnDef } from '../../ui/Table';
 
-import {
-    INVOICE_STATUS_COLORS,
-    INVOICE_STATUS_LABELS,
-} from '../../utils/invoiceLabels';
+import { INVOICE_STATUS_LABELS } from '../../utils/invoiceLabels';
 import { formatDateShort } from '../../utils/formats/dateShortFormat';
 import { formatMoney } from '../../utils/formats/moneyFormat';
+import InvoiceStatusBadge from '../../components/badges/InvoiceStatusBadge';
 
 interface Props {
     data: Invoice[];
@@ -67,11 +65,7 @@ export default function InvoicesTable({
                 id: 'status',
                 header: 'Статус',
                 accessorFn: row => INVOICE_STATUS_LABELS[row.status],
-                cell: ({ row }) => (
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${INVOICE_STATUS_COLORS[row.original.status]}`}>
-                        {INVOICE_STATUS_LABELS[row.original.status]}
-                    </span>
-                ),
+                cell: ({ row }) => <InvoiceStatusBadge status={row.original.status} />,
             },
             {
                 id: 'createdAt',

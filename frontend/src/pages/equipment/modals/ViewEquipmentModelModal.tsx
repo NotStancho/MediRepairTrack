@@ -11,7 +11,9 @@ import type { EquipmentModel } from '../../../types/equipmentModel/equipmentMode
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatDateShort } from '../../../utils/formats/dateShortFormat';
 
-import { EQUIPMENT_TYPE_COLORS, getEquipmentTypeLabel } from '../../../utils/equipmentLabel';
+import { getEquipmentTypeLabel } from '../../../utils/equipmentLabel';
+import EquipmentTypeBadge from '../../../components/badges/EquipmentTypeBadge';
+import Badge from '../../../components/badges/Badge';
 
 interface Props {
     model: EquipmentModel;
@@ -56,9 +58,13 @@ export default function ViewEquipmentModelModal({ model, onClose }: Props) {
                                 {model.modelName}
                             </div>
 
-                            <div className="mt-2 inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-sm text-ink-muted">
+                            <Badge
+                                size="md"
+                                colorClassName="border border-border bg-surface text-ink-muted"
+                                className="mt-2"
+                            >
                                 Виробник: {model.manufacturer}
-                            </div>
+                            </Badge>
                         </div>
 
                         <div className="shrink-0 rounded-xl border border-border bg-surface px-4 py-3 text-right">
@@ -66,9 +72,7 @@ export default function ViewEquipmentModelModal({ model, onClose }: Props) {
                                 Тип
                             </div>
                             <div className="mt-1 text-base font-semibold text-ink">
-                                <span className={`px-2 py-1 rounded text-xs ${EQUIPMENT_TYPE_COLORS[model.type]}`}>
-                                    {getEquipmentTypeLabel(model.type)}
-                                </span>
+                                <EquipmentTypeBadge type={model.type} shape="rounded" className="py-1" />
                             </div>
                         </div>
                     </div>

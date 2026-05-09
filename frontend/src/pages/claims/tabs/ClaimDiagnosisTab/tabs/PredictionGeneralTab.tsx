@@ -2,6 +2,7 @@
 
 import type { DiagnosisPrediction } from '../../../../../types/diagnosis/DSS/diagnosisPrediction';
 import { formatMoney } from '../../../../../utils/formats/moneyFormat';
+import Badge from '../../../../../components/badges/Badge';
 
 import { FiEdit2 } from 'react-icons/fi';
 
@@ -51,13 +52,19 @@ export default function PredictionGeneralTab({
                     </div>
 
                     <div className="flex gap-2 text-xs">
-                        <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-700">
+                        <Badge
+                            colorClassName="bg-blue-100 text-blue-700"
+                            shape="rounded"
+                        >
                             {prediction.predictionSource}
-                        </span>
+                        </Badge>
 
-                        <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+                        <Badge
+                            colorClassName="bg-gray-100 text-gray-600"
+                            shape="rounded"
+                        >
                             {prediction.modelVersion}
-                        </span>
+                        </Badge>
                     </div>
                 </div>
 

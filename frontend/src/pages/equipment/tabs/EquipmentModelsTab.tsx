@@ -14,7 +14,7 @@ import ConfirmBox from '../../../ui/ConfirmBox';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatDateShort } from '../../../utils/formats/dateShortFormat';
 
-import { EQUIPMENT_TYPE_COLORS, getEquipmentTypeLabel } from '../../../utils/equipmentLabel';
+import EquipmentTypeBadge from '../../../components/badges/EquipmentTypeBadge';
 
 import CreateEquipmentModelModal from '../modals/CreateEquipmentModelModal';
 import EditEquipmentModelModal from '../modals/EditEquipmentModelModal';
@@ -55,15 +55,9 @@ export default function EquipmentModelsTab() {
             id: 'type',
             header: 'Тип',
             accessorFn: row => row.type,
-            cell: ({ row }) => {
-                const type = row.original.type;
-
-                return (
-                    <span className={`px-2 py-1 rounded text-xs ${EQUIPMENT_TYPE_COLORS[type]}`}>
-                        {getEquipmentTypeLabel(type)}
-                    </span>
-                );
-            }
+            cell: ({ row }) => (
+                <EquipmentTypeBadge type={row.original.type} shape="rounded" className="py-1" />
+            )
         },
         {
             id: 'releaseDate',
