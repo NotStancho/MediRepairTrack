@@ -31,7 +31,7 @@ export const issueInvoice = async (invoiceId: number) =>
 
 export const updateInvoiceDueDate = async (
     invoiceId: number,
-    dueAt: string // ISO string
+    dueAt: string // ISO local date-time string
 ) =>
     (await api.patch(
         `/api/invoice/${invoiceId}/due-date`,

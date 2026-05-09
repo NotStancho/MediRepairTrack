@@ -4,6 +4,11 @@ import { INVOICE_ITEM_LABELS } from '../../../utils/invoiceLabels';
 import { useAuth } from '../../../context/AuthContext';
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../utils/formats/moneyFormat';
+import {
+    DUE_DATE_EXTENSION_MAX_DAYS,
+    getDueDateExtensionLimits,
+    toLocalDateTimePayload,
+} from '../../../utils/invoiceDueDate';
 import ConfirmBox from '../../../ui/ConfirmBox';
 import { useMemo, useState, useCallback } from 'react';
 import { useInvoice } from '../../../hooks/useInvoice';
@@ -45,6 +50,35 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [dueDateModalOpen, setDueDateModalOpen] = useState(false);
     const [newDueAt, setNewDueAt] = useState('');
+
+    const dueDateLimits = useMemo(
+        () => getDueDateExtensionLimits(invoice?.dueAt),
+        [invoice?.dueAt]
+    );
+
+    const dueDateValidationError = useMemo(() => {
+        if (!dueDateModalOpen) return '';
+
+        if (!dueDateLimits) {
+            return 'Неможливо визначити поточний термін оплати.';
+        }
+
+        if (!dueDateLimits.hasAllowedRange) {
+            return 'Для цього рахунку вже немає доступних дат у межах продовження.';
+        }
+
+        if (!newDueAt) {
+            return 'Оберіть новий термін оплати.';
+        }
+
+        const value = newDueAt.slice(0, 16);
+
+        if (value < dueDateLimits.min || value > dueDateLimits.max) {
+            return 'Дата має бути в дозволеному періоді.';
+        }
+
+        return '';
+    }, [dueDateLimits, dueDateModalOpen, newDueAt]);
 
     const [form, setForm] = useState<{
         description: string;
@@ -220,7 +254,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                 {/* LEFT */}
                 <div className="space-y-1">
                     <div>Створено: {formatDateTime(invoice.createdAt)}</div>
-                        {invoice.dueAt && (<div className="flex items-center gap-2">
+                    {invoice.dueAt && (<div className="flex items-center gap-2">
                             <span className={invoice.status === 'OVERDUE' ? 'text-red-700 font-medium' : 'text-orange-700'}>
                                 Оплатити до: {formatDateTime(invoice.dueAt)}
                             </span>
@@ -228,7 +262,7 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                             {canUpdateDueDate && (
                                 <button
                                     onClick={() => {
-                                        setNewDueAt(invoice.dueAt ?? '');
+                                        setNewDueAt(dueDateLimits?.hasAllowedRange ? dueDateLimits.min : '');
                                         setDueDateModalOpen(true);
                                     }}
                                     className="text-xs text-brand hover:underline"
@@ -428,12 +462,31 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
                     <FormField label="Новий термін оплати">
                         <input
                             type="datetime-local"
-                            value={newDueAt.slice(0, 16)}
+                            value={newDueAt}
+                            min={dueDateLimits?.min}
+                            max={dueDateLimits?.max}
+                            disabled={!dueDateLimits?.hasAllowedRange}
+                            aria-invalid={Boolean(dueDateValidationError)}
                             onChange={(e) =>
                                 setNewDueAt(e.target.value)
                             }
                             className={inputBase}
                         />
+                        {dueDateLimits?.hasAllowedRange ? (
+                            <p className="mt-2 text-xs text-ink-muted">
+                                Доступний період: {formatDateTime(dueDateLimits.min)} - {formatDateTime(dueDateLimits.max)}.
+                                Максимум +{DUE_DATE_EXTENSION_MAX_DAYS} днів від поточного терміну.
+                            </p>
+                        ) : (
+                            <p className="mt-2 text-xs text-red-700">
+                                Немає доступних дат для продовження в межах +{DUE_DATE_EXTENSION_MAX_DAYS} днів.
+                            </p>
+                        )}
+                        {dueDateValidationError && (
+                            <p className="mt-1 text-xs text-red-700">
+                                {dueDateValidationError}
+                            </p>
+                        )}
                     </FormField>
 
                     <ModalFooter>
@@ -446,9 +499,12 @@ export default function ClaimInvoiceTab({ claimId }: Props) {
 
                         <button
                             onClick={async () => {
-                                await updateDueDate(new Date(newDueAt).toISOString());
+                                if (dueDateValidationError) return;
+
+                                await updateDueDate(toLocalDateTimePayload(newDueAt));
                                 setDueDateModalOpen(false);
                             }}
+                            disabled={Boolean(dueDateValidationError)}
                             className={primaryButton}
                         >
                             Зберегти
