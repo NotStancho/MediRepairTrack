@@ -13,6 +13,7 @@ import FormField from '../../../ui/FormField';
 import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
 import Select from '../../../ui/Select';
+import ClaimStatusBadge from '../../../components/badges/ClaimStatusBadge';
 
 interface Props {
     claim: Claim;
@@ -79,6 +80,11 @@ export default function ClaimStatusUpdate({ claim, onUpdated }: Props) {
             {open && (
                 <Modal title="Оновити статус" onClose={closeModal} width="sm">
                     <div className="space-y-4 text-sm">
+                        <div className="flex items-center gap-2 text-ink-muted">
+                            <span>Поточний статус:</span>
+                            <ClaimStatusBadge status={claim.status} shape="rounded" />
+                        </div>
+
                         <FormField label="Новий статус">
                             <Select
                                 value={selected}
@@ -86,6 +92,12 @@ export default function ClaimStatusUpdate({ claim, onUpdated }: Props) {
                                 options={allowed}
                                 getLabel={(s) => CLAIM_STATUS_LABELS[s]}
                                 getValue={(s) => s}
+                                renderOption={(s) => (
+                                    <ClaimStatusBadge status={s} shape="rounded" />
+                                )}
+                                renderValue={(s) => (
+                                    <ClaimStatusBadge status={s} shape="rounded" />
+                                )}
                                 placeholder="Оберіть статус"
                                 loading={loadingAllowed}
                                 disabled={loadingAllowed || allowed.length === 0}
