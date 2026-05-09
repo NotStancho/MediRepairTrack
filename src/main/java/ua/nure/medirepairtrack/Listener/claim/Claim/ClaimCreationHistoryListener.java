@@ -19,16 +19,21 @@ public class ClaimCreationHistoryListener {
     @EventListener
     public void onClaimCreated(ClaimCreatedEvent event) {
 
+        Integer creatorEmployeeId =
+                event.creatorEmployeeId() != null
+                        ? event.creatorEmployeeId()
+                        : SystemEmployee.ID;
+
         log.info(
                 "[EVENT] ClaimCreated | claimId={} | creatorEmployeeId={} | status={} | repairType={}",
                 event.claimId(),
-                event.creatorEmployeeId(),
+                creatorEmployeeId,
                 event.status(),
                 event.repairType()
         );
 
         String description =
-                event.creatorEmployeeId() == null
+                SystemEmployee.ID.equals(creatorEmployeeId)
                         ? String.format(
                         "Заявка створена клієнтом. Тип ремонту: %s. Статус: %s",
                         event.repairType(),
@@ -40,14 +45,9 @@ public class ClaimCreationHistoryListener {
                         event.status()
                 );
 
-        Integer actorEmployeeId =
-                event.creatorEmployeeId() != null
-                        ? event.creatorEmployeeId()
-                        : SystemEmployee.ID;
-
         claimHistoryService.addSystemEvent(
                 event.claimId(),
-                actorEmployeeId,
+                creatorEmployeeId,
                 ActionType.SYSTEM_EVENT,
                 description
         );

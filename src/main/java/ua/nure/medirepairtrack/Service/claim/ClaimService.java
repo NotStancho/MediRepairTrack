@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.nure.medirepairtrack.Const.SystemEmployee;
 import ua.nure.medirepairtrack.DTO.claim.ClaimDTO.*;
 import ua.nure.medirepairtrack.Entity.billing.Invoice.Invoice;
 import ua.nure.medirepairtrack.Entity.billing.Invoice.InvoiceStatus;
@@ -72,8 +73,8 @@ public class ClaimService {
 
         claimRepository.save(claim);
 
-        // EVENT: creatorEmployeeId = null (створив клієнт)
-        publishClaimCreatedEvent(claim, null);
+        // EVENT: creatorEmployeeId = system employee (створив клієнт)
+        publishClaimCreatedEvent(claim, SystemEmployee.ID);
 
         return mapToResponse(claim);
     }
