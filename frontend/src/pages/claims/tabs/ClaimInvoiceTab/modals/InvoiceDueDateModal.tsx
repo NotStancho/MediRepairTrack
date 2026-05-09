@@ -1,3 +1,5 @@
+// pages/claims/tabs/ClaimInvoiceTab/modals/InvoiceDueDateModal.tsx
+
 import { useMemo, useState } from 'react';
 
 import Button from '../../../../../ui/Button';
@@ -10,7 +12,7 @@ import {
     DUE_DATE_EXTENSION_MAX_DAYS,
     getDueDateExtensionLimits,
     toLocalDateTimePayload,
-} from '../../../../../utils/invoiceDueDate';
+} from '../invoiceDueDate';
 
 interface Props {
     dueAt?: string | null;
