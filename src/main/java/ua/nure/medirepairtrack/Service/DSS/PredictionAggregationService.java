@@ -94,6 +94,12 @@ public class PredictionAggregationService {
                 .getClaim()
                 .getRepairType();
 
+        // Якщо тип ремонту ще не визначено, DSS використовує тариф післягарантійного ремонту
+        // як fallback для попередньої оцінки вартості.
+        if (repairType == RepairType.WAITING_DECISION) {
+            repairType = RepairType.POST_WARRANTY_REPAIR;
+        }
+
         PricingConfigResponseDTO config = pricingConfigService.getByRepairType(repairType);
 
         BigDecimal predictedHours = Optional
@@ -101,7 +107,6 @@ public class PredictionAggregationService {
                 .orElse(BigDecimal.ZERO);
 
         if (config.getLaborMinHours() != null && predictedHours.compareTo(config.getLaborMinHours()) < 0) {
-
             predictedHours = config.getLaborMinHours();
         }
 
@@ -111,13 +116,13 @@ public class PredictionAggregationService {
 
         BigDecimal partsCost = predictedWorkParts.stream()
                 .map(p ->
-                    p.getPart().getPrice()
-                            .multiply(p.getPredictedQuantity())
-                            .multiply(p.getProbabilityScore())
+                        p.getPart().getPrice()
+                                .multiply(p.getPredictedQuantity())
                 )
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        partsCost = partsCost.multiply(config.getPartsCoefficient());
+        partsCost = partsCost
+                .multiply(config.getPartsCoefficient());
 
         BigDecimal totalCost = laborCost.add(partsCost);
 
