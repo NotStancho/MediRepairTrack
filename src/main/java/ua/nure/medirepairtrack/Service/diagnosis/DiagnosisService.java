@@ -13,7 +13,7 @@ import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.DiagnosisStatus;
 import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.DiagnosisType;
 import ua.nure.medirepairtrack.Entity.employee.Employee.Employee;
-import ua.nure.medirepairtrack.Event.Diagnosis.DiagnosisCreatedEvent;
+import ua.nure.medirepairtrack.Event.Diagnosis.DiagnosisAutoCreatedEvent;
 import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.InvalidStatusTransitionException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
@@ -96,9 +96,7 @@ public class DiagnosisService {
 
         Diagnosis saved = diagnosisRepository.save(diagnosis);
 
-        eventPublisher.publishEvent(
-                new DiagnosisCreatedEvent(saved.getId())
-        );
+        eventPublisher.publishEvent(new DiagnosisAutoCreatedEvent(saved.getId(), claim.getId()));
 
         return map(saved);
     }

@@ -7,6 +7,7 @@ import ua.nure.medirepairtrack.Client.GeminiEmbedded.GeminiEmbeddingClient;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.DSS.ClaimEmbedding.ClaimEmbedding;
 import ua.nure.medirepairtrack.Repository.DSS.ClaimEmbeddingRepository;
+import ua.nure.medirepairtrack.Repository.claim.ClaimRepository;
 import ua.nure.medirepairtrack.util.EmbeddingConverter;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,20 @@ public class EmbeddingService {
 
     private final GeminiEmbeddingClient geminiClient;
     private final ClaimEmbeddingRepository claimEmbeddingRepository;
+    private final ClaimRepository claimRepository;
 
+    @Transactional
+    public void generateIfMissing(Integer claimId) {
+
+        if (claimEmbeddingRepository.existsById(claimId)) {
+            return;
+        }
+
+        Claim claim = claimRepository.findById(claimId)
+                .orElseThrow(() -> new IllegalArgumentException("Заявка не знайдена"));
+
+        generateEmbedding(claim);
+    }
     @Transactional
     public void generateIfMissing(Claim claim) {
 
