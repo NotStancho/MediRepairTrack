@@ -1,10 +1,10 @@
 // pages/claims/tabs/ClaimHistoryTab
 
-import { useClaimHistory } from '../../../hooks/useClaimHistory';
+import { useClaimHistory } from '../../../../hooks/useClaimHistory';
 
-import { formatDateTime } from '../../../utils/formats/dateFormat';
-import { HISTORY_ICONS } from '../../../utils/claimHistoryLabels';
-import EmployeePositionBadge from '../../../components/badges/EmployeePositionBadge';
+import { formatDateTime } from '../../../../utils/formats/dateFormat';
+import { HISTORY_ICONS } from '../../../../utils/claimHistoryLabels';
+import EmployeePositionBadge from '../../../../components/badges/EmployeePositionBadge';
 import ClaimHistoryDescription from './ClaimHistoryDescription';
 
 interface Props {
@@ -24,7 +24,7 @@ export default function ClaimHistoryTab({ claimId }: Props) {
             {items.map(item => {
                 const employee = item.employee;
                 const meta = HISTORY_ICONS[item.actionType];
-                const showEmployee = item.actionType !== 'SYSTEM_EVENT' && employee;
+                const showEmployee = employee && employee.position !== 'SYSTEM';
 
                 return (
                     <div key={item.id} className="relative flex gap-4">

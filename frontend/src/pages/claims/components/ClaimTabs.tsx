@@ -8,7 +8,7 @@ import Tabs from '../../../ui/Tabs';
 import type { TabItem } from '../../../ui/Tabs';
 
 import ClaimDetailsTab from '../tabs/ClaimDetailsTab';
-import ClaimHistoryTab from '../tabs/ClaimHistoryTab';
+import ClaimHistoryTab from '../tabs/ClaimHistoryTab/ClaimHistoryTab';
 import ClaimDiagnosisTab from '../tabs/ClaimDiagnosisTab/ClaimDiagnosisTab';
 import ClaimEmployeesTab from '../tabs/ClaimEmployeesTab/ClaimEmployeesTab';
 import ClaimWorksTab from '../tabs/ClaimWorksTab/ClaimWorksTab';

@@ -2,20 +2,20 @@
 
 import type { ReactNode } from 'react';
 
-import type { RoleInClaim } from '../../../types/claim/assignedClaim';
-import type { ClaimHistory } from '../../../types/claim/claimHistory';
-import type { ClaimStatus } from '../../../types/claim/claim';
-import type { DeliveryProvider, DeliveryStatus, DeliveryType } from '../../../types/delivery';
-import type { InvoiceStatus } from '../../../types/invoice';
+import type { RoleInClaim } from '../../../../types/claim/assignedClaim';
+import type { ClaimHistory } from '../../../../types/claim/claimHistory';
+import type { ClaimStatus } from '../../../../types/claim/claim';
+import type { DeliveryProvider, DeliveryStatus, DeliveryType } from '../../../../types/delivery';
+import type { InvoiceStatus } from '../../../../types/invoice';
 
-import { DELIVERY_PROVIDER_LABELS, DELIVERY_STATUS_LABELS, DELIVERY_TYPE_LABELS } from '../../../utils/deliveryLabels';
-import { INVOICE_STATUS_LABELS } from '../../../utils/invoiceLabels';
+import { DELIVERY_PROVIDER_LABELS, DELIVERY_STATUS_LABELS, DELIVERY_TYPE_LABELS } from '../../../../utils/deliveryLabels';
+import { INVOICE_STATUS_LABELS } from '../../../../utils/invoiceLabels';
 
-import ClaimStatusBadge from '../../../components/badges/ClaimStatusBadge';
-import DeliveryStatusBadge from '../../../components/badges/DeliveryStatusBadge';
-import DeliveryTypeBadge from '../../../components/badges/DeliveryTypeBadge';
-import InvoiceStatusBadge from '../../../components/badges/InvoiceStatusBadge';
-import RoleInClaimBadge from '../../../components/badges/RoleInClaimBadge';
+import ClaimStatusBadge from '../../../../components/badges/ClaimStatusBadge';
+import DeliveryStatusBadge from '../../../../components/badges/DeliveryStatusBadge';
+import DeliveryTypeBadge from '../../../../components/badges/DeliveryTypeBadge';
+import InvoiceStatusBadge from '../../../../components/badges/InvoiceStatusBadge';
+import RoleInClaimBadge from '../../../../components/badges/RoleInClaimBadge';
 
 interface Props {
     item: ClaimHistory;
