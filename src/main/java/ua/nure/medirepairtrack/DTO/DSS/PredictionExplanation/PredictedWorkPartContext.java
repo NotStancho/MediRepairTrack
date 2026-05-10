@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class PredictedPartContext {
+public class PredictedWorkPartContext {
 
     private String partName;
     private BigDecimal probability;

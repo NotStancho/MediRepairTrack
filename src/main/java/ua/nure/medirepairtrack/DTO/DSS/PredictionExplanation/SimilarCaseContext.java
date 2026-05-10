@@ -8,11 +8,9 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class SimilarCaseContext {
-
+    private Integer claimId;
     private String equipmentModel;
-
     private String defectDescription;
-
     private BigDecimal similarityScore;
 
 }
