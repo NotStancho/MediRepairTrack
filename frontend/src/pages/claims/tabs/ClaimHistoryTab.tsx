@@ -1,105 +1,30 @@
 // pages/claims/tabs/ClaimHistoryTab
 
-import { useEffect, useState } from 'react';
-import type { ClaimHistory } from '../../../types/claim/claimHistory';
-import type { Employee } from '../../../types/employee/employee';
-
-import { getClaimHistory } from '../../../api/claimHistory';
-import { getEmployeeById } from '../../../api/employee';
+import { useClaimHistory } from '../../../hooks/useClaimHistory';
 
 import { formatDateTime } from '../../../utils/formats/dateFormat';
 import { HISTORY_ICONS } from '../../../utils/claimHistoryLabels';
-import type { ClaimStatus } from '../../../types/claim/claim';
 import EmployeePositionBadge from '../../../components/badges/EmployeePositionBadge';
-import ClaimStatusBadge from '../../../components/badges/ClaimStatusBadge';
+import ClaimHistoryDescription from './ClaimHistoryDescription';
 
 interface Props {
     claimId: number;
 }
 
-const STATUS_TRANSITION_REGEX = /([A-Z_]+)\s*→\s*([A-Z_]+)/;
-
 export default function ClaimHistoryTab({ claimId }: Props) {
-    const [items, setItems] = useState<ClaimHistory[]>([]);
-    const [employees, setEmployees] = useState<Record<number, Employee>>({});
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        const load = async () => {
-            setLoading(true);
-
-            const history = await getClaimHistory(claimId);
-
-            const sorted = [...history].sort(
-                (a, b) =>
-                    new Date(b.actionDate).getTime() -
-                    new Date(a.actionDate).getTime()
-            );
-
-            if (cancelled) return;
-
-            setItems(sorted);
-
-            const ids = Array.from(
-                new Set(sorted.map(h => h.employeeId).filter(Boolean))
-            );
-
-            const missing = ids.filter(id => !employees[id]);
-            if (missing.length) {
-                const results = await Promise.all(
-                    missing.map(id => getEmployeeById(id))
-                );
-
-                if (!cancelled) {
-                    setEmployees(prev => {
-                        const copy = { ...prev };
-                        results.forEach(emp => (copy[emp.id] = emp));
-                        return copy;
-                    });
-                }
-            }
-
-            setLoading(false);
-        };
-
-        void load();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [claimId, employees]);
+    const { data: items, loading } = useClaimHistory(claimId);
 
     if (loading) return <div>Завантаження історії…</div>;
     if (!items.length) return <div className="text-sm text-ink-muted">Історія порожня</div>;
-
-    function parseStatusTransition(text: string): {
-        from: ClaimStatus;
-        to: ClaimStatus;
-    } | null {
-        const match = text.match(STATUS_TRANSITION_REGEX);
-
-        if (!match) return null;
-
-        return {
-            from: match[1] as ClaimStatus,
-            to: match[2] as ClaimStatus,
-        };
-    }
 
     return (
         <div className="relative pl-8 space-y-6">
             <div className="absolute left-3 top-0 bottom-0 w-px bg-border" />
 
             {items.map(item => {
-                const employee = employees[item.employeeId];
+                const employee = item.employee;
                 const meta = HISTORY_ICONS[item.actionType];
-
-                const statusTransition =
-                    item.actionType === 'STATUS_CHANGE'
-                        ? parseStatusTransition(item.description)
-                        : null;
+                const showEmployee = item.actionType !== 'SYSTEM_EVENT' && employee;
 
                 return (
                     <div key={item.id} className="relative flex gap-4">
@@ -116,36 +41,14 @@ export default function ClaimHistoryTab({ claimId }: Props) {
                                 {meta.label}
                             </div>
 
-                            {employee && (
-                                <div className="text-xs text-ink-muted">
-                                    {employee.userLastName} {employee.userFirstName}
-                                    {' • '}
+                            {showEmployee && (
+                                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+                                    <span>{employee.lastName} {employee.firstName}</span>
                                     <EmployeePositionBadge position={employee.position} />
                                 </div>
                             )}
 
-                            {statusTransition && (
-                                <div className="text-sm mt-1 text-ink-muted">
-                                    Статус заявки змінено:{' '}
-                                    <ClaimStatusBadge
-                                        status={statusTransition.from}
-                                        shape="rounded"
-                                        className="mx-1"
-                                    />
-                                    →
-                                    <ClaimStatusBadge
-                                        status={statusTransition.to}
-                                        shape="rounded"
-                                        className="ml-1"
-                                    />
-                                </div>
-                            )}
-
-                            {!statusTransition && item.description && (
-                                <div className="text-sm text-ink whitespace-pre-line mt-1">
-                                    {item.description}
-                                </div>
-                            )}
+                            <ClaimHistoryDescription item={item} />
                         </div>
                     </div>
                 );

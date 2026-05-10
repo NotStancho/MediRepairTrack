@@ -2,6 +2,7 @@ package ua.nure.medirepairtrack.DTO.claim.ClaimHistoryDTO;
 
 import lombok.Builder;
 import lombok.Data;
+import ua.nure.medirepairtrack.DTO.employee.EmployeeDTO.EmployeeShortDTO;
 import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ActionType;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ public class ClaimHistoryResponseDTO {
     private Integer id;
     private Integer claimId;
     private Integer employeeId;
+    private EmployeeShortDTO employee;
     private ActionType actionType;
     private String description;
     private LocalDateTime actionDate;

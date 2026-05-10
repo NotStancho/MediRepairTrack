@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.claim.ClaimHistoryDTO.ClaimHistoryResponseDTO;
 import ua.nure.medirepairtrack.DTO.claim.ClaimHistoryDTO.CreateCommentDTO;
+import ua.nure.medirepairtrack.DTO.employee.EmployeeDTO.EmployeeShortDTO;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
 import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ActionType;
 import ua.nure.medirepairtrack.Entity.claim.ClaimHistory.ClaimHistory;
@@ -74,10 +75,19 @@ public class ClaimHistoryService {
     }
 
     private ClaimHistoryResponseDTO map(ClaimHistory h) {
+        Employee employee = h.getEmployee();
+
         return ClaimHistoryResponseDTO.builder()
                 .id(h.getId())
                 .claimId(h.getClaim().getId())
                 .employeeId(h.getEmployee().getId())
+                .employee(EmployeeShortDTO.builder()
+                        .id(employee.getId())
+                        .firstName(employee.getUser().getFirstName())
+                        .lastName(employee.getUser().getLastName())
+                        .position(employee.getPosition())
+                        .availabilityStatus(employee.getAvailabilityStatus())
+                        .build())
                 .actionType(h.getActionType())
                 .description(h.getActionDescription())
                 .actionDate(h.getActionDate())
