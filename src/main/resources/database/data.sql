@@ -12,7 +12,7 @@ VALUES
 
 INSERT INTO `client` (fk_user, organization_name, organization_email, organization_phone_number, contact_person_name, address, notes)
 VALUES
-    (5, 'Харківська міська клінічна лікарня №31', 'info@clinic.ua', '+380441234567', 'Олег Коваль', 'м. Київ, вул. Шевченка, 12', 'Пріоритетний клієнт, потрібна швидка реакція'),
+    (5, 'Харківська міська клінічна лікарня №31', 'info@clinic.ua', '+380441234567', 'Олег Коваль', 'м. Харків, проспект Любові Малої, 4', 'Пріоритетний клієнт, потрібна швидка реакція'),
     (NULL, 'Приватна лабораторія БіоТест', 'office@biotest.ua', '+380442345678', 'Анна Мельник', 'м. Львів, просп. Науки, 7', 'Без облікового запису, комунікація телефоном або електронною поштою');
 
 INSERT INTO `employee` (fk_user, position, rate_per_hour, specialization, availability_status, hire_date)
