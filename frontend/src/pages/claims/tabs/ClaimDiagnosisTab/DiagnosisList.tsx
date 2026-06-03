@@ -43,17 +43,21 @@ export default function DiagnosisList({
 
                                           creatingPrediction, onCreatePrediction,
                                       }: Props) {
-    const [openPredictionId, setOpenPredictionId] = useState<number | null>(null);
+    const [openPredictionIds, setOpenPredictionIds] = useState<Set<number>>(() => new Set());
 
     const togglePrediction = (id: number) => {
-        setOpenPredictionId(prev => (prev === id ? null : id));
+        setOpenPredictionIds(prev => {
+            const next = new Set(prev);
+
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+
+            return next;
+        });
         onSelect(id);
-    };
-    const handleSelect = (id: number) => {
-        onSelect(id);
-        if (openPredictionId !== id) {
-            setOpenPredictionId(null);
-        }
     };
 
     if (!diagnoses.length) {
@@ -71,7 +75,7 @@ export default function DiagnosisList({
                     key={diagnosis.id}
                     diagnosis={diagnosis}
                     selected={diagnosis.id === selectedDiagnosisId}
-                    onClick={() => handleSelect(diagnosis.id)}
+                    onClick={() => onSelect(diagnosis.id)}
                     onEdit={() => onEdit(diagnosis)}
 
                     allowedStatuses={
@@ -89,12 +93,19 @@ export default function DiagnosisList({
                     onConfirm={() => onConfirm(diagnosis)}
                     onReject={() => onReject(diagnosis)}
                     onArchive={() => onArchive(diagnosis)}
-                    onDelete={() => onDelete(diagnosis)}
+                    onDelete={() => {
+                        onDelete(diagnosis);
+                        setOpenPredictionIds(prev => {
+                            const next = new Set(prev);
+                            next.delete(diagnosis.id);
+                            return next;
+                        });
+                    }}
 
                     creatingPrediction={creatingPrediction}
                     onCreatePrediction={onCreatePrediction}
 
-                    isPredictionOpen={openPredictionId === diagnosis.id}
+                    isPredictionOpen={openPredictionIds.has(diagnosis.id)}
                     onTogglePrediction={() => togglePrediction(diagnosis.id)}
                 />
             ))}
