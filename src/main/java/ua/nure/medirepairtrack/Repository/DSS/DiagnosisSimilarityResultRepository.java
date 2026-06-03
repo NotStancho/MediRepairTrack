@@ -10,6 +10,16 @@ import java.util.List;
 
 public interface DiagnosisSimilarityResultRepository extends JpaRepository<DiagnosisSimilarityResult, DiagnosisSimilarityResultId> {
 
+    @Query("""
+            select r
+            from DiagnosisSimilarityResult r
+            join fetch r.prediction
+            join fetch r.similarClaim c
+            join fetch c.equipment e
+            join fetch e.model
+            where r.prediction.id = :predictionId
+            order by r.rankPosition
+            """)
     List<DiagnosisSimilarityResult> findByPredictionIdOrderByRankPosition(Integer predictionId);
 
     @Query("SELECT MAX(r.rankPosition) FROM DiagnosisSimilarityResult r WHERE r.prediction.id = :predictionId")
