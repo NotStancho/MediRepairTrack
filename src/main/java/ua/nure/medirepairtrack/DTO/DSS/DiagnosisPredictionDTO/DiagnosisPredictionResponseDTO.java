@@ -31,4 +31,5 @@ public class DiagnosisPredictionResponseDTO {
     private String modelVersion;
 
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

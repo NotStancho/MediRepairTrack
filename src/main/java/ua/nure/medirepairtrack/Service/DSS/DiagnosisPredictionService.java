@@ -31,6 +31,7 @@ public class DiagnosisPredictionService {
     private final ComplexityLevelService complexityLevelService;
 
     private final PredictionAggregationService predictionAggregationService;
+    private final PredictionExplanationService predictionExplanationService;
 
     private final PredictionStateService predictionStateService;
 
@@ -162,6 +163,38 @@ public class DiagnosisPredictionService {
     }
 
     @Transactional
+    public DiagnosisPredictionResponseDTO regenerateExplanation(Integer id) {
+
+        DiagnosisPrediction prediction = getDiagnosisPredictionEntity(id);
+        Diagnosis diagnosis = prediction.getDiagnosis();
+
+        if (!diagnosisStatusMachine.allowsDiagnosisEdit(diagnosis.getStatus())) {
+            throw new OperationNotAllowedException(
+                    StatusMessageUtil.denied(
+                            "перегенерувати пояснення прогнозу діагностики",
+                            diagnosis.getStatus(),
+                            diagnosisStatusMachine.allowedDiagnosisEditStatuses()
+                    )
+            );
+        }
+
+        if (prediction.getPredictionSource() != PredictionSource.AUTOMATED) {
+            throw new OperationNotAllowedException("Перегенерація пояснення доступна тільки для автоматичного прогнозу");
+        }
+
+        String explanation = predictionExplanationService.generateExplanation(
+                predictionExplanationService.build(prediction)
+        );
+
+        prediction.setPredictionExplanation(explanation);
+        prediction.setUpdatedAt(LocalDateTime.now());
+
+        DiagnosisPrediction saved = diagnosisPredictionRepository.save(prediction);
+
+        return map(saved);
+    }
+
+    @Transactional
     public void deletePrediction(Integer id) {
         DiagnosisPrediction prediction = getDiagnosisPredictionEntity(id);
         Diagnosis diagnosis = prediction.getDiagnosis();
@@ -209,6 +242,7 @@ public class DiagnosisPredictionService {
                 .confidenceScore(p.getConfidenceScore())
                 .modelVersion(p.getModelVersion())
                 .createdAt(p.getCreatedAt())
+                .updatedAt(p.getUpdatedAt())
                 .build();
     }
 }

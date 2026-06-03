@@ -22,11 +22,15 @@ const tabs: TabItem[] = [
 interface Props {
     prediction: DiagnosisPrediction;
     onRecalculate?: () => void;
+    onRegenerateExplanation?: () => void;
+    regeneratingExplanation?: boolean;
     onEdit?: () => void;
 }
 
 export default function PredictionTabs({ prediction,
                                            onRecalculate,
+                                           onRegenerateExplanation,
+                                           regeneratingExplanation,
                                            onEdit
                                         }: Props) {
     const [active, setActive] = useState('general');
@@ -37,6 +41,8 @@ export default function PredictionTabs({ prediction,
                 <PredictionGeneralTab
                     prediction={prediction}
                     onRecalculate={onRecalculate}
+                    onRegenerateExplanation={onRegenerateExplanation}
+                    regeneratingExplanation={regeneratingExplanation}
                     onEdit={onEdit}
                 />
             )}

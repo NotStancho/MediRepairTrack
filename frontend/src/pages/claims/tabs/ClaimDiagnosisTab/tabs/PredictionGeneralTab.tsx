@@ -2,24 +2,32 @@
 
 import type { DiagnosisPrediction } from '../../../../../types/diagnosis/DSS/diagnosisPrediction';
 import { formatMoney } from '../../../../../utils/formats/moneyFormat';
+import { formatDateTime } from '../../../../../utils/formats/dateFormat';
 import Badge from '../../../../../components/badges/Badge';
 
-import { FiEdit2 } from 'react-icons/fi';
+import { FiEdit2, FiRefreshCw } from 'react-icons/fi';
 
 interface Props {
     prediction: DiagnosisPrediction;
     onRecalculate?: () => void;
+    onRegenerateExplanation?: () => void;
+    regeneratingExplanation?: boolean;
     onEdit?: () => void;
 }
 
 export default function PredictionGeneralTab({
                                            prediction,
                                            onRecalculate,
+                                           onRegenerateExplanation,
+                                           regeneratingExplanation,
                                            onEdit
                                        }: Props) {
 
     const formatPercent = (value: number) =>
         `${(value * 100).toFixed(1)}%`;
+
+    const canRegenerateExplanation =
+        prediction.predictionSource === 'AUTOMATED' && !!onRegenerateExplanation;
 
     return (
         <div className="relative space-y-4">
@@ -65,6 +73,14 @@ export default function PredictionGeneralTab({
                         >
                             {prediction.modelVersion}
                         </Badge>
+                        <div>
+                            <div className="text-xs text-ink-muted">
+                                Створено: {formatDateTime(prediction.createdAt)}
+                                {prediction.updatedAt && (
+                                    <>, оновлено: {formatDateTime(prediction.updatedAt)}</>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -109,8 +125,33 @@ export default function PredictionGeneralTab({
             </div>
 
             <div>
-                <div className="text-ink-muted mb-1 text-sm">
-                    Пояснення
+                <div className="flex items-center justify-between gap-3 mb-1">
+                    <div className="text-ink-muted text-sm">
+                        Пояснення
+                    </div>
+
+                    {canRegenerateExplanation && (
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                void onRegenerateExplanation?.();
+                            }}
+                            disabled={regeneratingExplanation}
+                            className="
+                                inline-flex items-center gap-1.5
+                                text-xs font-medium text-brand
+                                hover:underline
+                                disabled:cursor-not-allowed disabled:text-ink-muted disabled:no-underline
+                            "
+                        >
+                            <FiRefreshCw
+                                size={13}
+                                className={regeneratingExplanation ? 'animate-spin' : ''}
+                            />
+                            {regeneratingExplanation ? 'Генерація...' : 'Перегенерувати'}
+                        </button>
+                    )}
                 </div>
 
                 <div className="

@@ -8,7 +8,8 @@ import {
     createManualPrediction,
     updatePrediction,
     deletePrediction,
-    recalculatePrediction
+    recalculatePrediction,
+    regeneratePredictionExplanation
 } from '../../api/diagnosis/dss/diagnosisPrediction';
 
 import type {
@@ -24,6 +25,7 @@ export function usePrediction(diagnosisId: number) {
     const [updating, setUpdating] = useState(false);
     const [removing, setRemoving] = useState(false);
     const [recalculating, setRecalculating] = useState(false);
+    const [regeneratingExplanation, setRegeneratingExplanation] = useState(false);
 
     const load = useCallback(async (cancelled?: () => boolean) => {
         if (!diagnosisId) {
@@ -95,6 +97,17 @@ export function usePrediction(diagnosisId: number) {
         }
     };
 
+    const regenerateExplanation = async (id: number) => {
+        setRegeneratingExplanation(true);
+        try {
+            const updated = await regeneratePredictionExplanation(id);
+            setPrediction(updated);
+            return updated;
+        } finally {
+            setRegeneratingExplanation(false);
+        }
+    };
+
     return {
         prediction,
         loading,
@@ -103,11 +116,13 @@ export function usePrediction(diagnosisId: number) {
         updating,
         removing,
         recalculating,
+        regeneratingExplanation,
 
         create,
         update,
         remove,
         recalculate,
+        regenerateExplanation,
 
         refresh: load
     };

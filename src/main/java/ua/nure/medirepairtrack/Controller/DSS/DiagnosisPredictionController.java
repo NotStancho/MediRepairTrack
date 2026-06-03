@@ -40,6 +40,11 @@ public class DiagnosisPredictionController {
         predictionAggregationService.recalculate(predictionId);
     }
 
+    @PostMapping("/{predictionId}/regenerate-explanation")
+    public DiagnosisPredictionResponseDTO regenerateExplanation(@PathVariable Integer predictionId) {
+        return service.regenerateExplanation(predictionId);
+    }
+
     // Отримання конкретного прогнозу
     @GetMapping("/{predictionId}")
     public DiagnosisPredictionResponseDTO getById(@PathVariable Integer predictionId) {

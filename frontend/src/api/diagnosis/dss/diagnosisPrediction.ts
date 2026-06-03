@@ -45,3 +45,10 @@ export const deletePrediction = async (id: number): Promise<void> => {
 export const recalculatePrediction = async (id: number): Promise<void> => {
     await api.post(`/api/predictions/${id}/recalculate`);
 };
+
+export const regeneratePredictionExplanation = async (
+    id: number
+): Promise<DiagnosisPrediction> => {
+    const res = await api.post<RawPrediction>(`/api/predictions/${id}/regenerate-explanation`);
+    return mapPrediction(res.data);
+};

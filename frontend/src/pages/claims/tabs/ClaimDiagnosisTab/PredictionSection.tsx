@@ -16,7 +16,9 @@ export default function PredictionSection({ diagnosisId }: Props) {
         loading,
         update,
         updating,
-        recalculate
+        recalculate,
+        regenerateExplanation,
+        regeneratingExplanation
     } = usePrediction(diagnosisId);
 
     const [editOpen, setEditOpen] = useState(false);
@@ -38,6 +40,8 @@ export default function PredictionSection({ diagnosisId }: Props) {
             <PredictionTabs
                 prediction={prediction}
                 onRecalculate={() => recalculate(prediction.id)}
+                onRegenerateExplanation={() => regenerateExplanation(prediction.id)}
+                regeneratingExplanation={regeneratingExplanation}
                 onEdit={() => setEditOpen(true)}
             />
 
