@@ -104,7 +104,7 @@ public class DiagnosisPredictionService {
                 .predictionSource(PredictionSource.AUTOMATED)
                 .predictedCost(BigDecimal.ZERO)
                 .predictedTimeHours(BigDecimal.ZERO)
-                .predictionExplanation("AI analysis pending")
+                .predictionExplanation("Пояснення прогнозу ще не сформовано")
                 .predictedWarrantyProbability(BigDecimal.ZERO)
                 .confidenceScore(BigDecimal.ZERO)
                 .modelVersion("similarity-v1")
@@ -114,8 +114,17 @@ public class DiagnosisPredictionService {
         DiagnosisPrediction savedPrediction = diagnosisPredictionRepository.save(prediction);
 
         predictionAggregationService.generatePredictionData(savedPrediction);
+        applyPredictionInitialValuesToDiagnosis(savedPrediction);
 
         return savedPrediction;
+    }
+
+    private void applyPredictionInitialValuesToDiagnosis(DiagnosisPrediction prediction) {
+        Diagnosis diagnosis = prediction.getDiagnosis();
+
+        diagnosis.setEstimatedCost(prediction.getPredictedCost());
+        diagnosis.setEstimatedTimeHours(prediction.getPredictedTimeHours());
+        diagnosis.setPreliminaryConclusion("Система сформувала попередню рекомендацію. Остаточний висновок має підтвердити інженер.");
     }
 
     @Transactional
