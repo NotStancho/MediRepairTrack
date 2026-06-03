@@ -1,0 +1,447 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+title Діаграма класів для реалізації функції інтелектуальної підтримки діагностування дефектів
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+' =========================
+' Controller
+' =========================
+    class DiagnosisController {
+        +createManual(dto: CreateManualDiagnosisDTO): DiagnosisResponseDTO
+        +createAuto(dto: CreateAutoDiagnosisDTO): DiagnosisResponseDTO
+        +update(id: Integer, dto: UpdateDiagnosisDTO): DiagnosisResponseDTO
+        +delete(id: Integer): void
+        +confirm(id: Integer, engineerId: Integer): DiagnosisResponseDTO
+        +reject(id: Integer): DiagnosisResponseDTO
+        +archive(id: Integer): DiagnosisResponseDTO
+        +getById(id: Integer): DiagnosisResponseDTO
+        +getByClaim(claimId: Integer): List<DiagnosisResponseDTO>
+        +getAllowedStatuses(id: Integer): Set<DiagnosisStatus>
+    }
+
+    class DiagnosisPredictionController {
+        +createManual(dto: CreateManualPredictionDTO): DiagnosisPredictionResponseDTO
+        +update(predictionId: Integer, dto: UpdatePredictionDTO): DiagnosisPredictionResponseDTO
+        +delete(predictionId: Integer): void
+        +recalculatePredictions(predictionId: Integer): void
+        +getById(predictionId: Integer): DiagnosisPredictionResponseDTO
+        +getAllByDiagnosisId(diagnosisId: Integer): List<DiagnosisPredictionResponseDTO>
+    }
+
+
+' =========================
+' DTO
+' =========================
+'    class CreateManualDiagnosisDTO {
+'        +claimId: Integer
+'        +engineerId: Integer
+'        +preliminaryConclusion: String
+'        +estimatedCost: BigDecimal
+'        +estimatedTimeHours: BigDecimal
+'    }
+'
+'    class CreateAutoDiagnosisDTO {
+'        +claimId: Integer
+'    }
+'
+'    class UpdateDiagnosisDTO {
+'        +preliminaryConclusion: String
+'        +finalConclusion: String
+'        +estimatedCost: BigDecimal
+'        +estimatedTimeHours: BigDecimal
+'    }
+'
+'    class DiagnosisResponseDTO {
+'        +id: Integer
+'        +claimId: Integer
+'        +engineerId: Integer
+'        +preliminaryConclusion: String
+'        +finalConclusion: String
+'        +estimatedCost: BigDecimal
+'        +estimatedTimeHours: BigDecimal
+'        +diagnosisType: DiagnosisType
+'        +status: DiagnosisStatus
+'        +hasPrediction: Boolean
+'    }
+'
+'    class CreateManualPredictionDTO {
+'        +diagnosisId: Integer
+'        +predictedComplexityLevelId: Integer
+'        +predictedCost: BigDecimal
+'        +predictedTimeHours: BigDecimal
+'        +predictionExplanation: String
+'    }
+'
+'    class UpdatePredictionDTO {
+'        +predictedComplexityLevelId: Integer
+'        +predictedCost: BigDecimal
+'        +predictedTimeHours: BigDecimal
+'        +predictionExplanation: String
+'    }
+'
+'    class DiagnosisPredictionResponseDTO {
+'        +id: Integer
+'        +diagnosisId: Integer
+'        +predictedComplexityLevelId: Integer
+'        +predictionSource: PredictionSource
+'        +predictedCost: BigDecimal
+'        +predictedTimeHours: BigDecimal
+'        +predictionExplanation: String
+'        +predictedWarrantyProbability: BigDecimal
+'        +confidenceScore: BigDecimal
+'        +modelVersion: String
+'    }
+
+' =========================
+' Service
+' =========================
+    class DiagnosisService {
+        +createManualDiagnosis(dto: CreateManualDiagnosisDTO): DiagnosisResponseDTO
+        +createAutoDiagnosis(dto: CreateAutoDiagnosisDTO): DiagnosisResponseDTO
+        +updateDiagnosis(id: Integer, dto: UpdateDiagnosisDTO): DiagnosisResponseDTO
+        +deleteDiagnosis(id: Integer): void
+        +confirmDiagnosis(id: Integer, engineerId: Integer): DiagnosisResponseDTO
+        +rejectDiagnosis(id: Integer): DiagnosisResponseDTO
+        +archiveDiagnosis(id: Integer): DiagnosisResponseDTO
+        +getAllowedNextStatuses(diagnosisId: Integer): Set<DiagnosisStatus>
+        +getDiagnosisEntity(id: Integer): Diagnosis
+        +getDiagnosis(id: Integer): DiagnosisResponseDTO
+        +getClaimDiagnoses(claimId: Integer): List<DiagnosisResponseDTO>
+    }
+
+    class DiagnosisPredictionService {
+        +createManualPrediction(dto: CreateManualPredictionDTO): DiagnosisPredictionResponseDTO
+        +generateAutoPrediction(diagnosisId: Integer): DiagnosisPrediction
+        +updatePrediction(id: Integer, dto: UpdatePredictionDTO): DiagnosisPredictionResponseDTO
+        +deletePrediction(id: Integer): void
+        +getById(id: Integer): DiagnosisPredictionResponseDTO
+        +getAllByDiagnosisId(diagnosisId: Integer): List<DiagnosisPredictionResponseDTO>
+        +getDiagnosisPredictionEntity(id: Integer): DiagnosisPrediction
+    }
+
+    class PredictionAggregationService {
+        +generatePredictionData(...): void
+        +calculatePredictedTimeHours(...): void
+        +calculatePredictedCost(...): void
+        +calculateWarrantyProbability(...): void
+        +calculateConfidenceScore(...): void
+        +calculatePredictedComplexityLevel(...): void
+        +recalculate(...): void
+    }
+
+    class EmbeddingService {
+        +generateIfMissing(claim: Claim): void
+        -generateEmbedding(claim: Claim): void
+    }
+
+    class SimilaritySearchService {
+        +findSimilarClaims(claim: Claim): List<SimilarClaim>
+        -vectorSearch(claim: Claim): List<SimilarClaim>
+        -cosineSimilarity(a: float[], b: float[]): double
+    }
+
+    class PredictionStateService {
+        +markAsHybridIfNeeded(prediction: DiagnosisPrediction): void
+    }
+
+    class PredictionExplanationService {
+        +build(prediction: DiagnosisPrediction): PredictionContext
+        +generateExplanation(context: PredictionContext): String
+        -buildPrompt(context: PredictionContext): String
+        -buildFallbackExplanation(context: PredictionContext): String
+    }
+
+    class DiagnosisStatusMachine {
+        +allowsDiagnosisEdit(status: DiagnosisStatus): boolean
+        +allowsDiagnosisDelete(status: DiagnosisStatus): boolean
+        +allowsDiagnosisConfirm(status: DiagnosisStatus): boolean
+        +allowsDiagnosisReject(status: DiagnosisStatus): boolean
+        +allowsDiagnosisArchive(status: DiagnosisStatus): boolean
+        +getAllowedNextStatuses(status: DiagnosisStatus): Set<DiagnosisStatus>
+    }
+
+' =========================
+' Repository
+' =========================
+    interface DiagnosisRepository {
+        +findById(id: Integer): Optional<Diagnosis>
+        +findByClaimIdOrderByCreatedAtDesc(claimId: Integer): List<Diagnosis>
+        +findFirstByClaimId(claimId: Integer): Optional<Diagnosis>
+        +save(diagnosis: Diagnosis): Diagnosis
+        +delete(diagnosis: Diagnosis): void
+    }
+
+    interface DiagnosisPredictionRepository {
+        +findById(id: Integer): Optional<DiagnosisPrediction>
+        +findByDiagnosisIdOrderByCreatedAtDesc(diagnosisId: Integer): List<DiagnosisPrediction>
+        +existsByDiagnosisId(diagnosisId: Integer): boolean
+        +save(prediction: DiagnosisPrediction): DiagnosisPrediction
+        +delete(prediction: DiagnosisPrediction): void
+    }
+
+    interface ClaimRepository {
+        +findById(id: Integer): Optional<Claim>
+    }
+
+    interface ClaimEmbeddingRepository {
+        +existsById(claimId: Integer): boolean
+        +findById(claimId: Integer): Optional<ClaimEmbedding>
+        +findByClaimIdNot(claimId: Integer): List<ClaimEmbedding>
+        +save(embedding: ClaimEmbedding): ClaimEmbedding
+        +deleteById(claimId: Integer): void
+    }
+
+' =========================
+' External clients
+' =========================
+package "External clients" {
+    class GeminiEmbeddingClient {
+        +embed(text: String): List<Double>
+    }
+
+    class GeminiLLMClient {
+        +generate(prompt: String): String
+    }
+}
+
+' =========================
+' Entity classes
+' =========================
+    class Claim {
+        -id: Integer
+        -repairType: RepairType
+        -status: ClaimStatus
+        -defectDescription: String
+        -equipment: Equipment
+        -createdAt: LocalDateTime
+    }
+
+    class Equipment {
+        -id: Integer
+        -model: EquipmentModel
+        -serialNumber: String
+    }
+
+    class EquipmentModel {
+        -id: Integer
+        -modelName: String
+        -manufacturer: String
+        -type: String
+    }
+
+    class Diagnosis {
+        -id: Integer
+        -claim: Claim
+        -engineer: Employee
+        -diagnosisType: DiagnosisType
+        -preliminaryConclusion: String
+        -finalConclusion: String
+        -estimatedCost: BigDecimal
+        -estimatedTimeHours: BigDecimal
+        -status: DiagnosisStatus
+        -confirmedAt: LocalDateTime
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+    }
+
+    class DiagnosisPrediction {
+        -id: Integer
+        -diagnosis: Diagnosis
+        -predictedComplexityLevel: ComplexityLevel
+        -predictionSource: PredictionSource
+        -predictedCost: BigDecimal
+        -predictedTimeHours: BigDecimal
+        -predictionExplanation: String
+        -predictedWarrantyProbability: BigDecimal
+        -confidenceScore: BigDecimal
+        -modelVersion: String
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+    }
+
+    class ClaimEmbedding {
+        -claim: Claim
+        -embedding_vector: byte[]
+        -dimension: Integer
+        -modelName: String
+        -createdAt: LocalDateTime
+    }
+
+    class DiagnosisSimilarityResult {
+        -id: Integer
+        -prediction: DiagnosisPrediction
+        -similarClaim: Claim
+        -similarityScore: BigDecimal
+        -rankPosition: Integer
+    }
+
+'    class DiagnosisPredictionDefectCategory {
+'        -prediction: DiagnosisPrediction
+'        -defectCategory: DefectCategory
+'        -probabilityScore: BigDecimal
+'        -rankPosition: Integer
+'    }
+'
+'    class DiagnosisPredictionRepairWork {
+'        -prediction: DiagnosisPrediction
+'        -repairWork: RepairWork
+'        -probabilityScore: BigDecimal
+'        -predictedTimeSpent: BigDecimal
+'        -rankPosition: Integer
+'    }
+'
+'    class DiagnosisPredictionRepairWorkPart {
+'        -predictionRepairWork: DiagnosisPredictionRepairWork
+'        -part: Part
+'        -quantity: BigDecimal
+'        -probabilityScore: BigDecimal
+'        -rankPosition: Integer
+'    }
+'
+'    class DefectCategory {
+'        -id: Integer
+'        -name: String
+'        -description: String
+'    }
+'
+'    class RepairWork {
+'        -id: Integer
+'        -name: String
+'        -description: String
+'    }
+'
+'    class Part {
+'        -id: Integer
+'        -partName: String
+'        -price: BigDecimal
+'        -stockQuantity: BigDecimal
+'        -unitName: String
+'    }
+
+    class Employee {
+        -id: Integer
+        -position: String
+        -specialization: String
+    }
+
+    class ComplexityLevel {
+        -id: Integer
+        -name: String
+        -description: String
+    }
+
+    enum DiagnosisStatus {
+        DRAFT
+        PREDICTED
+        CONFIRMED
+        REJECTED
+        ARCHIVED
+    }
+
+    enum DiagnosisType {
+        MANUAL
+        AUTOMATED
+        HYBRID
+    }
+
+    enum PredictionSource {
+        MANUAL
+        AUTOMATED
+        HYBRID
+    }
+
+    enum ClaimStatus {
+        CREATED
+        ACCEPTED
+        IN_DIAGNOSIS
+        IN_REPAIR
+        COMPLETED
+        REJECTED
+    }
+
+    enum RepairType {
+        WAITING_DECISION
+        WARRANTY_REPAIR
+        POST_WARRANTY_REPAIR
+    }
+
+' =========================
+' Controller dependencies
+' =========================
+DiagnosisController -> DiagnosisService
+DiagnosisPredictionController --> DiagnosisPredictionService
+DiagnosisPredictionController --> PredictionAggregationService
+
+'DiagnosisController ..> CreateManualDiagnosisDTO
+'DiagnosisController ..> CreateAutoDiagnosisDTO
+'DiagnosisController ..> UpdateDiagnosisDTO
+'DiagnosisController ..> DiagnosisResponseDTO
+'
+'DiagnosisPredictionController ..> CreateManualPredictionDTO
+'DiagnosisPredictionController ..> UpdatePredictionDTO
+'DiagnosisPredictionController ..> DiagnosisPredictionResponseDTO
+
+' =========================
+' Service dependencies
+' =========================
+DiagnosisService --> DiagnosisRepository
+DiagnosisService --> DiagnosisPredictionRepository
+DiagnosisService --> DiagnosisStatusMachine
+
+DiagnosisPredictionService --> DiagnosisPredictionRepository
+DiagnosisPredictionService --> DiagnosisService
+DiagnosisPredictionService --> PredictionAggregationService
+DiagnosisPredictionService --> PredictionStateService
+DiagnosisPredictionService --> DiagnosisStatusMachine
+
+PredictionAggregationService --> DiagnosisPredictionRepository
+PredictionAggregationService --> PredictionExplanationService
+
+EmbeddingService --> GeminiEmbeddingClient
+EmbeddingService --> ClaimEmbeddingRepository
+EmbeddingService --> ClaimRepository
+
+SimilaritySearchService --> ClaimEmbeddingRepository
+
+PredictionExplanationService --> GeminiLLMClient
+
+' =========================
+' Repository to Entity dependencies
+' =========================
+DiagnosisRepository ..> Diagnosis
+DiagnosisPredictionRepository ..> DiagnosisPrediction
+ClaimRepository ..> Claim
+ClaimEmbeddingRepository ..> ClaimEmbedding
+
+' =========================
+' Entity relationships
+' =========================
+Equipment "1" --> "1" EquipmentModel
+Claim "1" --> "1" Equipment
+Claim "1" --> "0..*" Diagnosis
+Claim "1" --> "0..1" ClaimEmbedding
+
+Diagnosis "*" --> "0..1" Employee
+Diagnosis "1" --> "0..*" DiagnosisPrediction
+
+DiagnosisPrediction "*" --> "1" ComplexityLevel
+DiagnosisPrediction "1" --> "0..*" DiagnosisSimilarityResult
+'DiagnosisPrediction "1" --> "0..*" DiagnosisPredictionDefectCategory
+'DiagnosisPrediction "1" --> "0..*" DiagnosisPredictionRepairWork
+
+DiagnosisSimilarityResult "*" --> "1" Claim : similarClaim
+'DiagnosisPredictionDefectCategory "*" --> "1" DefectCategory
+'DiagnosisPredictionRepairWork "*" --> "1" RepairWork
+'DiagnosisPredictionRepairWork "1" --> "0..*" DiagnosisPredictionRepairWorkPart
+'DiagnosisPredictionRepairWorkPart "*" --> "1" Part
+
+Claim --> ClaimStatus
+Claim --> RepairType
+Diagnosis --> DiagnosisStatus
+Diagnosis --> DiagnosisType
+DiagnosisPrediction --> PredictionSource
+
+@enduml

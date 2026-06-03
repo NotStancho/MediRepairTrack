@@ -1,0 +1,85 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Діаграма послідовності прецеденту «Підтвердити результат діагностики»
+
+autonumber 1.1
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Сервісний інженер" as engineer
+
+boundary "Claim Details Page" as frontend
+control "diagnosisController:\nDiagnosisController" as diagnosisController
+participant "diagnosisService:\nDiagnosisService" as diagnosisService
+database "diagnosisRepository:\nDiagnosisRepository" as diagnosisRepository
+participant "diagnosisStatusMachine:\nDiagnosisStatusMachine" as diagnosisStatusMachine
+participant "employeeService:\nEmployeeService" as employeeService
+
+engineer -> frontend: натискає кнопку підтвердження діагностики
+activate frontend
+
+frontend -> diagnosisController: confirm(diagnosisId, engineerId)
+activate diagnosisController
+
+diagnosisController -> diagnosisService: confirmDiagnosis(diagnosisId, engineerId)
+activate diagnosisService
+
+diagnosisService -> diagnosisRepository: findById(diagnosisId)
+activate diagnosisRepository
+diagnosisRepository --> diagnosisService: diagnosis
+deactivate diagnosisRepository
+
+diagnosisService -> employeeService: getEmployeeEntity(engineerId)
+activate employeeService
+employeeService --> diagnosisService: engineer
+deactivate employeeService
+
+diagnosisService -> diagnosisStatusMachine: allowsDiagnosisConfirm(diagnosis.status)
+activate diagnosisStatusMachine
+diagnosisStatusMachine --> diagnosisService: isAllowed
+deactivate diagnosisStatusMachine
+
+alt підтвердження заборонено для поточного статусу
+    diagnosisService --> diagnosisController: InvalidStatusTransitionException
+    diagnosisController --> frontend: response з помилкою
+    frontend -> frontend: відобразити повідомлення про недопустимий перехід статусу
+
+else підтвердження дозволено
+
+    alt finalConclusion порожній
+        diagnosisService --> diagnosisController: BadRequestException("Не вказано остаточний висновок")
+        diagnosisController --> frontend: response з помилкою
+        frontend -> frontend: відобразити вимогу заповнити остаточний висновок
+
+    else finalConclusion заповнений
+
+        alt estimatedCost <= 0 або estimatedTimeHours <= 0
+            diagnosisService --> diagnosisController: BadRequestException("Оцінка вартості та часу повинна бути більшою за нуль")
+            diagnosisController --> frontend: response з помилкою
+            frontend -> frontend: відобразити вимогу заповнити оцінку вартості та часу
+
+        else дані коректні
+            diagnosisService -> diagnosisService: setEngineer(engineer)
+            diagnosisService -> diagnosisService: setStatus(CONFIRMED)
+            diagnosisService -> diagnosisService: setConfirmedAt(now)
+            diagnosisService -> diagnosisService: setUpdatedAt(now)
+
+            diagnosisService -> diagnosisRepository: save(diagnosis)
+            activate diagnosisRepository
+            diagnosisRepository --> diagnosisService: confirmedDiagnosis
+            deactivate diagnosisRepository
+
+            diagnosisService --> diagnosisController: DiagnosisResponseDTO
+            diagnosisController --> frontend: response з підтвердженою діагностикою
+            frontend -> frontend: оновити дані діагностики на сторінці
+        end
+    end
+end
+
+deactivate diagnosisService
+deactivate diagnosisController
+deactivate frontend
+
+@enduml

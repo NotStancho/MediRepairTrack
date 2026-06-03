@@ -1,0 +1,149 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Діаграма послідовності прецеденту «Отримати попередню діагностичну рекомендацію»
+
+autonumber 1.1
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Менеджер" as manager
+
+boundary "Claim Details Page" as frontend
+control "claimController:\nClaimController" as claimController
+participant "claimService:\nClaimService" as claimService
+database "claimRepository:\nClaimRepository" as claimRepository
+participant "eventPublisher:\nApplicationEventPublisher" as eventPublisher
+
+participant "diagnosisListener:\nDiagnosisListener" as diagnosisListener
+participant "diagnosisService:\nDiagnosisService" as diagnosisService
+database "diagnosisRepository:\nDiagnosisRepository" as diagnosisRepository
+
+participant "predictionListener:\nDiagnosisPredictionListener" as predictionListener
+participant "embeddingService:\nEmbeddingService" as embeddingService
+database "embeddingRepository:\nClaimEmbeddingRepository" as embeddingRepository
+participant "geminiClient:\nGeminiEmbeddingClient" as geminiClient
+participant "predictionService:\nDiagnosisPredictionService" as predictionService
+
+manager -> frontend: натискає кнопку прийняття заявки
+activate frontend
+
+frontend -> claimController: updateStatus(claimId, ACCEPTED)
+activate claimController
+
+claimController -> claimService: updateStatus(claimId, ACCEPTED)
+activate claimService
+
+claimService -> claimRepository: findById(claimId)
+activate claimRepository
+claimRepository --> claimService: claim
+deactivate claimRepository
+
+claimService -> claimRepository: save(claim зі статусом ACCEPTED)
+activate claimRepository
+claimRepository --> claimService: updatedClaim
+deactivate claimRepository
+
+claimService -> eventPublisher: publishEvent(ClaimStatusChangedEvent)
+activate eventPublisher
+
+group Обробка події прийняття заявки
+
+    eventPublisher -> diagnosisListener: handleClaimAccepted(event)
+    activate diagnosisListener
+
+    diagnosisListener -> diagnosisService: ensureInitialDiagnosisExists(claimId)
+    activate diagnosisService
+
+    diagnosisService -> diagnosisRepository: findFirstByClaimId(claimId)
+    activate diagnosisRepository
+    diagnosisRepository --> diagnosisService: optionalDiagnosis
+    deactivate diagnosisRepository
+
+    alt діагностика відсутня
+        diagnosisService -> claimService: getClaim(claimId)
+        claimService --> diagnosisService: claim
+
+        diagnosisService -> diagnosisRepository: save(diagnosis)
+        activate diagnosisRepository
+
+        note right of diagnosisRepository
+            diagnosisType = AUTOMATED
+            status = PREDICTED
+            engineer = null
+        end note
+
+        diagnosisRepository --> diagnosisService: savedDiagnosis
+        deactivate diagnosisRepository
+
+        diagnosisService -> eventPublisher: publishEvent(DiagnosisAutoCreatedEvent)
+
+        group Формування автоматичного прогнозу діагностики
+
+            eventPublisher -> predictionListener: handleDiagnosisCreated(event)
+            activate predictionListener
+
+            predictionListener -> embeddingService: generateIfMissing(claimId)
+            activate embeddingService
+
+            embeddingService -> embeddingRepository: existsById(claimId)
+            activate embeddingRepository
+            embeddingRepository --> embeddingService: exists
+            deactivate embeddingRepository
+
+            alt embedding відсутній
+                embeddingService -> claimService: getClaim(claimId)
+                claimService --> embeddingService: claim
+
+                embeddingService -> geminiClient: embed(defectDescription)
+                activate geminiClient
+                geminiClient --> embeddingService: embeddingVector
+                deactivate geminiClient
+
+                embeddingService -> embeddingRepository: save(claimEmbedding)
+                activate embeddingRepository
+                embeddingRepository --> embeddingService: savedClaimEmbedding
+                deactivate embeddingRepository
+            else embedding вже існує
+                embeddingService --> predictionListener: embedding знайдено
+            end
+
+            deactivate embeddingService
+
+            predictionListener -> predictionService: generateAutoPrediction(diagnosisId)
+            activate predictionService
+            predictionService --> predictionListener: diagnosisPrediction
+            deactivate predictionService
+
+            predictionListener --> eventPublisher: прогноз сформовано
+            deactivate predictionListener
+
+        end
+
+        eventPublisher --> diagnosisService: event handled
+        diagnosisService --> diagnosisListener: diagnosis created
+
+    else діагностика вже існує
+        diagnosisService --> diagnosisListener: створення не виконується
+    end
+
+    deactivate diagnosisService
+    diagnosisListener --> eventPublisher: handled
+    deactivate diagnosisListener
+
+end
+
+eventPublisher --> claimService: event handled
+deactivate eventPublisher
+
+claimService --> claimController: updatedClaim
+deactivate claimService
+
+claimController --> frontend: response з оновленим статусом заявки
+deactivate claimController
+
+manager -> frontend: переглянути оновлений статус заявки
+deactivate frontend
+
+@enduml

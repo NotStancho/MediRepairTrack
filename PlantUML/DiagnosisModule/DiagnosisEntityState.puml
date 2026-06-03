@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+title Діаграма станів сутності «Diagnosis»
+
+skinparam shadowing false
+skinparam state {
+    BackgroundColor white
+    BorderColor black
+}
+
+[*] --> DRAFT : ручне \n створення \n діагностики
+[*] --> PREDICTED : автоматичне \n створення \n діагностики
+
+DRAFT --> CONFIRMED : підтвердження \n діагностики
+
+PREDICTED --> CONFIRMED : підтвердження \n діагностики
+PREDICTED --> REJECTED : відхилення \n діагностики
+
+CONFIRMED --> ARCHIVED : архівування \n діагностики
+
+REJECTED --> [*]
+ARCHIVED --> [*]
+@enduml
