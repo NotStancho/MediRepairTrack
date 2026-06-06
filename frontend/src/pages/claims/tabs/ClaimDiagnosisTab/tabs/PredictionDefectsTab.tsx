@@ -133,26 +133,7 @@ export default function PredictionDefectsTab({ predictionId }: Props) {
     ], []);
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
-                <div>
-                    <div className="font-medium text-ink">
-                        Прогнозовані дефекти
-                    </div>
-                    <div className="text-sm text-ink-muted">
-                        Елементів: {data.length}
-                    </div>
-                </div>
-
-                <Button
-                    variant="secondary"
-                    className="h-8 px-3 text-xs"
-                    onClick={() => setCreateOpen(true)}
-                >
-                    + Додати дефект
-                </Button>
-            </div>
-
+        <>
             <Table
                 data={data}
                 columns={columns}
@@ -165,6 +146,14 @@ export default function PredictionDefectsTab({ predictionId }: Props) {
                     <TableToolbar
                         table={table}
                         globalFilterPlaceholder="Пошук за назвою, описом або симптомами"
+                        rightSlot={
+                            <Button
+                                variant="primary"
+                                onClick={() => setCreateOpen(true)}
+                            >
+                                + Додати дефект
+                            </Button>
+                        }
                     />
                 )}
                 renderEmptyState={
@@ -216,6 +205,6 @@ export default function PredictionDefectsTab({ predictionId }: Props) {
                     onCancel={() => setDeleteItem(null)}
                 />
             )}
-        </div>
+        </>
     );
 }

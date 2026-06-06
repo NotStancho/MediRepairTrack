@@ -87,9 +87,14 @@ export default function PredictionGeneralTab({
                 {onRecalculate && (
                     <button
                         onClick={onRecalculate}
-                        className="text-xs text-brand hover:underline"
+                        className="
+                            inline-flex items-center gap-1.5
+                            text-xs font-medium text-brand
+                            hover:underline
+                        "
                     >
-                        Перерахувати
+                        <FiRefreshCw size={13} />
+                        Перерахувати оцінки
                     </button>
                 )}
             </div>
@@ -117,7 +122,7 @@ export default function PredictionGeneralTab({
                 </div>
 
                 <div>
-                    <div className="text-ink-muted">Confidence</div>
+                    <div className="text-ink-muted">Середня схожість</div>
                     <div className="font-mono">
                         {formatPercent(prediction.confidenceScore)}
                     </div>

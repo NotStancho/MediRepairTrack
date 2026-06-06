@@ -211,26 +211,7 @@ export default function PredictionWorksTab({ predictionId }: Props) {
     ], [partsByRepairWorkId]);
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
-                <div>
-                    <div className="font-medium text-ink">
-                        Прогнозовані ремонтні роботи
-                    </div>
-                    <div className="text-sm text-ink-muted">
-                        Елементів: {data.length}
-                    </div>
-                </div>
-
-                <Button
-                    variant="secondary"
-                    className="h-8 px-3 text-xs"
-                    onClick={() => setCreateOpen(true)}
-                >
-                    + Додати ремонтну роботу
-                </Button>
-            </div>
-
+        <>
             <Table
                 data={data}
                 columns={columns}
@@ -244,6 +225,14 @@ export default function PredictionWorksTab({ predictionId }: Props) {
                     <TableToolbar
                         table={table}
                         globalFilterPlaceholder="Пошук за роботою, запчастиною або складністю"
+                        rightSlot={
+                            <Button
+                                variant="primary"
+                                onClick={() => setCreateOpen(true)}
+                            >
+                                + Додати ремонтну роботу
+                            </Button>
+                        }
                     />
                 )}
                 renderEmptyState={
@@ -320,6 +309,6 @@ export default function PredictionWorksTab({ predictionId }: Props) {
                     }}
                 />
             )}
-        </div>
+        </>
     );
 }

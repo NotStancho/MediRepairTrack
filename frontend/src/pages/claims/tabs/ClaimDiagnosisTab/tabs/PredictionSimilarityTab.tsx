@@ -47,12 +47,17 @@ export default function PredictionSimilarityTab({ predictionId }: Props) {
 
     const columns = useMemo<TableColumnDef<SimilarityResult>[]>(() => [
         {
-            id: 'claimId',
-            header: 'Заявка',
-            accessorFn: row => row.claim.id,
+            id: 'claimSimilarity',
+            header: 'Заявка / схожість',
+            accessorFn: row => `${row.claim.id} ${(row.similarityScore * 100).toFixed(1)}%`,
             cell: ({ row }) => (
-                <div className="font-mono text-sm">
-                    №{row.original.claim.id}
+                <div className="space-y-1">
+                    <div className="font-mono text-sm font-medium">
+                        №{row.original.claim.id}
+                    </div>
+                    <div className="font-mono text-xs text-ink-muted">
+                        {(row.original.similarityScore * 100).toFixed(1)}% схожості
+                    </div>
                 </div>
             ),
         },
@@ -85,30 +90,14 @@ export default function PredictionSimilarityTab({ predictionId }: Props) {
             ),
         },
         {
-            id: 'repairType',
-            header: 'Тип ремонту',
-            accessorFn: row => REPAIR_TYPE_LABELS[row.claim.repairType],
+            id: 'repairStatus',
+            header: 'Тип ремонту / статус',
+            accessorFn: row => `${REPAIR_TYPE_LABELS[row.claim.repairType]} ${CLAIM_STATUS_LABELS[row.claim.status]}`,
             cell: ({ row }) => (
-                <RepairTypeBadge type={row.original.claim.repairType} shape="rounded" />
-            ),
-        },
-        {
-            id: 'status',
-            header: 'Статус',
-            accessorFn: row => CLAIM_STATUS_LABELS[row.claim.status],
-            cell: ({ row }) => (
-                <ClaimStatusBadge status={row.original.claim.status} shape="rounded" />
-            ),
-        },
-        {
-            id: 'similarity',
-            header: 'Схожість',
-            accessorFn: row => row.similarityScore,
-            meta: { align: 'right' },
-            cell: ({ row }) => (
-                <span className="font-mono">
-                    {(row.original.similarityScore * 100).toFixed(1)}%
-                </span>
+                <div className="flex flex-col items-start gap-1">
+                    <RepairTypeBadge type={row.original.claim.repairType} shape="rounded" />
+                    <ClaimStatusBadge status={row.original.claim.status} shape="rounded" />
+                </div>
             ),
         },
         {
@@ -159,26 +148,7 @@ export default function PredictionSimilarityTab({ predictionId }: Props) {
     ], []);
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
-                <div>
-                    <div className="font-medium text-ink">
-                        Схожі заявки
-                    </div>
-                    <div className="text-sm text-ink-muted">
-                        Елементів: {data.length}
-                    </div>
-                </div>
-
-                <Button
-                    variant="secondary"
-                    className="h-8 px-3 text-xs"
-                    onClick={() => setCreateOpen(true)}
-                >
-                    + Додати заявку
-                </Button>
-            </div>
-
+        <>
             <Table
                 data={data}
                 columns={columns}
@@ -191,6 +161,14 @@ export default function PredictionSimilarityTab({ predictionId }: Props) {
                     <TableToolbar
                         table={table}
                         globalFilterPlaceholder="Пошук за ID, моделлю, серійним номером або описом"
+                        rightSlot={
+                            <Button
+                                variant="primary"
+                                onClick={() => setCreateOpen(true)}
+                            >
+                                + Додати заявку
+                            </Button>
+                        }
                     />
                 )}
                 renderEmptyState={
@@ -242,6 +220,6 @@ export default function PredictionSimilarityTab({ predictionId }: Props) {
                     onCancel={() => setDeleteItem(null)}
                 />
             )}
-        </div>
+        </>
     );
 }
