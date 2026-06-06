@@ -11,6 +11,7 @@ import Modal from '../../../ui/Modal/Modal';
 import ModalFooter from '../../../ui/Modal/ModalFooter';
 import Select from '../../../ui/Select';
 import { inputBase } from '../../../ui/formStyles';
+import ComplexityLevelBadge from '../../../components/badges/ComplexityLevelBadge';
 
 interface Props {
     complexityLevels: ComplexityLevel[];
@@ -69,11 +70,14 @@ export default function CreateRepairWorkModal({
                         loading={complexityLoading}
                         renderOption={item => (
                             <div className="min-w-0 py-1">
-                                <div className="font-medium text-ink">{item.name}</div>
+                                <ComplexityLevelBadge level={item} shape="rounded" />
                                 <div className="text-xs text-ink-muted line-clamp-2">
                                     {item.description}
                                 </div>
                             </div>
+                        )}
+                        renderValue={item => (
+                            <ComplexityLevelBadge level={item} shape="rounded" />
                         )}
                     />
                 </FormField>

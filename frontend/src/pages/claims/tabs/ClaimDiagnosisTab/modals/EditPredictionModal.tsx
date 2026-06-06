@@ -13,6 +13,7 @@ import { useComplexityLevels } from '../../../../../hooks/diagnosis/useComplexit
 
 import type { DiagnosisPrediction } from '../../../../../types/diagnosis/DSS/diagnosisPrediction';
 import type { UpdatePredictionPayload } from '../../../../../types/diagnosis/DSS/diagnosisPredictionPayloads';
+import ComplexityLevelBadge from '../../../../../components/badges/ComplexityLevelBadge';
 
 interface Props {
     prediction: DiagnosisPrediction;
@@ -30,7 +31,7 @@ export default function EditPredictionModal({
     const { data: levels, loading: levelsLoading } = useComplexityLevels();
 
     const [form, setForm] = useState({
-        complexityId: prediction.predictedComplexityLevelId ?? null as number | null,
+        complexityId: prediction.predictedComplexityLevel?.id ?? null as number | null,
         cost: prediction.predictedCost?.toString() ?? '',
         time: prediction.predictedTimeHours?.toString() ?? '',
         explanation: prediction.predictionExplanation ?? ''
@@ -67,6 +68,12 @@ export default function EditPredictionModal({
                         getValue={(item) => item.id}
                         placeholder="Оберіть рівень складності"
                         loading={levelsLoading}
+                        renderOption={(item) => (
+                            <ComplexityLevelBadge level={item} shape="rounded" />
+                        )}
+                        renderValue={(item) => (
+                            <ComplexityLevelBadge level={item} shape="rounded" />
+                        )}
                         searchable
                     />
                 </FormField>

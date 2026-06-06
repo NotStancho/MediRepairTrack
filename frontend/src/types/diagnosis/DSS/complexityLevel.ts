@@ -5,3 +5,5 @@ export interface ComplexityLevel {
     name: string;
     description: string;
 }
+
+export type ComplexityLevelShort = Pick<ComplexityLevel, 'id' | 'name'>;

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.ComplexityLevelResponseDTO;
+import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.ComplexityLevelShortDTO;
 import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.CreateComplexityLevelDTO;
 import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.UpdateComplexityLevelDTO;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
@@ -68,6 +69,13 @@ public class ComplexityLevelService {
                 .id(e.getId())
                 .name(e.getName())
                 .description(e.getDescription())
+                .build();
+    }
+
+    public ComplexityLevelShortDTO mapShort(ComplexityLevel e) {
+        return ComplexityLevelShortDTO.builder()
+                .id(e.getId())
+                .name(e.getName())
                 .build();
     }
 }

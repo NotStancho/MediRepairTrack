@@ -2,6 +2,7 @@ package ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO;
 
 import lombok.Builder;
 import lombok.Data;
+import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.ComplexityLevelShortDTO;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.PredictionSource;
 
 import java.math.BigDecimal;
@@ -14,8 +15,7 @@ public class DiagnosisPredictionResponseDTO {
     private Integer id;
     private Integer diagnosisId;
 
-    private Integer predictedDefectCategoryId;
-    private Integer predictedComplexityLevelId;
+    private ComplexityLevelShortDTO predictedComplexityLevel;
 
     private PredictionSource predictionSource;
 

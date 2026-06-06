@@ -11,6 +11,7 @@ import Select from '../../../../../ui/Select';
 
 import { useComplexityLevels } from '../../../../../hooks/diagnosis/useComplexityLevels';
 import type { CreateManualPredictionPayload } from '../../../../../types/diagnosis/DSS/diagnosisPredictionPayloads';
+import ComplexityLevelBadge from '../../../../../components/badges/ComplexityLevelBadge';
 
 interface Props {
     diagnosisId: number;
@@ -72,6 +73,12 @@ export default function CreatePredictionModal({
 
                         placeholder="Оберіть рівень складності"
                         loading={levelsLoading}
+                        renderOption={(item) => (
+                            <ComplexityLevelBadge level={item} shape="rounded" />
+                        )}
+                        renderValue={(item) => (
+                            <ComplexityLevelBadge level={item} shape="rounded" />
+                        )}
 
                         searchable
                     />

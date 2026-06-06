@@ -242,7 +242,7 @@ public class DiagnosisPredictionService {
         return DiagnosisPredictionResponseDTO.builder()
                 .id(p.getId())
                 .diagnosisId(p.getDiagnosis().getId())
-                .predictedComplexityLevelId(p.getPredictedComplexityLevel().getId())
+                .predictedComplexityLevel(complexityLevelService.mapShort(p.getPredictedComplexityLevel()))
                 .predictionSource(p.getPredictionSource())
                 .predictedCost(p.getPredictedCost())
                 .predictedTimeHours(p.getPredictedTimeHours())

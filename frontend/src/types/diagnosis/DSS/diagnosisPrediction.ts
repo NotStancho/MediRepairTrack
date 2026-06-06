@@ -1,6 +1,7 @@
 // types/diagnosis/DSS/diagnosisPrediction.ts
 
 import type { Probability } from '../../common/valueObjects'
+import type { ComplexityLevelShort } from './complexityLevel';
 
 export type PredictionSource =
     | 'AUTOMATED'
@@ -11,7 +12,7 @@ export interface DiagnosisPrediction {
     id: number;
     diagnosisId: number;
 
-    predictedComplexityLevelId: number;
+    predictedComplexityLevel: ComplexityLevelShort;
 
     predictionSource: PredictionSource;
 

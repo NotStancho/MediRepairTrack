@@ -1,9 +1,14 @@
 // pages/claims/tabs/ClaimDiagnosisTab/tabs/PredictionGeneralTab.tsx
 
+import { useState } from 'react';
+
 import type { DiagnosisPrediction } from '../../../../../types/diagnosis/DSS/diagnosisPrediction';
 import { formatMoney } from '../../../../../utils/formats/moneyFormat';
 import { formatDateTime } from '../../../../../utils/formats/dateFormat';
 import Badge from '../../../../../components/badges/Badge';
+import ComplexityLevelBadge from '../../../../../components/badges/ComplexityLevelBadge';
+import MetricCard from '../../../../../components/MetricCard';
+import ConfirmBox from '../../../../../ui/ConfirmBox';
 
 import { FiEdit2, FiRefreshCw } from 'react-icons/fi';
 
@@ -16,123 +21,132 @@ interface Props {
 }
 
 export default function PredictionGeneralTab({
-                                           prediction,
-                                           onRecalculate,
-                                           onRegenerateExplanation,
-                                           regeneratingExplanation,
-                                           onEdit
-                                       }: Props) {
+                                                 prediction,
+                                                 onRecalculate,
+                                                 onRegenerateExplanation,
+                                                 regeneratingExplanation,
+                                                 onEdit
+                                             }: Props) {
+    const [recalculateConfirmOpen, setRecalculateConfirmOpen] = useState(false);
 
     const formatPercent = (value: number) =>
         `${(value * 100).toFixed(1)}%`;
 
     const canRegenerateExplanation =
         prediction.predictionSource === 'AUTOMATED' && !!onRegenerateExplanation;
+    const canRecalculate =
+        prediction.predictionSource !== 'AUTOMATED' && !!onRecalculate;
 
     return (
-        <div className="relative space-y-4">
-
-            <div className="flex justify-between items-start pr-10">
-                {onEdit && (
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onEdit();
-                        }}
-                        className="
-                            absolute top-3 right-3
-                            flex items-center justify-center
-                            w-8 h-8
-                            rounded-lg border border-border
-                            bg-surface
-                            hover:bg-brand-soft hover:border-brand
-                            transition
-                            shadow-sm
-                        "
+        <div className="space-y-4">
+            <div className="flex flex-wrap justify-between items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+                    <Badge
+                        colorClassName="bg-gray-100 text-gray-600"
+                        shape="rounded"
                     >
-                        <FiEdit2 size={14} className="text-ink-muted" />
-                    </button>
-                )}
+                        {prediction.modelVersion}
+                    </Badge>
 
-                <div className="space-y-1">
-                    <div className="font-medium">
-                        Прогноз #{prediction.id}
-                    </div>
+                    <span>
+                        Створено: {formatDateTime(prediction.createdAt)}
+                    </span>
 
-                    <div className="flex gap-2 text-xs">
-                        <Badge
-                            colorClassName="bg-blue-100 text-blue-700"
-                            shape="rounded"
+                    {prediction.updatedAt && (
+                        <>
+                            <span>·</span>
+                            <span>
+                                Оновлено: {formatDateTime(prediction.updatedAt)}
+                            </span>
+                        </>
+                    )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                    {canRecalculate && (
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setRecalculateConfirmOpen(true);
+                            }}
+                            className="
+                                inline-flex items-center gap-1.5
+                                text-xs font-medium text-brand
+                                hover:underline
+                            "
                         >
-                            {prediction.predictionSource}
-                        </Badge>
+                            <FiRefreshCw size={13} />
+                            Перерахувати оцінки
+                        </button>
+                    )}
 
-                        <Badge
-                            colorClassName="bg-gray-100 text-gray-600"
-                            shape="rounded"
+                    {onEdit && (
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onEdit();
+                            }}
+                            className="
+                                flex items-center justify-center
+                                w-8 h-8
+                                rounded-lg border border-border
+                                bg-surface
+                                hover:bg-brand-soft hover:border-brand
+                                transition
+                                shadow-sm
+                            "
+                            title="Редагувати прогноз"
                         >
-                            {prediction.modelVersion}
-                        </Badge>
-                        <div>
-                            <div className="text-xs text-ink-muted">
-                                Створено: {formatDateTime(prediction.createdAt)}
-                                {prediction.updatedAt && (
-                                    <>, оновлено: {formatDateTime(prediction.updatedAt)}</>
-                                )}
-                            </div>
+                            <FiEdit2 size={14} className="text-ink-muted" />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                <MetricCard
+                    label="Оцінка вартості"
+                    value={`${formatMoney(prediction.predictedCost)} ₴`}
+                />
+
+                <MetricCard
+                    label="Оцінка часу"
+                    value={`${prediction.predictedTimeHours} год`}
+                />
+
+                <MetricCard
+                    label="Складність"
+                    value={
+                        <ComplexityLevelBadge
+                            level={prediction.predictedComplexityLevel}
+                            shape="rounded"
+                        />
+                    }
+                />
+
+                <MetricCard
+                    label="Ймовірність гарантії"
+                    value={formatPercent(prediction.predictedWarrantyProbability)}
+                />
+
+                <MetricCard
+                    label="Середня схожість"
+                    value={formatPercent(prediction.confidenceScore)}
+                    helper="За знайденими історичними кейсами"
+                />
+            </div>
+
+            <section className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                    <div>
+                        <div className="text-sm font-medium text-ink">
+                            Пояснення прогнозу
                         </div>
-                    </div>
-                </div>
-
-                {onRecalculate && (
-                    <button
-                        onClick={onRecalculate}
-                        className="
-                            inline-flex items-center gap-1.5
-                            text-xs font-medium text-brand
-                            hover:underline
-                        "
-                    >
-                        <FiRefreshCw size={13} />
-                        Перерахувати оцінки
-                    </button>
-                )}
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-                <div>
-                    <div className="text-ink-muted">Оцінка вартості</div>
-                    <div className="font-mono font-semibold">
-                        {formatMoney(prediction.predictedCost)}
-                    </div>
-                </div>
-
-                <div>
-                    <div className="text-ink-muted">Оцінка часу</div>
-                    <div className="font-mono font-semibold">
-                        {prediction.predictedTimeHours} год
-                    </div>
-                </div>
-
-                <div>
-                    <div className="text-ink-muted">Ймовірність гарантії</div>
-                    <div className="font-mono">
-                        {formatPercent(prediction.predictedWarrantyProbability)}
-                    </div>
-                </div>
-
-                <div>
-                    <div className="text-ink-muted">Середня схожість</div>
-                    <div className="font-mono">
-                        {formatPercent(prediction.confidenceScore)}
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <div className="flex items-center justify-between gap-3 mb-1">
-                    <div className="text-ink-muted text-sm">
-                        Пояснення
+                        <div className="text-xs text-ink-muted">
+                            Текстове пояснення сформоване на основі поточних даних прогнозу
+                        </div>
                     </div>
 
                     {canRegenerateExplanation && (
@@ -154,22 +168,39 @@ export default function PredictionGeneralTab({
                                 size={13}
                                 className={regeneratingExplanation ? 'animate-spin' : ''}
                             />
-                            {regeneratingExplanation ? 'Генерація...' : 'Перегенерувати'}
+                            {regeneratingExplanation ? 'Генерація...' : 'Перегенерувати пояснення'}
                         </button>
                     )}
                 </div>
 
                 <div className="
-                    text-sm
+                    rounded-xl border border-border bg-surface-muted
+                    p-4 text-sm text-ink
                     whitespace-pre-line
-                    bg-surface-muted
-                    border border-border
-                    rounded p-3
                 ">
-                    {prediction.predictionExplanation}
+                    {prediction.predictionExplanation?.trim()
+                        ? prediction.predictionExplanation
+                        : (
+                            <span className="text-ink-muted italic">
+                                Пояснення прогнозу ще не сформовано
+                            </span>
+                    )}
                 </div>
-            </div>
+            </section>
 
+            {recalculateConfirmOpen && (
+                <ConfirmBox
+                    title="Перерахувати оцінки прогнозу?"
+                    description="Система перерахує підсумкові оцінки часу, вартості та складності. Список схожих заявок, прогнозованих дефектів, робіт і запчастин не зміниться."
+                    confirmText="Перерахувати"
+                    cancelText="Скасувати"
+                    onConfirm={() => {
+                        onRecalculate?.();
+                        setRecalculateConfirmOpen(false);
+                    }}
+                    onCancel={() => setRecalculateConfirmOpen(false)}
+                />
+            )}
         </div>
     );
 }
