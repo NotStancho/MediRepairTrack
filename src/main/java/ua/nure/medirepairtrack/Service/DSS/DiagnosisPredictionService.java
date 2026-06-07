@@ -81,7 +81,7 @@ public class DiagnosisPredictionService {
     }
 
     @Transactional
-    public DiagnosisPrediction generateAutoPrediction(Integer diagnosisId) {
+    public void generateAutoPrediction(Integer diagnosisId) {
 
         Diagnosis diagnosis = diagnosisService.getDiagnosisEntity(diagnosisId);
 
@@ -115,8 +115,6 @@ public class DiagnosisPredictionService {
 
         predictionAggregationService.generatePredictionData(savedPrediction);
         applyPredictionInitialValuesToDiagnosis(savedPrediction);
-
-        return savedPrediction;
     }
 
     private void applyPredictionInitialValuesToDiagnosis(DiagnosisPrediction prediction) {
