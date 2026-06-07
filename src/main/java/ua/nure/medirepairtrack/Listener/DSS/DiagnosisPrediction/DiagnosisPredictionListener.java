@@ -1,12 +1,17 @@
 package ua.nure.medirepairtrack.Listener.DSS.DiagnosisPrediction;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 import ua.nure.medirepairtrack.Event.Diagnosis.DiagnosisAutoCreatedEvent;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisPredictionService;
 import ua.nure.medirepairtrack.Service.DSS.EmbeddingService;
 
+import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DiagnosisPredictionListener {
@@ -14,8 +19,14 @@ public class DiagnosisPredictionListener {
     private final DiagnosisPredictionService predictionService;
     private final EmbeddingService embeddingService;
 
-    @EventListener
+    @Async
+    @TransactionalEventListener(phase = AFTER_COMMIT)
     public void handleDiagnosisCreated(DiagnosisAutoCreatedEvent event) {
+        log.info("[EVENT] DiagnosisAutoCreated | diagnosisId={} | claimId={} | prediction=triggered",
+                event.diagnosisId(),
+                event.claimId()
+        );
+
         embeddingService.generateIfMissing(event.claimId());
         predictionService.generateAutoPrediction(event.diagnosisId());
     }

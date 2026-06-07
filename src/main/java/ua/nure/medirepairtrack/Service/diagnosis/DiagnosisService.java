@@ -3,6 +3,7 @@ package ua.nure.medirepairtrack.Service.diagnosis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ua.nure.medirepairtrack.DTO.diagnosis.DiagnosisDTO.CreateAutoDiagnosisDTO;
 import ua.nure.medirepairtrack.DTO.diagnosis.DiagnosisDTO.CreateManualDiagnosisDTO;
@@ -265,7 +266,7 @@ public class DiagnosisService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void ensureInitialDiagnosisExists(Integer claimId) {
 
         Optional<Diagnosis> existing = diagnosisRepository.findFirstByClaimId(claimId);
