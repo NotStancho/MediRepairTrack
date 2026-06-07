@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.nure.medirepairtrack.Entity.claim.Claim.Claim;
+import ua.nure.medirepairtrack.Exception.BadRequestException;
 import ua.nure.medirepairtrack.Exception.NotFoundException;
 import ua.nure.medirepairtrack.Repository.DSS.ClaimEmbeddingRepository;
 import ua.nure.medirepairtrack.util.EmbeddingConverter;
@@ -38,13 +39,13 @@ public class SimilaritySearchService {
         var sourceEmbedding = claimEmbeddingRepository.findById(claim.getId())
                 .orElseThrow(() -> new NotFoundException("Embedding для цієї заявки не знайдено"));
 
-        float[] sourceVector = EmbeddingConverter.fromByteArray(sourceEmbedding.getContextEmbedding());
+        float[] sourceVector = EmbeddingConverter.fromByteArray(sourceEmbedding.getEmbeddingVector());
 
         return claimEmbeddingRepository.findByClaimIdNot(claim.getId())
                 .stream()
                 .map(e -> {
 
-                    float[] targetVector = EmbeddingConverter.fromByteArray(e.getContextEmbedding());
+                    float[] targetVector = EmbeddingConverter.fromByteArray(e.getEmbeddingVector());
 
                     double score = cosineSimilarity(sourceVector, targetVector);
 
@@ -54,6 +55,9 @@ public class SimilaritySearchService {
     }
 
     private double cosineSimilarity(float[] a, float[] b) {
+        if (a.length != b.length) {
+            throw new BadRequestException("Розмірність embedding-векторів не збігається");
+        }
 
         double dot = 0.0;
         double normA = 0.0;

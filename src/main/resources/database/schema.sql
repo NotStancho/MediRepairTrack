@@ -370,10 +370,8 @@ CREATE TABLE IF NOT EXISTS `MediRepairTrack`.`claim_defect_category` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `MediRepairTrack`.`claim_embedding` (
   `fk_claim` INT NOT NULL,
-  `symptom_embedding` BLOB NOT NULL,
-  `symptom_dimension` INT NOT NULL,
-  `context_embedding` BLOB NOT NULL,
-  `context_dimension` INT NOT NULL,
+  `vector_embedding` BLOB NOT NULL,
+  `vector_dimension` INT NOT NULL,
   `model_name` VARCHAR(50) NOT NULL,
   `created_at` TIMESTAMP NOT NULL,
   PRIMARY KEY (`fk_claim`),
