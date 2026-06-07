@@ -36,11 +36,14 @@ public class EmbeddingService {
     }
 
     @Transactional
-    public void regenerateEmbedding(Claim claim) {
+    public void regenerateEmbedding(Integer claimId) {
 
-        if (claimEmbeddingRepository.existsById(claim.getId())) {
-            claimEmbeddingRepository.deleteById(claim.getId());
+        if (claimEmbeddingRepository.existsById(claimId)) {
+            claimEmbeddingRepository.deleteById(claimId);
         }
+
+        Claim claim = claimRepository.findById(claimId)
+                        .orElseThrow(() -> new NotFoundException("Заявка не знайдена"));
 
         generateEmbedding(claim);
     }
