@@ -22,12 +22,28 @@ public class DiagnosisPredictionListener {
     @Async
     @TransactionalEventListener(phase = AFTER_COMMIT)
     public void handleDiagnosisCreated(DiagnosisAutoCreatedEvent event) {
-        log.info("[EVENT] DiagnosisAutoCreated | diagnosisId={} | claimId={} | prediction=triggered",
+        log.info(
+                "[EVENT] DiagnosisAutoCreated | diagnosisId={} | claimId={} | prediction=started",
                 event.diagnosisId(),
                 event.claimId()
         );
 
-        embeddingService.generateIfMissing(event.claimId());
-        predictionService.generateAutoPrediction(event.diagnosisId());
+        try {
+            embeddingService.generateIfMissing(event.claimId());
+            predictionService.generateAutoPrediction(event.diagnosisId());
+
+            log.info(
+                    "[EVENT] DiagnosisAutoCreated | diagnosisId={} | claimId={} | prediction=completed",
+                    event.diagnosisId(),
+                    event.claimId()
+            );
+        } catch (RuntimeException ex) {
+            log.error(
+                    "[EVENT] DiagnosisAutoCreated | diagnosisId={} | claimId={} | prediction=failed",
+                    event.diagnosisId(),
+                    event.claimId(),
+                    ex
+            );
+        }
     }
 }
