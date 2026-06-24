@@ -25,6 +25,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PredictionAggregationService {
 
+    private final PredictionDemoDelayService demoDelayService;
+
     private final DiagnosisSimilarityResultService similarityResultService;
     private final DiagnosisPredictedWorkService predictedWorkService;
     private final DiagnosisPredictedWorkPartService predictedWorkPartService;
@@ -38,16 +40,39 @@ public class PredictionAggregationService {
     private final DiagnosisPredictionRepository diagnosisPredictionRepository;
 
     private final DiagnosisPermissionService permissionService;
+    private final DiagnosisPredictionJobService predictionJobService;
 
     @Transactional
     public void generatePredictionData(DiagnosisPrediction prediction) {
-        // 1. similarity search
-        similarityResultService.generateSimilarityResults(prediction);
+        Integer diagnosisId = prediction.getDiagnosis().getId();
 
+        demoDelayService.waitIfEnabled();
+        // 1. similarity search
+        predictionJobService.running(diagnosisId, 40, "SIMILARITY_SEARCH",
+                "Підбираємо схожі історичні заявки для порівняння."
+        );
+        demoDelayService.waitIfEnabled();
+        similarityResultService.generateSimilarityResults(prediction);
+        predictionJobService.running(diagnosisId, 50, "SIMILARITY_READY",
+                "Схожі заявки опрацьовано. Формуємо рекомендовані роботи."
+        );
+        demoDelayService.waitIfEnabled();
         // 2. predicted entities
         predictedWorkService.generatePredictedWorks(prediction);
+        predictionJobService.running(diagnosisId, 60, "WORKS_READY",
+                "Рекомендовані ремонтні роботи сформовано. Прогнозуємо потрібні запчастини."
+        );
+        demoDelayService.waitIfEnabled();
         predictedWorkPartService.generatePredictedWorkParts(prediction);
+        predictionJobService.running(diagnosisId, 70, "PARTS_READY",
+                "Потрібні запчастини спрогнозовано. Визначаємо ймовірні категорії дефектів."
+        );
+        demoDelayService.waitIfEnabled();
         predictedDefectService.generatePredictedDefects(prediction);
+        predictionJobService.running(diagnosisId, 78, "DEFECTS_READY",
+                "Ймовірні категорії дефектів сформовано. Розраховуємо підсумкові оцінки."
+        );
+        demoDelayService.waitIfEnabled();
 
         // 3. aggregated metrics
         calculatePredictedTimeHours(prediction);
@@ -57,9 +82,16 @@ public class PredictionAggregationService {
         calculatePredictedCost(prediction);
         calculateWarrantyProbability(prediction, similarityResults);
         calculateConfidenceScore(prediction, similarityResults);
-
+        predictionJobService.running(diagnosisId, 86, "METRICS_READY",
+                "Оцінку часу, вартості та впевненості розраховано. Визначаємо складність ремонту."
+        );
+        demoDelayService.waitIfEnabled();
         // 4. rule-based complexity
         calculatePredictedComplexityLevel(prediction);
+        predictionJobService.running(diagnosisId, 92, "COMPLEXITY_READY",
+                "Складність ремонту визначено. Готуємо пояснення прогнозу для інженера."
+        );
+        demoDelayService.waitIfEnabled();
 
         // 5. explanation (LLM)
         PredictionContext context = explanationService.build(prediction);
@@ -67,6 +99,10 @@ public class PredictionAggregationService {
         String explanation = explanationService.generateExplanation(context);
 
         prediction.setPredictionExplanation(explanation);
+        predictionJobService.running(diagnosisId, 96, "EXPLANATION_READY",
+                "Пояснення прогнозу підготовлено. Завершуємо оновлення діагностики."
+        );
+        demoDelayService.waitIfEnabled();
     }
 
     @Transactional

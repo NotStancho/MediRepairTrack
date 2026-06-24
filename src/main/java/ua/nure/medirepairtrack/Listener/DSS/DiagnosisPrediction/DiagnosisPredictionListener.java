@@ -6,8 +6,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 import ua.nure.medirepairtrack.Event.Diagnosis.DiagnosisAutoCreatedEvent;
+import ua.nure.medirepairtrack.Service.DSS.DiagnosisPredictionJobService;
 import ua.nure.medirepairtrack.Service.DSS.DiagnosisPredictionService;
 import ua.nure.medirepairtrack.Service.DSS.EmbeddingService;
+import ua.nure.medirepairtrack.Service.DSS.PredictionDemoDelayService;
 
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
@@ -16,8 +18,11 @@ import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMI
 @RequiredArgsConstructor
 public class DiagnosisPredictionListener {
 
+    private final PredictionDemoDelayService demoDelayService;
+
     private final DiagnosisPredictionService predictionService;
     private final EmbeddingService embeddingService;
+    private final DiagnosisPredictionJobService predictionJobService;
 
     @Async
     @TransactionalEventListener(phase = AFTER_COMMIT)
@@ -29,8 +34,31 @@ public class DiagnosisPredictionListener {
         );
 
         try {
+            predictionJobService.start(event.diagnosisId());
+            predictionJobService.running(
+                    event.diagnosisId(),
+                    5,
+                    "STARTING",
+                    "Починаємо автоматичне формування прогнозу."
+            );
+            demoDelayService.waitIfEnabled();
+            predictionJobService.running(
+                    event.diagnosisId(),
+                    15,
+                    "EMBEDDING",
+                    "Аналізуємо опис несправності та готуємо дані заявки."
+            );
+            demoDelayService.waitIfEnabled();
             embeddingService.generateIfMissing(event.claimId());
+            predictionJobService.running(
+                    event.diagnosisId(),
+                    25,
+                    "EMBEDDING_READY",
+                    "Опис несправності проаналізовано. Переходимо до прогнозування."
+            );
+            demoDelayService.waitIfEnabled();
             predictionService.generateAutoPrediction(event.diagnosisId());
+            predictionJobService.complete(event.diagnosisId());
 
             log.info(
                     "[EVENT] DiagnosisAutoCreated | diagnosisId={} | claimId={} | prediction=completed",
@@ -43,6 +71,10 @@ public class DiagnosisPredictionListener {
                     event.diagnosisId(),
                     event.claimId(),
                     ex
+            );
+            predictionJobService.fail(
+                    event.diagnosisId(),
+                    ex.getMessage() != null ? ex.getMessage() : "Невідома помилка під час формування прогнозу DSS"
             );
         }
     }

@@ -1,15 +1,17 @@
 // pages/claims/tabs/ClaimDiagnosisTab/DiagnosisCard.tsx
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { Diagnosis, DiagnosisStatus } from '../../../../types/diagnosis/diagnosis';
 import type { CreateManualPredictionPayload } from '../../../../types/diagnosis/DSS/diagnosisPredictionPayloads';
+import { useDiagnosisPredictionJob } from '../../../../hooks/diagnosis/useDiagnosisPredictionJob';
 
 import { formatDateTime } from '../../../../utils/formats/dateFormat';
 import { formatMoney } from '../../../../utils/formats/moneyFormat';
 import DiagnosisTypeBadge from '../../../../components/badges/DiagnosisTypeBadge';
 
 import DiagnosisStatusActions from './DiagnosisStatusActions';
+import DiagnosisPredictionJobProgress from './DiagnosisPredictionJobProgress';
 import PredictionSection from './PredictionSection';
 import CreatePredictionModal from './modals/CreatePredictionModal';
 
@@ -39,6 +41,7 @@ interface Props {
 
     creatingPrediction?: boolean;
     onCreatePrediction?: (payload: CreateManualPredictionPayload) => Promise<void>;
+    onPredictionJobCompleted?: () => Promise<void> | void;
 
     isPredictionOpen?: boolean;
     onTogglePrediction?: () => void;
@@ -57,10 +60,56 @@ export default function DiagnosisCard({
 
                                           isPredictionOpen, onTogglePrediction,
                                           creatingPrediction, onCreatePrediction,
+                                          onPredictionJobCompleted,
                                       }: Props) {
 
     const [createPredictionOpen, setCreatePredictionOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
+    const completedJobHandledRef = useRef<number | null>(null);
+
+    const {
+        job: predictionJob,
+        loading: predictionJobLoading,
+        connected: predictionJobConnected,
+        error: predictionJobError,
+        isActive: predictionJobActive,
+    } = useDiagnosisPredictionJob(diagnosis.id);
+
+    const isPredictionProcessing = predictionJobActive;
+
+    useEffect(() => {
+        if (
+            predictionJob?.status !== 'COMPLETED' ||
+            diagnosis.hasPrediction ||
+            completedJobHandledRef.current === diagnosis.id
+        ) {
+            return;
+        }
+
+        completedJobHandledRef.current = diagnosis.id;
+        void onPredictionJobCompleted?.();
+    }, [diagnosis.id, diagnosis.hasPrediction, onPredictionJobCompleted, predictionJob?.status]);
+
+    if (isPredictionProcessing) {
+        return (
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className={`
+                w-full rounded-lg border
+                ${selected
+                    ? 'border-brand shadow-sm bg-surface'
+                    : 'border-border bg-surface'}
+            `}
+            >
+                <DiagnosisPredictionJobProgress
+                    job={predictionJob}
+                    loading={predictionJobLoading}
+                    connected={predictionJobConnected}
+                    error={predictionJobError}
+                />
+            </div>
+        );
+    }
 
     return (
         <div
@@ -246,6 +295,10 @@ export default function DiagnosisCard({
 
                         {isPredictionOpen ? 'Згорнути прогноз' : 'Розгорнути прогноз'}
                     </button>
+                ) : predictionJobLoading ? (
+                    <div className="text-xs text-ink-muted">
+                        Перевіряємо стан автоматичного прогнозу...
+                    </div>
                 ) : (
                     <Button
                         onClick={(e) => {

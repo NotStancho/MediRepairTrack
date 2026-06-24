@@ -32,6 +32,7 @@ public class DiagnosisPredictionService {
 
     private final PredictionAggregationService predictionAggregationService;
     private final PredictionExplanationService predictionExplanationService;
+    private final DiagnosisPredictionJobService predictionJobService;
 
     private final PredictionStateService predictionStateService;
 
@@ -95,7 +96,10 @@ public class DiagnosisPredictionService {
             );
         }
 
-        // temporary
+        predictionJobService.running(diagnosisId, 30, "PREDICTION_RECORD",
+                "Створюємо базовий запис автоматичного прогнозу."
+        );
+
         ComplexityLevel complexity = complexityLevelService.getEntity(1);
 
         DiagnosisPrediction prediction = DiagnosisPrediction.builder()
@@ -113,7 +117,16 @@ public class DiagnosisPredictionService {
 
         DiagnosisPrediction savedPrediction = diagnosisPredictionRepository.save(prediction);
 
+        predictionJobService.running(diagnosisId, 35, "PREDICTION_RECORD_READY",
+                "Базовий прогноз створено. Обчислюємо рекомендації автоматичного прогнозу."
+        );
+
         predictionAggregationService.generatePredictionData(savedPrediction);
+
+        predictionJobService.running(diagnosisId, 98, "DIAGNOSIS_UPDATE",
+                "Оновлюємо попередню оцінку діагностики за результатами DSS."
+        );
+
         applyPredictionInitialValuesToDiagnosis(savedPrediction);
     }
 

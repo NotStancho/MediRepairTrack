@@ -136,6 +136,11 @@ export default function ClaimDiagnosisTab({ claimId }: Props) {
                         setSelectedDiagnosisId(payload.diagnosisId);
                         await loadAllowedStatuses(payload.diagnosisId);
                     }}
+                    onPredictionJobCompleted={async (diagnosisId) => {
+                        await refresh();
+                        setSelectedDiagnosisId(diagnosisId);
+                        await loadAllowedStatuses(diagnosisId);
+                    }}
                 />
             </section>
 

@@ -27,6 +27,7 @@ interface Props {
 
     creatingPrediction: boolean;
     onCreatePrediction: (payload: CreateManualPredictionPayload) => Promise<void>;
+    onPredictionJobCompleted?: (diagnosisId: number) => Promise<void> | void;
 }
 
 export default function DiagnosisList({
@@ -42,6 +43,7 @@ export default function DiagnosisList({
                                           onConfirm, onReject, onArchive, onDelete,
 
                                           creatingPrediction, onCreatePrediction,
+                                          onPredictionJobCompleted,
                                       }: Props) {
     const [openPredictionIds, setOpenPredictionIds] = useState<Set<number>>(() => new Set());
 
@@ -58,6 +60,16 @@ export default function DiagnosisList({
             return next;
         });
         onSelect(id);
+    };
+
+    const handlePredictionJobCompleted = async (diagnosisId: number) => {
+        setOpenPredictionIds(prev => {
+            const next = new Set(prev);
+            next.add(diagnosisId);
+            return next;
+        });
+
+        await onPredictionJobCompleted?.(diagnosisId);
     };
 
     if (!diagnoses.length) {
@@ -104,6 +116,7 @@ export default function DiagnosisList({
 
                     creatingPrediction={creatingPrediction}
                     onCreatePrediction={onCreatePrediction}
+                    onPredictionJobCompleted={() => handlePredictionJobCompleted(diagnosis.id)}
 
                     isPredictionOpen={openPredictionIds.has(diagnosis.id)}
                     onTogglePrediction={() => togglePrediction(diagnosis.id)}
