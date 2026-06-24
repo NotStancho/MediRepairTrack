@@ -299,6 +299,10 @@ export default function DiagnosisCard({
                     <div className="text-xs text-ink-muted">
                         Перевіряємо стан автоматичного прогнозу...
                     </div>
+                ) : diagnosis.diagnosisType === 'AUTOMATED' ? (
+                    <div className="text-xs text-ink-muted">
+                        Автоматичний прогноз формується або ще не створений.
+                    </div>
                 ) : (
                     <Button
                         onClick={(e) => {
