@@ -97,7 +97,7 @@ public class DiagnosisService {
 
         Diagnosis saved = diagnosisRepository.save(diagnosis);
 
-        eventPublisher.publishEvent(new DiagnosisAutoCreatedEvent(saved.getId(), claim.getId()));
+        eventPublisher.publishEvent(new DiagnosisAutoCreatedEvent(saved.getId(), claim.getId(), dto.getSimilaritySearchMode()));
 
         return map(saved);
     }

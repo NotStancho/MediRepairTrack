@@ -98,11 +98,14 @@ public class DiagnosisSimilarityResultService {
 
         Claim claim = prediction.getDiagnosis().getClaim();
 
-        List<SimilaritySearchService.SimilarClaim> similarClaims = similaritySearchService.findSimilarClaims(claim);
+        SimilaritySearchService.SimilaritySearchResult searchResult =
+                similaritySearchService.findSimilarClaims(claim, prediction.getSimilaritySearchMode());
+
+        prediction.setResolvedSimilaritySearchMode(searchResult.resolvedMode());
 
         int rank = 1;
 
-        for (var sc : similarClaims) {
+        for (var sc : searchResult.similarClaims()) {
 
             DiagnosisSimilarityResult entity =
                     DiagnosisSimilarityResult.builder()

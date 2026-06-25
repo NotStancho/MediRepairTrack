@@ -1,7 +1,10 @@
 // types/diagnosis/diagnosisPayloads.ts
 
+import type { SimilaritySearchMode } from './DSS/similaritySearchMode';
+
 export interface CreateAutoDiagnosisPayload {
     claimId: number;
+    similaritySearchMode?: SimilaritySearchMode;
 }
 
 export interface CreateManualDiagnosisPayload {

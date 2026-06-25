@@ -40,16 +40,16 @@ SELECT * FROM pricing_config;
 
 SELECT
     fk_claim,
-    context_embedding AS embedding,
-    context_dimension AS embedding_dimension,
+    embedding_vector AS embedding,
+    dimension AS embedding_dimension,
     model_name,
     created_at
 FROM claim_embedding;
 
 SELECT
     fk_claim,
-    LEFT(HEX(context_embedding), 48) AS embedding_preview,
-    context_dimension AS embedding_dimension,
+    LEFT(HEX(embedding_vector), 48) AS embedding_preview,
+    dimension AS embedding_dimension,
     model_name
 FROM claim_embedding
     LIMIT 5;

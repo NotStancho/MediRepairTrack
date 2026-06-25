@@ -7,6 +7,7 @@ import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.CreateManualPredic
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.DiagnosisPredictionResponseDTO;
 import ua.nure.medirepairtrack.DTO.DSS.DiagnosisPredictionDTO.UpdatePredictionDTO;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
+import ua.nure.medirepairtrack.Entity.DSS.Similarity.SimilaritySearchMode;
 import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.DiagnosisPrediction;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.PredictionSource;
@@ -72,6 +73,8 @@ public class DiagnosisPredictionService {
                 .predictionExplanation(dto.getPredictionExplanation())
                 .predictedWarrantyProbability(BigDecimal.ZERO) // default
                 .confidenceScore(BigDecimal.ZERO) // default
+                .similaritySearchMode(null)
+                .resolvedSimilaritySearchMode(null)
                 .modelVersion("manual")
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -82,7 +85,11 @@ public class DiagnosisPredictionService {
     }
 
     @Transactional
-    public void generateAutoPrediction(Integer diagnosisId) {
+    public void generateAutoPrediction(Integer diagnosisId, SimilaritySearchMode similaritySearchMode) {
+
+        SimilaritySearchMode requestMode = similaritySearchMode != null
+                ? similaritySearchMode
+                : SimilaritySearchMode.AUTO_HIERARCHICAL;
 
         Diagnosis diagnosis = diagnosisService.getDiagnosisEntity(diagnosisId);
 
@@ -111,6 +118,8 @@ public class DiagnosisPredictionService {
                 .predictionExplanation("Пояснення прогнозу ще не сформовано")
                 .predictedWarrantyProbability(BigDecimal.ZERO)
                 .confidenceScore(BigDecimal.ZERO)
+                .similaritySearchMode(requestMode)
+                .resolvedSimilaritySearchMode(null)
                 .modelVersion("similarity-v1")
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -260,6 +269,8 @@ public class DiagnosisPredictionService {
                 .predictionExplanation(p.getPredictionExplanation())
                 .predictedWarrantyProbability(p.getPredictedWarrantyProbability())
                 .confidenceScore(p.getConfidenceScore())
+                .similaritySearchMode(p.getSimilaritySearchMode())
+                .resolvedSimilaritySearchMode(p.getResolvedSimilaritySearchMode())
                 .modelVersion(p.getModelVersion())
                 .createdAt(p.getCreatedAt())
                 .updatedAt(p.getUpdatedAt())

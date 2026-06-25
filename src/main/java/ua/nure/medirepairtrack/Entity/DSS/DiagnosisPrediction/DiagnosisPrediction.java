@@ -2,6 +2,7 @@ package ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ua.nure.medirepairtrack.Entity.DSS.Similarity.SimilaritySearchMode;
 import ua.nure.medirepairtrack.Entity.diagnosis.Diagnosis.Diagnosis;
 import ua.nure.medirepairtrack.Entity.DSS.ComplexityLevel;
 
@@ -48,6 +49,14 @@ public class DiagnosisPrediction {
 
     @Column(name = "confidence_score", nullable = false)
     private BigDecimal confidenceScore;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "similarity_search_mode")
+    private SimilaritySearchMode similaritySearchMode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "resolved_similarity_search_mode")
+    private SimilaritySearchMode resolvedSimilaritySearchMode;
 
     @Column(name = "model_version", nullable = false)
     private String modelVersion;

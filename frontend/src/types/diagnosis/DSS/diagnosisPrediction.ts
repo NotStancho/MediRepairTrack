@@ -2,6 +2,7 @@
 
 import type { Probability } from '../../common/valueObjects'
 import type { ComplexityLevelShort } from './complexityLevel';
+import type { SimilaritySearchMode } from './similaritySearchMode';
 
 export type PredictionSource =
     | 'AUTOMATED'
@@ -22,6 +23,9 @@ export interface DiagnosisPrediction {
 
     predictedWarrantyProbability: Probability;
     confidenceScore: Probability;
+
+    similaritySearchMode: SimilaritySearchMode | null;
+    resolvedSimilaritySearchMode: SimilaritySearchMode | null;
 
     modelVersion: string;
 

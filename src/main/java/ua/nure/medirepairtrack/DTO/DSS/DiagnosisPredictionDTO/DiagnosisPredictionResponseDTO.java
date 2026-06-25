@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import ua.nure.medirepairtrack.DTO.DSS.ComplexityLevelDTO.ComplexityLevelShortDTO;
 import ua.nure.medirepairtrack.Entity.DSS.DiagnosisPrediction.PredictionSource;
+import ua.nure.medirepairtrack.Entity.DSS.Similarity.SimilaritySearchMode;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +28,9 @@ public class DiagnosisPredictionResponseDTO {
     private BigDecimal predictedWarrantyProbability;
 
     private BigDecimal confidenceScore;
+
+    private SimilaritySearchMode similaritySearchMode;
+    private SimilaritySearchMode resolvedSimilaritySearchMode;
 
     private String modelVersion;
 

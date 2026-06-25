@@ -7,6 +7,9 @@ import ModalFooter from '../../../../../ui/Modal/ModalFooter';
 import Button from '../../../../../ui/Button';
 import FormField from '../../../../../ui/FormField';
 import { inputBase } from '../../../../../ui/formStyles';
+import Select from '../../../../../ui/Select';
+
+import SimilaritySearchModeBadge from "../../../../../components/badges/SimilaritySearchModeBadge";
 
 import { useAuth } from '../../../../../context/AuthContext';
 
@@ -21,6 +24,13 @@ import type {
 } from '../../../../../types/diagnosis/diagnosisPayloads';
 
 import type { Diagnosis } from '../../../../../types/diagnosis/diagnosis';
+import type { SimilaritySearchMode } from '../../../../../types/diagnosis/DSS/similaritySearchMode';
+
+import {
+    SIMILARITY_SEARCH_MODE_DESCRIPTIONS,
+    SIMILARITY_SEARCH_MODE_LABELS,
+    SIMILARITY_SEARCH_MODE_OPTIONS,
+} from '../../../../../utils/similaritySearchModeLabels';
 
 interface Props {
     claimId: number;
@@ -42,6 +52,7 @@ export default function CreateDiagnosisModal({
     const canManual = isEngineer || isManager;
 
     const [mode, setMode] = useState<'AUTO' | 'MANUAL'>('AUTO');
+    const [similaritySearchMode, setSimilaritySearchMode] = useState<SimilaritySearchMode>('AUTO_HIERARCHICAL');
 
     const [form, setForm] = useState({
         preliminaryConclusion: '',
@@ -59,7 +70,10 @@ export default function CreateDiagnosisModal({
             let res: Diagnosis;
 
             if (mode === 'AUTO') {
-                const payload: CreateAutoDiagnosisPayload = { claimId };
+                const payload: CreateAutoDiagnosisPayload = {
+                    claimId,
+                    similaritySearchMode
+                };
                 res = await createAutoDiagnosis(payload);
             } else {
                 const payload: CreateManualDiagnosisPayload = {
@@ -117,8 +131,31 @@ export default function CreateDiagnosisModal({
             </div>
 
             {mode === 'AUTO' && (
-                <div className="text-sm text-ink-muted">
-                    Система автоматично сформує діагностику на основі аналізу опису несправності.
+                <div className="space-y-3">
+                    <div className="text-sm text-ink-muted">
+                        Система автоматично сформує діагностику на основі аналізу опису несправності.
+                    </div>
+
+                    <FormField label="Стратегія пошуку схожих заявок">
+                        <Select<SimilaritySearchMode, SimilaritySearchMode>
+                            value={similaritySearchMode}
+                            onChange={setSimilaritySearchMode}
+                            options={SIMILARITY_SEARCH_MODE_OPTIONS}
+                            getLabel={(mode) => SIMILARITY_SEARCH_MODE_LABELS[mode]}
+                            getValue={(mode) => mode}
+                            renderOption={(mode) =>
+                                    <SimilaritySearchModeBadge mode={mode} shape="rounded" />
+                            }
+                            renderValue={(mode) =>
+                                <SimilaritySearchModeBadge mode={mode} shape="rounded" />
+                            }
+                            placeholder="Оберіть режим пошуку"
+                        />
+                    </FormField>
+
+                    <div className="rounded-lg border border-border bg-surface-muted px-3 py-2 text-xs text-ink-muted">
+                        {SIMILARITY_SEARCH_MODE_DESCRIPTIONS[similaritySearchMode]}
+                    </div>
                 </div>
             )}
 

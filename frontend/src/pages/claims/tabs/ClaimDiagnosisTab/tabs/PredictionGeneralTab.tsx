@@ -11,6 +11,7 @@ import MetricCard from '../../../../../components/MetricCard';
 import ConfirmBox from '../../../../../ui/ConfirmBox';
 
 import { FiEdit2, FiRefreshCw } from 'react-icons/fi';
+import SimilaritySearchModeBadge from '../../../../../components/badges/SimilaritySearchModeBadge';
 
 interface Props {
     prediction: DiagnosisPrediction;
@@ -40,26 +41,57 @@ export default function PredictionGeneralTab({
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap justify-between items-center gap-3">
-                <div className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-                    <Badge
-                        colorClassName="bg-gray-100 text-gray-600"
-                        shape="rounded"
-                    >
-                        {prediction.modelVersion}
-                    </Badge>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-ink-muted">
+                    <div className="flex items-center gap-2">
+                        <span className="text-ink-muted">Версія:</span>
 
-                    <span>
-                        Створено: {formatDateTime(prediction.createdAt)}
-                    </span>
+                        <Badge
+                            colorClassName="bg-gray-100 text-gray-600"
+                            shape="rounded"
+                        >
+                            {prediction.modelVersion}
+                        </Badge>
+                    </div>
 
-                    {prediction.updatedAt && (
-                        <>
-                            <span>·</span>
-                            <span>
-                                Оновлено: {formatDateTime(prediction.updatedAt)}
-                            </span>
-                        </>
+                    {(prediction.similaritySearchMode || prediction.resolvedSimilaritySearchMode) && (
+                        <div className="flex items-center gap-2 border-l border-border pl-3">
+                            <span className="text-ink-muted">Пошук:</span>
+
+                            {prediction.similaritySearchMode && (
+                                <SimilaritySearchModeBadge
+                                    mode={prediction.similaritySearchMode}
+                                    shape="rounded"
+                                />
+                            )}
+
+                            {prediction.resolvedSimilaritySearchMode &&
+                                prediction.resolvedSimilaritySearchMode !== prediction.similaritySearchMode && (
+                                    <>
+                                        <span className="text-ink-soft">→</span>
+
+                                        <SimilaritySearchModeBadge
+                                            mode={prediction.resolvedSimilaritySearchMode}
+                                            shape="rounded"
+                                        />
+                                    </>
+                                )}
+                        </div>
                     )}
+
+                    <div className="flex flex-wrap items-center gap-2 border-l border-border pl-3">
+                        <span>
+                            Створено: {formatDateTime(prediction.createdAt)}
+                        </span>
+
+                        {prediction.updatedAt && (
+                            <>
+                                <span>·</span>
+                                <span>
+                                    Оновлено: {formatDateTime(prediction.updatedAt)}
+                                </span>
+                            </>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">

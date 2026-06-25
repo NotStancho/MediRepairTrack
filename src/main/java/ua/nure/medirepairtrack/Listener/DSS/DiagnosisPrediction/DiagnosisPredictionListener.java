@@ -57,7 +57,7 @@ public class DiagnosisPredictionListener {
                     "Опис несправності проаналізовано. Переходимо до прогнозування."
             );
             demoDelayService.waitIfEnabled();
-            predictionService.generateAutoPrediction(event.diagnosisId());
+            predictionService.generateAutoPrediction(event.diagnosisId(), event.similaritySearchMode());
             predictionJobService.complete(event.diagnosisId());
 
             log.info(

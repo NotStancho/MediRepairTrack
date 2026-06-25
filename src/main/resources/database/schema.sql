@@ -564,6 +564,8 @@ CREATE TABLE IF NOT EXISTS `MediRepairTrack`.`diagnosis_prediction` (
   `prediction_explanation` TEXT NOT NULL,
   `predicted_warranty_probability` DECIMAL(5,4) NOT NULL,
   `confidence_score` DECIMAL(5,4) NOT NULL,
+  `similarity_search_mode` ENUM('AUTO_HIERARCHICAL', 'SAME_MODEL', 'SAME_MANUFACTURER_AND_EQUIPMENT_TYPE', 'SAME_EQUIPMENT_TYPE', 'SAME_MANUFACTURER', 'ALL') NULL,
+  `resolved_similarity_search_mode` ENUM('AUTO_HIERARCHICAL', 'SAME_MODEL', 'SAME_MANUFACTURER_AND_EQUIPMENT_TYPE', 'SAME_EQUIPMENT_TYPE', 'SAME_MANUFACTURER', 'ALL') NULL,
   `model_version` VARCHAR(50) NOT NULL,
   `created_at` TIMESTAMP NOT NULL,
   `updated_at` TIMESTAMP NULL,
